@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,4 +26,6 @@ Route::get('/db-check', function () {
         return "Could not connect to the database. Please check your configuration. error:" . $e;
     }
 });
+
+Route::get('/viewstaff', [UserController::class, 'index']);
 
