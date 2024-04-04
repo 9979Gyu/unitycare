@@ -35,6 +35,8 @@ Route::post('/storeadmin', [UserController::class, 'storeAdmin'])->name('user.st
 Route::get('/register', [UserController::class, 'register']);
 Route::get('/login', [UserController::class, 'login']);
 Route::post('/auth', [UserController::class, 'verifyUser']);
+Route::get('/edituser/{id}', [UserController::class, 'edit']);
+Route::post('/updateuser/{id}', [UserController::class, 'update']);
 
 
 

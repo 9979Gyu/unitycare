@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use DataTables;
 use Illuminate\Support\Facades\Hash;
+use Auth;
 
 class UserController extends Controller
 {
@@ -85,7 +86,6 @@ class UserController extends Controller
         if ($validator->fails()) {
             $errors = $validator->errors();
 
-            // Option 1: Loop through all errors and display them
             foreach ($errors->all() as $message) {
                 return redirect('/viewstaff')->with('error', $message);
             }
@@ -142,7 +142,6 @@ class UserController extends Controller
         if ($validator->fails()) {
             $errors = $validator->errors();
 
-            // Option 1: Loop through all errors and display them
             foreach ($errors->all() as $message) {
                 return redirect('/viewstaff')->with('error', $message);
             }
@@ -190,6 +189,15 @@ class UserController extends Controller
     public function edit($id)
     {
         //
+        $user = User::where([
+            ['id', $id],
+        ])->first();
+        if($user->roleID == 2){
+            return view('users.edit', compact('user'));
+        }
+        else{
+            return view('welcome');
+        }
     }
 
     /**
@@ -202,6 +210,50 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
         //
+        $rules = [
+            'name' => 'required',
+            'email' => 'required|unique:users,email,'. $id,
+            'username' => 'required|unique:users,username,'. $id,
+            'contactNo' => 'required|unique:users,contactNo,'. $id,
+            'address' => 'required',
+            'state' => 'required',
+            'city' => 'required',
+            'postalCode' => 'required',
+            'roleID' => 'required|in:2'
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            $errors = $validator->errors();
+
+            foreach ($errors->all() as $message) {
+                return redirect('/viewstaff')->with('error', $message);
+            }
+        }
+        else{
+
+            DB::table('users')
+                ->where('id', $id)
+                ->update([
+                    'name' => $request->get('name'),
+                    'email' => $request->get('email'),
+                    'username' => $request->get('username'),
+                    'contactNo' => $request->get('contactNo'),
+                    'address' => $request->get('address'),
+                    'state' => $request->get('state'),
+                    'city' => $request->get('city'),
+                    'postalCode' => $request->get('postalCode'),
+                    'status' => 1,
+                    'officeNo' => $request->get('officeNo'),
+                    'ICNo' => $request->get('ICNo'),
+                    'roleID' => $request->get('roleID'),
+                ]);
+
+            return redirect('/viewstaff')->with('success', 'Information updated');
+        }
+
+
     }
 
     /**
@@ -265,7 +317,6 @@ class UserController extends Controller
         if ($validator->fails()) {
             $errors = $validator->errors();
 
-            // Option 1: Loop through all errors and display them
             foreach ($errors->all() as $message) {
                 return redirect('/login')->with('error', $message);
             }
