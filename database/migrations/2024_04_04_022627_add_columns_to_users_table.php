@@ -15,11 +15,6 @@ class AddColumnsToUsersTable extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             //
-            $table->id('userID');
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->timestamp('emailVerifiedAt')->nullable();
-            $table->string('password');
             $table->string('username');
             $table->integer('contactNo');
             $table->string('address');
@@ -29,8 +24,6 @@ class AddColumnsToUsersTable extends Migration
             $table->integer('officeNo');
             $table->integer('ICNo');
             $table->integer('status');
-            $table->rememberToken();
-            $table->timestamps();
             $table->unsignedBigInteger('roleID');
             $table->foreign('roleID')->references('roleID')->on('roles')->onDelete('cascade');
         });
