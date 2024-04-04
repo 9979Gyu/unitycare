@@ -21,18 +21,10 @@
         .touppercase {
             text-transform: uppercase;
         }
-
-        .error {
-            color: red;
-        }
-
-        .success {
-            color: green;
-        }
     </style>
 </head>
 <body>
-    @include('headers.staffhead')
+    @include('headers.regishead')
     <div class="container mt-3">
         @yield('content')
     </div>

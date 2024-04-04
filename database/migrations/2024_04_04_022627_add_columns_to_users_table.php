@@ -21,8 +21,8 @@ class AddColumnsToUsersTable extends Migration
             $table->string('state');
             $table->string('city');
             $table->integer('postalCode');
-            $table->integer('officeNo');
-            $table->integer('ICNo');
+            $table->integer('officeNo')->nullable()->change();
+            $table->integer('ICNo')->nullable()->change();
             $table->integer('status');
             $table->unsignedBigInteger('roleID');
             $table->foreign('roleID')->references('roleID')->on('roles')->onDelete('cascade');

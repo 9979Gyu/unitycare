@@ -28,4 +28,14 @@ Route::get('/db-check', function () {
 });
 
 Route::get('/viewstaff', [UserController::class, 'index']);
+Route::get('/createstaff', [UserController::class, 'create']);
+Route::get('/getstaff', [UserController::class, 'getUsersDatatable'])->name('user.getAllDatatable');
+Route::post('/storestaff', [UserController::class, 'store'])->name('user.store');
+Route::post('/storeadmin', [UserController::class, 'storeAdmin'])->name('user.storeAdmin');
+Route::get('/register', [UserController::class, 'register']);
+Route::get('/login', [UserController::class, 'login']);
+Route::post('/auth', [UserController::class, 'verifyUser']);
+
+
+
 

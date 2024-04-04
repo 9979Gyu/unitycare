@@ -1,12 +1,12 @@
-@extends('layouts.app')
+@extends('layouts.master')
 @section('title')
-    UnityCare-Staff
+    UnityCare-Registration
 @endsection
 @section('content')
 
-    <h2>Staff</h2>
+    <h2>Registration</h2>
     <br>
-    <form action="/storestaff" method="post" class="container">
+    <form action="/storeadmin" method="post" class="container">
         @csrf
         <div class="mb-3">
             <h5>Personal Information</h5>
@@ -87,7 +87,7 @@
             <label for="password" class="col-sm-2 col-form-label required">Password</label>
             <div class="col-sm-10">
                 <input type="password" name="password" class="form-control" id="password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Must contain at least one  number and one uppercase and lowercase letter, and at least 8 or more characters">
-                <input type="number" name="roleID" value="2" hidden>
+                <input type="number" name="roleID" value="1" hidden>
             </div>
         </div>
 

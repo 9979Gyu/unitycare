@@ -1,3 +1,9 @@
+$(document).ready(function(){
+    $("#state").load(function(){
+        displayState();
+    })
+});
+
 function displayState(){
     var state = ["Kelantan", "Melaka", 'Negeri Sembilan'];
     
@@ -10,7 +16,6 @@ function displayState(){
         option.text = state[i];
         select.appendChild(option);
     }
-
 }
 
 function displayCity(state){
