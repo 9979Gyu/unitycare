@@ -7,7 +7,7 @@
         <div class="collapse navbar-collapse" id="navbar1">
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link" href="#">User</a>
+                    <a class="nav-link" href="/viewstaff">User</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#">Program</a>

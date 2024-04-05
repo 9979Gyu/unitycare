@@ -286,7 +286,7 @@ class UserController extends Controller
                 $table->addColumn('action', function ($row) {
                     $token = csrf_token();
                     $btn = '<div class="d-flex justify-content-center">';
-                    $btn = $btn . '<span class="badge badge-warning"> Edit </span></div>';
+                    $btn = $btn . '<a href="/edituser/' . $row->id . '"><span class="badge badge-warning"> Edit </span></a></div>';
                     $btn = $btn . '<span class="badge badge-danger"> Remove </span></div>';
 
                     return $btn;
@@ -295,8 +295,10 @@ class UserController extends Controller
                 $table->rawColumns(['action']);
                 return $table->make(true);
             }
-
+            
         }
+
+        return view('users.index');
     }
 
     /**

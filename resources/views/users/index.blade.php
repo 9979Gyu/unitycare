@@ -54,11 +54,11 @@
 
                 },
                 'columnDefs': [{
-                    "targets": [0], // your case first column
+                    "targets": [0],
                     "className": "text-center",
                     "width": "2%"
                 }, {
-                    "targets": [1, 2, 3, 4, 5, 6, 7, 8, 9], // your case first column
+                    "targets": [1, 2, 3, 4, 5],
                     "className": "text-center",
                 },],
                 
