@@ -6,12 +6,13 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
     <title>@yield('title')</title>
+    <!-- icon not show. (reason: "") -->
+    <link rel="icon" href="{{ asset('images/applogo2.png') }}" type="image/png">
     
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <!-- Style -->
-    <!-- failed to refer to the css (reason: "") -->
     <link href="{{ asset('css/style.css') }}" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
@@ -37,7 +38,7 @@
                         <h5>Hubungi Kami</h5>
                         <ul class="nav flex-column">
                             <li class="nav-item mb-3"><a href="#" class="nav-link p-0 text-white">Telefon: 60129231224</a></li>
-                            <li class="nav-item mb-3"><a href="#" class="nav-link p-0 text-white">Emel: B032220008@student.utem.edu.my</a></li>
+                            <li class="nav-item mb-3"><a href="mailto:B032220008@student.utem.edu.my" class="nav-link p-0 text-white">Emel: B032220008@student.utem.edu.my</a></li>
                             <li class="nav-item mb-3"><a href="#" class="nav-link p-0 text-white">Alamat: Universiti Teknikal Malaysia Melaka, Hang Tuah Jaya, Durian Tunggal, 76100, Melaka, Malaysia.</a></li>
                         </ul>
                     </div>
