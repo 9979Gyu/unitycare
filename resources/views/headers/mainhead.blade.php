@@ -39,7 +39,7 @@
                         <b>Pengguna</b>
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <li><a class="dropdown-item" href="/viewstaff"><b>Log Masuk</b></a></li>
+                        <li><a class="dropdown-item" href="/login"><b>Log Masuk</b></a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="/createstaff"><b>Sukarelawan</b></a></li>
                     </ul>

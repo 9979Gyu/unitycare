@@ -25,15 +25,15 @@
         <form action="/auth" method="post">
             @csrf
             <div class="row mb-3">
-                <label for="fname" class="col-sm-2 col-form-label required">Nama Pengguna</label>
-                <div class="col-sm-4">
+                <label for="fname" class="col-sm-3 col-form-label required">Nama Pengguna</label>
+                <div class="col-sm-5">
                     <input type="text" name="username" class="form-control" id="username" required>
                 </div>
             </div>
 
             <div class="row mb-3">
-                <label for="lname" class="col-sm-2 col-form-label required">Kata Laluan</label>
-                <div class="col-sm-4">
+                <label for="lname" class="col-sm-3 col-form-label required">Kata Laluan</label>
+                <div class="col-sm-5">
                     <input type="password" name="password" class="form-control" id="pwd" required>
                 </div>
             </div>
