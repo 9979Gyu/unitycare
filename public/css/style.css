@@ -22,26 +22,43 @@ body{
     color: green;
 }
 
-.navCustom{
+.navCustom {
     background-color: #2176e9;
 }
 
-.switchBgTextBtn{
+.banner {
+    padding: 5px;
+    background-color: #2277e9;
+    color: white;
+}
+
+.big-button {
+    width: 200px;
+    height: 250px;
+    border: none;
+    border-radius: 10%;
+}
+
+.big-button p{
+    font-size: 30px;
+}
+
+.switchBgTextBtn {
     background-color: white;
     color: #2176e9;
 }
 
-.switchBgTextBtn:hover{
+.switchBgTextBtn:hover {
     background-color: white;
     color: #135bbb;
 }
 
-.flex{
+.flex {
     margin: 2%;
     display: flex;
 }
 
-.flex img{
+.flex img {
     border-radius: 50%;
     width: 10%;
     height: auto;

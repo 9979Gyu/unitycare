@@ -72,32 +72,34 @@ class UserController extends Controller
     public function store(Request $request)
     {
 
-        $rules = [
-            'name' => 'required',
-            'email' => 'required|unique:users,email',
-            'password' => 'required',
-            'username' => 'required|unique:users,username',
-            'contactNo' => 'required|unique:users,contactNo',
-            'address' => 'required',
-            'state' => 'required',
-            'city' => 'required',
-            'postalCode' => 'required',
-            'roleID' => 'required|in:1,2,3,4,5'
-        ];
+        $roleID = $request->get('roleID');
 
-        $validator = Validator::make($request->all(), $rules);
-
-        if ($validator->fails()) {
-            $errors = $validator->errors();
-
-            foreach ($errors->all() as $message) {
-                return redirect('/viewstaff')->with('error', $message);
-            }
+        if($roleID == 1 || $roleID == 2 || $roleID == 4 || $roleID == 5){
+            // store as admin / staff / volunteer / poor people
+            $rules = [
+                'name' => 'required',
+                'ICNo' => 'required',
+                'email' => 'required|unique:users,email',
+                'password' => 'required',
+                'username' => 'required|unique:users,username',
+                'contactNo' => 'required|unique:users,contactNo',
+                'address' => 'required',
+                'state' => 'required',
+                'city' => 'required',
+                'postalCode' => 'required',
+                'roleID' => 'required|in:1,2,4'
+            ];
         }
-        else{
+        else if($roleID == 3){
+            // store as enterprise
+            
+        }
 
+        $validated = $request->validate($rules);
+
+        if($validated){
             $user = new User([
-                'name' => $request->get('fname') . ' ' . $request->get('lname'),
+                'name' => $request->get('name'),
                 'email' => $request->get('email'),
                 'password' => Hash::make($request->get('password')),
                 'username' => $request->get('username'),
@@ -114,8 +116,23 @@ class UserController extends Controller
 
             $user->save();
 
-            return redirect('/viewstaff')->with('success', 'user is added');
+            if($roleID == 1 || $roleID == 2)
+                return redirect('/viewstaff')->with('success', 'Pengguna berjaya didaftarkan');
+            else
+                return redirect('/login')->with('success', 'Pengguna berjaya didaftarkan');
         }
+        else{
+            $validator = Validator::make($request->all(), $rules);
+            if ($validator->fails()) {
+                $errors = $validator->errors();
+    
+                return redirect()->back()
+                    ->withInput($request->all())
+                    ->withErrors(['message' => $errors->all]);
+
+            }
+        }
+
     }
 
     /**

@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\PostcodeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,11 +36,14 @@ Route::get('/login', function () {
 Route::post('/auth', [UserController::class, 'verifyUser']);
 Route::post('/logout', [UserController::class, 'logout']);
 
-Route::get('/viewstaff', [UserController::class, 'index']);
+
 Route::get('/create/{roleNo}', [UserController::class, 'create']);
+Route::post('/store', [UserController::class, 'store']);
+
+Route::get('/viewstaff', [UserController::class, 'index']);
 
 Route::get('/getstaff', [UserController::class, 'getUsersDatatable'])->name('user.getAllDatatable');
-Route::post('/storestaff', [UserController::class, 'store'])->name('user.store');
+
 Route::post('/storeadmin', [UserController::class, 'storeAdmin'])->name('user.storeAdmin');
 Route::get('/register', [UserController::class, 'register']);
 
@@ -51,4 +55,6 @@ Route::post('/deleteuser/{id}', [UserController::class, 'destroy']);
 // Volunteer
 
 
+// Postcode - search state and cities
+Route::get('/search', [PostcodeController::class, 'search']);
 

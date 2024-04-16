@@ -6,7 +6,7 @@
 
     <h2>Staff</h2>
     <br>
-    <form action="/storestaff" method="post" class="container">
+    <form action="/store" method="post" class="container">
         @csrf
         <div class="mb-3">
             <h5>Personal Information</h5>
@@ -100,76 +100,4 @@
 
     </form>
     <br>
-    <script>
-        $(document).ready(function(){
-            displayStateAndCity();
-
-            function displayStateAndCity(){
-
-                // array of state and cities
-                var states = ["Kelantan", "Melaka", 'Negeri Sembilan'];
-                var cities = {"kelantan": [
-                        "Gua Musang",
-                        "Jeli",
-                        "Ketereh",
-                        "Kota Bharu",
-                        "Kuala Krai",
-                        "Pasir Mas",
-                        "Machang",
-                        "Tanah Merah",
-                        "Tumpat"
-                    ],
-                    "melaka": [
-                        "Alor Gajah",
-                        "Ayer Keroh",
-                        "Ayer Molek",
-                        "Batu Berendam",
-                        "Bemban",
-                        "Bukit Baru",
-                        "Bukit Rambai",
-                        "Jasin",
-                        "Klebang Besar",
-                        "Kuala Sungai Baru",
-                        "Masjid Tanah",
-                        "Melaka",
-                        "Pulau Sebang",
-                        "Sungai Udang"
-                    ],
-                    "negeri sembilan": [
-                        "Bahau",
-                        "Seremban",
-                        "Kuala Pilah",
-                        "Nilai",
-                        "Port Dickson"
-                    ],
-                };
-                
-                // clear the dropdown and create default options
-                $('#state').empty().append("<option value='' disabled selected>Select state</option>");
-                $('#city').empty().append("<option value='' disabled selected>Select city</option>");
-
-                $.each(states, function(index, stateName){
-                    $("#state").append("<option value='"+ stateName + "'>" + stateName + "</option>");
-                });
-
-                function updateCity(selectedState){
-                    if(cities.hasOwnProperty(selectedState.toLowerCase())){
-                        $('#city').empty().append("<option value='' disabled selected>Select city</option>");
-                        $.each(cities[selectedState.toLowerCase()], function(index, cityName) {
-                            $("#city").append("<option value='" + cityName + "'>" + cityName + "</option>");
-                        });
-                    }
-                    else{
-                        console.error("Invalid state:", selectedState);
-                    }
-                }   
-
-                $("#state").change(function(){
-                    var selectedState = $(this).val();
-                    updateCity(selectedState);
-                });
-            }
-        });
-    </script>
-    
 @endsection
