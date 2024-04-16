@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use DataTables;
 use Illuminate\Support\Facades\Hash;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -26,17 +26,6 @@ class UserController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function login()
-    {
-        //
-        return view('users.login');
-    }
-
-    /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response
@@ -46,6 +35,13 @@ class UserController extends Controller
         //
         if($roleNo == 1){
             // show add admin page
+            if (Auth::check() && Auth::user()->roleID === 1) {
+                // User is logged in and has roleID of 6
+                return view('users.adminReg');
+            } else {
+                // User is not logged in or doesn't have roleID of 6
+                echo "You are not authorized to access this page.";
+            }
         }
         else if($roleNo == 2){
             // show add staff page
@@ -68,28 +64,6 @@ class UserController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function createVolunteer()
-    {
-        //
-        return view('users.add');
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function register()
-    {
-        //
-        return view('users.adminReg');
-    }
-
-    /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -99,8 +73,7 @@ class UserController extends Controller
     {
 
         $rules = [
-            'fname' => 'required',
-            'lname' => 'required',
+            'name' => 'required',
             'email' => 'required|unique:users,email',
             'password' => 'required',
             'username' => 'required|unique:users,username',
@@ -353,46 +326,27 @@ class UserController extends Controller
      */
     public function verifyUser(Request $request)
     {   
-        $rules = [
-            'password' => 'required',
-            'username' => 'required',
-        ];
 
-        $validator = Validator::make($request->all(), $rules);
+        // validate the user data
+        $request->validate([
+            'username' => "required",
+            'password' => "required",
+        ]);
 
-        if ($validator->fails()) {
-            $errors = $validator->errors();
-
-            foreach ($errors->all() as $message) {
-                return redirect('/login')->with('error', $message);
-            }
+        // Attempt to log user in
+        if(Auth::attempt(['username' => $request->username, 'password' => $request->password])){
+            return redirect('/');
         }
-        else{
 
-            $password = $request->get('password');
-            $username = $request->get('username');
+        return redirect()->back()
+            ->withInput($request->only('username'))
+            ->withErrors(['message' => 'Nama Pengguna atau Kata Laluan Tidak Sah']);
 
-            $selectedUser = DB::table('users')
-            ->where([
-                ['users.username', $username],
-            ])
-            ->first();
+    }
 
-            if(isset($selectedUser)){
-                dd($selectedUser);
-                if (Hash::check($password, $selectedUser->password)){
-                    if($selectedUser->roleID == 1)
-                        return redirect('/viewstaff')->with('success', 'Welcome admin');
-                    else
-                        return redirect('/welcome');
-                }
-                else{
-                    return redirect('/login')->with('error', 'Wrong username or password');
-                }
-                
-            }
-
-            
-        }
+    public function logout()
+    {
+        Auth::logout();
+        return redirect('/login')->with('success', 'Berjaya Log Keluar');
     }
 }

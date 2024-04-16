@@ -39,7 +39,20 @@
                         <b>Pengguna</b>
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <li><a class="dropdown-item" href="/login"><b>Log Masuk</b></a></li>
+                        <li>
+                            @if(Auth::check())
+                                <form class="dropdown-item" method="POST" action="/logout">
+                                    @csrf
+                                    <button type="submit" style="background: none!important; border: none; cursor: pointer;">
+                                        <b>Logout</b>
+                                    </button>
+                                </form>
+                            @else
+                                <a class="dropdown-item" href="/login">
+                                    <b>Log Masuk</b>
+                                </a>
+                            @endif                                
+                        </li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="/createstaff"><b>Sukarelawan</b></a></li>
                     </ul>

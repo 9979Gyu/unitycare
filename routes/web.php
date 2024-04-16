@@ -33,6 +33,7 @@ Route::get('/login', function () {
 });
 
 Route::post('/auth', [UserController::class, 'verifyUser']);
+Route::post('/logout', [UserController::class, 'logout']);
 
 Route::get('/viewstaff', [UserController::class, 'index']);
 Route::get('/create/{roleNo}', [UserController::class, 'create']);

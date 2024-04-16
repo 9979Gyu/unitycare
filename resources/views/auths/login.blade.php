@@ -13,21 +13,26 @@
         </div>
     @endif
 
-    @if (session()->has('error'))
+    @if ($errors->any())
         <div class="alert alert-danger">
-            {{ session('error') }}
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
         </div>
     @endif
 
     <h2>Login</h2>
     <br>
+    
     <div class="container">
         <form action="/auth" method="post">
             @csrf
             <div class="row mb-3">
                 <label for="fname" class="col-sm-3 col-form-label required">Nama Pengguna</label>
                 <div class="col-sm-5">
-                    <input type="text" name="username" class="form-control" id="username" required>
+                    <input type="text" value="{{ old('username') }}" name="username" class="form-control" id="username" required>
                 </div>
             </div>
 
