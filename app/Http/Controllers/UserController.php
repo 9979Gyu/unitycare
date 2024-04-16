@@ -41,7 +41,38 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create($roleNo)
+    {
+        //
+        if($roleNo == 1){
+            // show add admin page
+        }
+        else if($roleNo == 2){
+            // show add staff page
+            return view('users.add');
+        }
+        else if($roleNo == 3){
+            // show add enterprise page
+        }
+        else if($roleNo == 4){
+            // show add volunteer page
+            return view('volunteers.add');
+        }
+        else if($roleNo == 5){
+            // show add poor people page
+        }
+        else{
+            // show landing page
+        }
+        
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function createVolunteer()
     {
         //
         return view('users.add');
@@ -265,6 +296,18 @@ class UserController extends Controller
     public function destroy($id)
     {
         //
+        $result = DB::table('users')
+            ->where('id', $id)
+            ->update([
+                'status' => 0,
+            ]);
+
+        if($result){
+            return redirect('/viewstaff')->with('success', 'Successfully Deleted');
+        }
+        else{
+            return redirect('/viewstaff')->with('error', 'Failed to Delete');
+        }
     }
 
     public function getUsersDatatable(Request $request)
@@ -281,13 +324,14 @@ class UserController extends Controller
             ->get();
 
             if(isset($selectedUsers)){
+
                 $table = Datatables::of($selectedUsers);
 
                 $table->addColumn('action', function ($row) {
                     $token = csrf_token();
                     $btn = '<div class="d-flex justify-content-center">';
                     $btn = $btn . '<a href="/edituser/' . $row->id . '"><span class="badge badge-warning"> Edit </span></a></div>';
-                    $btn = $btn . '<span class="badge badge-danger"> Remove </span></div>';
+                    $btn = $btn . '<a class="deleteAnchor" href="#" id="' . $row->id . '"><span class="badge badge-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"> Remove </span></a></div>';
 
                     return $btn;
                 });
@@ -335,6 +379,7 @@ class UserController extends Controller
             ->first();
 
             if(isset($selectedUser)){
+                dd($selectedUser);
                 if (Hash::check($password, $selectedUser->password)){
                     if($selectedUser->roleID == 1)
                         return redirect('/viewstaff')->with('success', 'Welcome admin');

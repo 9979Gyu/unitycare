@@ -1,0 +1,48 @@
+body{
+    background-color: white;
+    color: #0e1012;
+}
+
+.required:after {
+    content: "*";
+    color: red;
+    font-weight: bold;
+    margin-left: 5px;
+}
+
+.touppercase {
+    text-transform: uppercase;
+}
+
+.error {
+    color: red;
+}
+
+.success {
+    color: green;
+}
+
+.navCustom{
+    background-color: #2176e9;
+}
+
+.switchBgTextBtn{
+    background-color: white;
+    color: #2176e9;
+}
+
+.switchBgTextBtn:hover{
+    background-color: white;
+    color: #135bbb;
+}
+
+.flex{
+    margin: 2%;
+    display: flex;
+}
+
+.flex img{
+    border-radius: 50%;
+    width: 10%;
+    height: auto;
+}

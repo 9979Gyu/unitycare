@@ -9,13 +9,13 @@
     <br>
 
     @if (session()->has('success'))
-        <div class="alert alert-success">
+        <div class="alert alert-success condition-message">
             {{ session('success') }}
         </div>
     @endif
 
     @if (session()->has('error'))
-        <div class="alert alert-danger">
+        <div class="alert alert-danger condition-message">
             {{ session('error') }}
         </div>
     @endif
@@ -28,7 +28,7 @@
                     <th>Name</th>
                     <th>Email</th>
                     <th>Username</th>
-                    <th>Contact No</th>
+                    <th>Contact No (60+)</th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -37,12 +37,33 @@
         </table>
     </div>
 
+    <!-- Modal -->
+    <div class="modal fade" id="deleteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="deleteModalLabel">Remove Staff</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            Are you sure to remove the staff?
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-danger" id="delete">Delete</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+        </div>
+    </div>
+    </div>
+
     <script>
     $(document).ready(function() {
-        console.log("hi");
+
+        var requestTable;
+
         fetch_data();
         function fetch_data() {
-            $('#requestTable').DataTable({
+            requestTable = $('#requestTable').DataTable({
                 processing: true,
                 serverSide: true,
                 ajax: {
@@ -91,7 +112,7 @@
                     data: "contactNo",
                     name: 'contactNo',
                     orderable: true,
-                    searchable: true
+                    searchable: true,
                 },{
                     data: 'action',
                     name: 'action',
@@ -100,7 +121,6 @@
                 }, ]
                 
             });
-            console.log("123");
         }
 
         // csrf token for ajax
@@ -109,6 +129,24 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
+
+        $('#delete').click(function() {
+            $.ajax({
+                type: 'POST',
+                dataType: 'html',
+                url: "/deleteuser/" + $(".deleteAnchor").attr('id'),
+                success: function(data) {
+                    $('#deleteModal').modal('hide');
+                    $('.condition-message').html(data);
+
+                    requestTable.ajax.reload();
+                },
+                error: function (data) {
+                    $('.condition-message').html(data);
+                }
+            })
+        });
+
     });
     </script>
 

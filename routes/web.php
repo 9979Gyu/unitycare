@@ -15,7 +15,8 @@ use App\Http\Controllers\UserController;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    // return view('welcome');
+    return view('/landings/index');
 });
 
 Route::get('/db-check', function () {
@@ -27,17 +28,26 @@ Route::get('/db-check', function () {
     }
 });
 
+Route::get('/login', function () {
+    return view('/auths/login');
+});
+
+Route::post('/auth', [UserController::class, 'verifyUser']);
+
 Route::get('/viewstaff', [UserController::class, 'index']);
-Route::get('/createstaff', [UserController::class, 'create']);
+Route::get('/create/{roleNo}', [UserController::class, 'create']);
+
 Route::get('/getstaff', [UserController::class, 'getUsersDatatable'])->name('user.getAllDatatable');
 Route::post('/storestaff', [UserController::class, 'store'])->name('user.store');
 Route::post('/storeadmin', [UserController::class, 'storeAdmin'])->name('user.storeAdmin');
 Route::get('/register', [UserController::class, 'register']);
-Route::get('/login', [UserController::class, 'login']);
-Route::post('/auth', [UserController::class, 'verifyUser']);
+
 Route::get('/edituser/{id}', [UserController::class, 'edit']);
 Route::post('/updateuser/{id}', [UserController::class, 'update']);
+Route::post('/deleteuser/{id}', [UserController::class, 'destroy']);
 
+
+// Volunteer
 
 
 

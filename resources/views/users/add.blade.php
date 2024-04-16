@@ -94,7 +94,7 @@
         <div class="row">
             <div class="col-sm-10 offset-sm-2">
                 <button type="submit" class="btn btn-primary">Submit</button>
-                <button type="button" class="btn btn-secondary">Close</button>
+                <button type="button" class="btn btn-secondary" onclick="window.history.back();">Close</button>
             </div>
         </div>
 
