@@ -1,172 +1,147 @@
 @extends('layouts.app')
 @section('title')
-    UnityCare-User
+    UnityCare-Edit
 @endsection
+
 @section('content')
 
-    <h2>User</h2>
-    <br>
-    <form action="/updateuser/{{ $user->id }}" method="post" class="container">
+    @if (session()->has('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    <form action="/updateuser/{{$user->id}}" method="post" class="container">
         @csrf
-
         <div class="mb-3">
-            <h5>Personal Information</h5>
+            <h5>Maklumat Peribadi</h5>
         </div>
         <div class="row mb-3">
-            <label for="name" class="col-sm-2 col-form-label required">Name</label>
+            <label for="name" class="col-sm-2 col-form-label required">Nama</label>
             <div class="col-sm-10">
-                <input type="text" name="name" class="form-control touppercase" id="fname" value="{{ $user->name }}" required>
+                <input type="text" name="name" class="form-control touppercase" id="name" value="{{ $user->name }}" required>
             </div>
         </div>
 
         <div class="row mb-3">
-            <label for="ICNo" class="col-sm-2 col-form-label">IC No</label>
-            <div class="col-sm-4">
-                <input type="number" name="ICNo" class="form-control" id="ICNo" value="{{ $user->ICNo }}">
-            </div>
-            <label for="contactNo" class="col-sm-2 col-form-label required">Contact No (60+)</label>
-            <div class="col-sm-4">
-                <input type="number" name="contactNo" class="form-control" id="contactNo" value="{{ $user->contactNo }}" required>
-            </div>
-        </div>
-
-        <div class="row mb-3">
-            <label for="address" class="col-sm-2 col-form-label required">Address</label>
+            <label for="ICNo" class="col-sm-2 col-form-label required">IC No</label>
             <div class="col-sm-10">
-                <input type="text" name="address" class="form-control touppercase" id="address" value="{{ $user->address }}" required>
+                <input type="text" value="{{ $user->ICNo }}" name="ICNo" class="form-control" id="ICNo" pattern="\d{12}" title="Sila berikan nombor IC yang betul" required placeholder="Contoh: 021221041234">
             </div>
         </div>
 
         <div class="row mb-3">
-            <label for="state" class="col-sm-2 col-form-label required">State</label>
+            <label for="contactNo" class="col-sm-2 col-form-label required">Nombor Telefon (60+)</label>
+            <div class="col-sm-4">
+                <input type="text" value="{{ $user->contactNo }}" name="contactNo" class="form-control" id="contactNo" pattern="\d{9,10}" title="Sila berikan nombor telefon yang betul" required>
+            </div>
+
+            <label for="officeNo" class="col-sm-2 col-form-label">Nombor Telefon Pejabat</label>
+            <div class="col-sm-4">
+                <input type="text" value="{{ $user->officeNo }}" name="officeNo" class="form-control" id="officeNo">
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <label for="address" class="col-sm-2 col-form-label required">Alamat</label>
+            <div class="col-sm-10">
+                <input type="text" value="{{ $user->address }}" name="address" class="form-control touppercase" id="address" required>
+            </div>
+        </div>
+
+        <!-- auto sort state and city based on postal code -->
+        <div class="row mb-3">
+            <label for="postalCode" class="col-sm-2 col-form-label required">Poskod</label>
+            <div class="col-sm-4">
+                <input type="number" value="{{ $user->postalCode }}" name="postalCode" class="form-control" id="postalCode" required>
+            </div>
+            <label for="state" class="col-sm-2 col-form-label required">Negeri</label>
             <div class="col-sm-4">
                 <select name="state" id="state" class="form-select">
-                    <option selected>Select state</option>
-                </select>
-            </div>
-            <label for="city" class="col-sm-2 col-form-label required">City</label>
-            <div class="col-sm-4">
-                <select name="city" id="city" class="form-select">
-                    <option selected>Select city</option>
+                    <option selected>{{ $user->state }}</option>
                 </select>
             </div>
         </div>
 
         <div class="row mb-3">
-            <label for="postalCode" class="col-sm-2 col-form-label required">Postal Code</label>
-            <div class="col-sm-4">
-                <input type="number" name="postalCode" class="form-control" id="postalCode" value="{{ $user->postalCode }}" required>
-            </div>
-            <label for="officeNo" class="col-sm-2 col-form-label">Office No</label>
-            <div class="col-sm-4">
-                <input type="number" name="officeNo" class="form-control" id="officeNo" value="{{ $user->officeNo }}">
+            
+            <label for="city" class="col-sm-2 col-form-label required">Bandar</label>
+            <div class="col-sm-10">
+                <select name="city" id="city" class="form-select">
+                    <option selected>{{ $user->city }}</option>
+                </select>
             </div>
         </div>
+
+        <br>
 
         <div class="mb-3">
-            <h5>Account Information</h5>
+            <h5>Maklumat Akaun</h5>
         </div>
         <div class="row mb-3">
-            <label for="username" class="col-sm-2 col-form-label required">Username</label>
+            <label for="username" class="col-sm-2 col-form-label required">Nama Pengguna</label>
             <div class="col-sm-10">
-                <input type="text" name="username" class="form-control" id="username" pattern=".{3,}" maxlength="25" title="Three or more characters" value="{{ $user->username }}">
+                <input type="text" value="{{ $user->username }}" name="username" class="form-control" id="username" pattern=".{3,}" maxlength="25" title="Three or more characters">
             </div>
         </div>
 
         <div class="row mb-3">
-            <label for="email" class="col-sm-2 col-form-label required">Email</label>
+            <label for="email" class="col-sm-2 col-form-label required">Emel</label>
             <div class="col-sm-10">
-                <input type="email" name="email" class="form-control touppercase" id="email" pattern="[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$" value="{{ $user->email }}">
-                <input type="number" name="roleID" value="{{ $user->roleID }}" hidden>
-
+                <input type="email" value="{{ $user->email }}" name="email" class="form-control touppercase" id="email" pattern="[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$">
             </div>
         </div>
+
+        <input type="number" name="roleID" value="{{ $user->roleID }}" hidden>
 
         <div class="row">
             <div class="col-sm-10 offset-sm-2">
-                <button type="submit" class="btn btn-primary">Submit</button>
-                <button type="button" class="btn btn-secondary">Close</button>
+                <button type="submit" class="btn btn-primary">Hantar</button>
+                <button type="button" onclick="window.location='/view/{{$user->roleID}}'" class="btn btn-danger">Tutup</button>
             </div>
         </div>
 
     </form>
+
     <br>
-    <script>
+
+    <script type="text/javascript">
         $(document).ready(function(){
-            displayStateAndCity();
-
-            function displayStateAndCity(){
-
-                // array of state and cities
-                var states = ["Kelantan", "Melaka", 'Negeri Sembilan'];
-                var cities = {"kelantan": [
-                        "Gua Musang",
-                        "Jeli",
-                        "Ketereh",
-                        "Kota Bharu",
-                        "Kuala Krai",
-                        "Pasir Mas",
-                        "Machang",
-                        "Tanah Merah",
-                        "Tumpat"
-                    ],
-                    "melaka": [
-                        "Alor Gajah",
-                        "Ayer Keroh",
-                        "Ayer Molek",
-                        "Batu Berendam",
-                        "Bemban",
-                        "Bukit Baru",
-                        "Bukit Rambai",
-                        "Jasin",
-                        "Klebang Besar",
-                        "Kuala Sungai Baru",
-                        "Masjid Tanah",
-                        "Melaka",
-                        "Pulau Sebang",
-                        "Sungai Udang"
-                    ],
-                    "negeri sembilan": [
-                        "Bahau",
-                        "Seremban",
-                        "Kuala Pilah",
-                        "Nilai",
-                        "Port Dickson"
-                    ],
-                };
-                
-                // clear the dropdown and create database options
-                $('#state').empty().append("<option value='{{$user->state}}' selected>{{$user->state}}</option>");
-                $('#city').empty().append("<option value='{{$user->city}}' selected>{{$user->city}}</option>");
-
-                $.each(states, function(index, stateName){
-                    if(stateName != $("#state").val())
-                        $("#state").append("<option value='"+ stateName + "'>" + stateName + "</option>");
-                });
-
-                $.each(cities[$("#state").val().toLowerCase()], function(index, cityName) {
-                    if(cityName != $("#city").val())
-                        $("#city").append("<option value='" + cityName + "'>" + cityName + "</option>");
-                });
-
-                function updateCity(selectedState){
-                    if(cities.hasOwnProperty(selectedState.toLowerCase())){
-                        $('#city').empty().append("<option value='' disabled selected>Select city</option>");
-                        $.each(cities[selectedState.toLowerCase()], function(index, cityName) {
-                            $("#city").append("<option value='" + cityName + "'>" + cityName + "</option>");
-                        });
-                    }
-                    else{
-                        console.error("Invalid state:", selectedState);
-                    }
-                }   
-
-                $("#state").change(function(){
-                    var selectedState = $(this).val();
-                    updateCity(selectedState);
-                });
-            }
+            $("#postalCode").on('change', function(){
+                var postcode = $(this).val();
+                if(postcode){
+                    $.ajax({
+                        url: '/search',
+                        type: 'GET',
+                        data: {postcode: postcode},
+                        success: function(data){
+                            $('#state').empty();
+                            $("#city").empty();
+                            data.forEach(function(item){
+                                $("#state").append('<option>' + item.state + '</option>');
+                                $("#city").append('<option>' + item.city + '</option>');
+                            });
+                        }
+                    });
+                }
+                else{
+                    $('#state').empty();
+                    $("#city").empty();
+                    $("#state").append('<option selected>Pilih Negeri</option>');
+                    $("#city").append('<option selected>Pilih Bandar</option>');
+                }
+            });
         });
     </script>
-    
+
 @endsection

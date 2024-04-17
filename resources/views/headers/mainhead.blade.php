@@ -49,8 +49,10 @@
                             <li><a class="dropdown-item" href="/view/4"><b>Sukarelawan</b></a></li>
                             <li><hr class="dropdown-divider"></li>
                             @endif
+                            @if(Auth::user()->roleID != 4)
                             <li><a class="dropdown-item" href="#"><b>Pekerjaan</b></a></li>
                             <li><hr class="dropdown-divider"></li>
+                            @endif
                             <li><a class="dropdown-item" href="#"><b>Program</b></a></li>
                         </ul>
                     </li>

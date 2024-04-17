@@ -39,21 +39,14 @@ Route::post('/logout', [UserController::class, 'logout']);
 
 Route::get('/create/{roleNo}', [UserController::class, 'create']);
 Route::post('/store', [UserController::class, 'store']);
-
 Route::get('/view/{roleNo}', [UserController::class, 'index']);
-
 Route::get('/getstaff', [UserController::class, 'getUsersDatatable'])->name('user.getAllDatatable');
-
-Route::post('/storeadmin', [UserController::class, 'storeAdmin'])->name('user.storeAdmin');
-Route::get('/register', [UserController::class, 'register']);
-
 Route::get('/edituser/{id}', [UserController::class, 'edit']);
 Route::post('/updateuser/{id}', [UserController::class, 'update']);
 Route::post('/deleteuser/{id}', [UserController::class, 'destroy']);
 
-
-// Volunteer
-
+Route::get('/register', [UserController::class, 'register']);
+Route::post('/storeadmin', [UserController::class, 'storeAdmin'])->name('user.storeAdmin');
 
 // Postcode - search state and cities
 Route::get('/search', [PostcodeController::class, 'search']);

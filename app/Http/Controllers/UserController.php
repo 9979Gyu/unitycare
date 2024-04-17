@@ -21,17 +21,19 @@ class UserController extends Controller
     public function index($roleNo)
     {
         //
-        $logRole = Auth::user()->roleID;
+        if(Auth::check()){
+            $logRole = Auth::user()->roleID;
 
-        if($logRole == 1 || ($logRole == 2 && $roleNo > 2)){
-            $users = User::where('roleID', $roleNo)->get();
-            $rolename = DB::table('roles')
-                ->where('roleID', $users[0]->roleID)
-                ->value("name");
+            if($logRole == 1 || ($logRole == 2 && $roleNo > 2)){
+                $users = User::where('roleID', $roleNo)->get();
+                $rolename = DB::table('roles')
+                    ->where('roleID', $users[0]->roleID)
+                    ->value("name");
 
-            return view('users.index', compact('users', 'rolename'));
+                return view('users.index', compact('users', 'rolename'));
+            }
+
         }
-
         return redirect('/')->withErrors(['message' => 'Anda tidak dibenarkan untuk melayari halaman ini']);
         
     }
@@ -44,34 +46,7 @@ class UserController extends Controller
     public function create($roleNo)
     {
         //
-        if($roleNo == 1){
-            // show add admin page
-            if (Auth::check() && Auth::user()->roleID === 1) {
-                // User is logged in and has roleID of 6
-                return view('users.adminReg');
-            } else {
-                // User is not logged in or doesn't have roleID of 6
-                echo "You are not authorized to access this page.";
-            }
-        }
-        else if($roleNo == 2){
-            // show add staff page
-            return view('users.add');
-        }
-        else if($roleNo == 3){
-            // show add enterprise page
-        }
-        else if($roleNo == 4){
-            // show add volunteer page
-            return view('volunteers.add');
-        }
-        else if($roleNo == 5){
-            // show add poor people page
-        }
-        else{
-            // show landing page
-        }
-        
+        return view('users.add', compact('roleNo'));  
     }
 
     /**
@@ -89,7 +64,7 @@ class UserController extends Controller
             // store as admin / staff / volunteer / poor people
             $rules = [
                 'name' => 'required',
-                'ICNo' => 'required',
+                'ICNo' => 'required|unique:users,ICNo',
                 'email' => 'required|unique:users,email',
                 'password' => 'required',
                 'username' => 'required|unique:users,username',
@@ -98,7 +73,7 @@ class UserController extends Controller
                 'state' => 'required',
                 'city' => 'required',
                 'postalCode' => 'required',
-                'roleID' => 'required|in:1,2,4'
+                'roleID' => 'required|in:1,2,4,5'
             ];
         }
         else if($roleID == 3){
@@ -128,7 +103,7 @@ class UserController extends Controller
             $user->save();
 
             if($roleID == 1 || $roleID == 2)
-                return redirect('/viewstaff')->with('success', 'Pengguna berjaya didaftarkan');
+                return redirect('/view/' . $roleID )->with('success', 'Pengguna berjaya didaftarkan');
             else
                 return redirect('/login')->with('success', 'Pengguna berjaya didaftarkan');
         }
@@ -223,12 +198,14 @@ class UserController extends Controller
         //
         $user = User::where([
             ['id', $id],
+            ['status', 1]
         ])->first();
-        if($user->roleID == 2){
+
+        if(Auth::check()){
             return view('users.edit', compact('user'));
         }
         else{
-            return view('welcome');
+            return redirect('/')->withErrors(['message' => 'Anda tidak dibenarkan untuk melayari halaman ini']);
         }
     }
 
@@ -244,6 +221,7 @@ class UserController extends Controller
         //
         $rules = [
             'name' => 'required',
+            'ICNo' => 'required|unique:users,ICNo,' . $id,
             'email' => 'required|unique:users,email,'. $id,
             'username' => 'required|unique:users,username,'. $id,
             'contactNo' => 'required|unique:users,contactNo,'. $id,
@@ -251,20 +229,12 @@ class UserController extends Controller
             'state' => 'required',
             'city' => 'required',
             'postalCode' => 'required',
-            'roleID' => 'required|in:2'
+            'roleID' => 'required|in:2,4'
         ];
 
-        $validator = Validator::make($request->all(), $rules);
+        $validated = $request->validate($rules);
 
-        if ($validator->fails()) {
-            $errors = $validator->errors();
-
-            foreach ($errors->all() as $message) {
-                return redirect('/viewstaff')->with('error', $message);
-            }
-        }
-        else{
-
+        if($validated){
             DB::table('users')
                 ->where('id', $id)
                 ->update([
@@ -282,10 +252,19 @@ class UserController extends Controller
                     'roleID' => $request->get('roleID'),
                 ]);
 
-            return redirect('/viewstaff')->with('success', 'Information updated');
+            return redirect('/view/' . $request->get('roleID'))->with('success', 'Data berjaya dikemaskini');
         }
+        else{
+            $validator = Validator::make($request->all(), $rules);
+            if ($validator->fails()) {
+                $errors = $validator->errors();
+    
+                return redirect()->back()
+                    ->withInput($request->all())
+                    ->withErrors(['message' => $errors->all]);
 
-
+            }
+        }
     }
 
     /**
@@ -304,10 +283,10 @@ class UserController extends Controller
             ]);
 
         if($result){
-            return redirect('/viewstaff')->with('success', 'Successfully Deleted');
+            return redirect()->back()->with('success', 'Successfully Deleted');
         }
         else{
-            return redirect('/viewstaff')->with('error', 'Failed to Delete');
+            return redirect()->back()->withErrors(["message" => "Failed to Delete"]);
         }
     }
 

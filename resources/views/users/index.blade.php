@@ -40,21 +40,21 @@
 
     <!-- Modal -->
     <div class="modal fade" id="deleteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-        <div class="modal-header">
-            <h5 class="modal-title" id="deleteModalLabel">Remove {{ $rolename }}</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Remove {{ $rolename }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure to remove?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="delete">Delete</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
         </div>
-        <div class="modal-body">
-            Are you sure to remove?
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-danger" id="delete">Delete</button>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        </div>
-        </div>
-    </div>
     </div>
 
     <script>
@@ -131,21 +131,29 @@
             }
         });
 
-        $('#delete').click(function() {
-            $.ajax({
-                type: 'POST',
-                dataType: 'html',
-                url: "/deleteuser/" + $(".deleteAnchor").attr('id'),
-                success: function(data) {
-                    $('#deleteModal').modal('hide');
-                    $('.condition-message').html(data);
+        var idToDelete;
+        $(document).on('click', '.deleteAnchor', function() {
+            idToDelete = $(this).attr('id');
+            console.log(idToDelete);
+        });
 
-                    requestTable.ajax.reload();
-                },
-                error: function (data) {
-                    $('.condition-message').html(data);
-                }
-            })
+        $('#delete').click(function() {
+            if (idToDelete) {
+                $.ajax({
+                    type: 'POST',
+                    dataType: 'html',
+                    url: "/deleteuser/" + idToDelete,
+                    success: function(data) {
+                        $('#deleteModal').modal('hide');
+                        $('.condition-message').html(data);
+
+                        requestTable.ajax.reload();
+                    },
+                    error: function (data) {
+                        $('.condition-message').html(data);
+                    }
+                })
+            }
         });
 
     });
