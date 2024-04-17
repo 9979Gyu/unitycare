@@ -3,9 +3,7 @@
     UnityCare-Volunteer
 @endsection
 
-<header>
-    @include('headers.mainhead')
-</header>
+
 
 @section('content')
 
@@ -122,6 +120,8 @@
         </div>
 
     </form>
+
+    <br>
 
     <script type="text/javascript">
         $(document).ready(function(){

@@ -37,6 +37,7 @@ body{
     height: 250px;
     border: none;
     border-radius: 10%;
+    margin: 2%;
 }
 
 .big-button p{
@@ -56,6 +57,7 @@ body{
 .flex {
     margin: 2%;
     display: flex;
+    flex-wrap: wrap;
 }
 
 .flex img {

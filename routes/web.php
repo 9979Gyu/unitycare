@@ -40,7 +40,7 @@ Route::post('/logout', [UserController::class, 'logout']);
 Route::get('/create/{roleNo}', [UserController::class, 'create']);
 Route::post('/store', [UserController::class, 'store']);
 
-Route::get('/viewstaff', [UserController::class, 'index']);
+Route::get('/view/{roleNo}', [UserController::class, 'index']);
 
 Route::get('/getstaff', [UserController::class, 'getUsersDatatable'])->name('user.getAllDatatable');
 

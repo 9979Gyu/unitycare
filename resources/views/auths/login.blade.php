@@ -3,8 +3,6 @@
     UnityCare-Login
 @endsection
 
-@include('headers.mainhead')
-
 @section('content')
 
     @if (session()->has('success'))

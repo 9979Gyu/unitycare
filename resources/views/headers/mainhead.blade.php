@@ -21,19 +21,40 @@
                 <li class="nav-item">
                     <a class="nav-link" aria-current="page" href="#"><b>Info</b></a>
                 </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <b>Jadi Ahli</b>
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <li><a class="dropdown-item" href="/create/3"><b>Syarikat</b></a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="/create/4"><b>Sukarelawan</b></a></li>
-                    </ul>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" tabindex="-1"><b>Program</b></a>
-                </li>
+                @if(!Auth::check())
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <b>Jadi Ahli</b>
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="/create/3"><b>Syarikat</b></a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/create/4"><b>Sukarelawan</b></a></li>
+                        </ul>
+                    </li>
+                @endif
+                @if(Auth::check())
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <b>Tindakan</b>
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            @if(Auth::user()->roleID == 1)
+                            <li><a class="dropdown-item" href="/view/2"><b>Pekerja</b></a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            @endif
+                            @if(Auth::user()->roleID == 1 || Auth::user()->roleID == 2)
+                            <li><a class="dropdown-item" href="/view/3"><b>Syarikat</b></a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/view/4"><b>Sukarelawan</b></a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            @endif
+                            <li><a class="dropdown-item" href="#"><b>Pekerjaan</b></a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#"><b>Program</b></a></li>
+                        </ul>
+                    </li>
+                @endif
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <b>Pengguna</b>
@@ -60,10 +81,10 @@
                 </li>
             </ul>
             
-            <form class="d-flex" role="search">
+            <!-- <form class="d-flex" role="search">
                 <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
                 <button class="btn btn-outline-light" type="submit">Search</button>
-            </form>
+            </form> -->
         </div>
     </div>
 </nav>

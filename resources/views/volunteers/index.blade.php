@@ -1,11 +1,11 @@
 @extends('layouts.app')
 @section('title')
-    UnityCare-{{ $rolename }}
+    UnityCare-Volunteer
 @endsection
 
 @section('content')
     
-    <h2>{{ $rolename }}</h2>
+    <h2>Volunteer</h2>
     <br>
 
     @if (session()->has('success'))
@@ -20,7 +20,6 @@
         </div>
     @endif
 
-    <input type="number" id="roleID" value="{{ $users[0]->roleID }}" hidden>
     <div class="table-responsive">
         <table id="requestTable" class="table table-bordered table-striped dt-responsive" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
             <thead>
@@ -43,11 +42,11 @@
     <div class="modal-dialog">
         <div class="modal-content">
         <div class="modal-header">
-            <h5 class="modal-title" id="deleteModalLabel">Remove {{ $rolename }}</h5>
+            <h5 class="modal-title" id="deleteModalLabel">Remove Volunteer</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-            Are you sure to remove?
+            Are you sure to remove the volunteer?
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-danger" id="delete">Delete</button>
@@ -70,7 +69,7 @@
                 ajax: {
                     url: "/getstaff",
                     data: {
-                        rid: $("#roleID").val(),
+                        rid: 2,
                     },
                     type: 'GET',
 

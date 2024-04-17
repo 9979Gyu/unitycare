@@ -18,11 +18,22 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index($roleNo)
     {
         //
-        $users = User::where('roleID', 2)->get();
-        return view('users.index', compact('users'));
+        $logRole = Auth::user()->roleID;
+
+        if($logRole == 1 || ($logRole == 2 && $roleNo > 2)){
+            $users = User::where('roleID', $roleNo)->get();
+            $rolename = DB::table('roles')
+                ->where('roleID', $users[0]->roleID)
+                ->value("name");
+
+            return view('users.index', compact('users', 'rolename'));
+        }
+
+        return redirect('/')->withErrors(['message' => 'Anda tidak dibenarkan untuk melayari halaman ini']);
+        
     }
 
     /**
