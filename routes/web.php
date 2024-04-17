@@ -29,6 +29,16 @@ Route::get('/db-check', function () {
     }
 });
 
+Route::get('/db2-check', function(){
+    try{
+        // $dbVersion = DB::connection('mysqlSecondConnection')->table('users')->get();
+        return "Connected successfully to: " . DB::connection("mysqlSecondConnection")->getDatabaseName();
+    }
+    catch (\Exception $e) {
+        return "Could not connect to the database. Please check your configuration. error:" . $e;
+    }
+});
+
 Route::get('/login', function () {
     return view('/auths/login');
 });
@@ -50,4 +60,8 @@ Route::post('/storeadmin', [UserController::class, 'storeAdmin'])->name('user.st
 
 // Postcode - search state and cities
 Route::get('/search', [PostcodeController::class, 'search']);
+
+// Poor people
+Route::get('/createspecial', [UserController::class, 'createPoorPeople']);
+Route::post('/checkUser', [UserController::class, 'checkUser']);
 

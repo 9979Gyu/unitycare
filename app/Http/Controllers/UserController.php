@@ -49,6 +49,28 @@ class UserController extends Controller
         return view('users.add', compact('roleNo'));  
     }
 
+    public function createPoorPeople(){
+        return view('users.poor.add');
+    }
+
+    public function checkUser(Request $request){
+        $ic = $request->get('ic');
+
+        if(isset($ic)){
+            $user = DB::connection('mysqlSecondConnection')
+                ->table('users')
+                ->where('users.ICNo', $ic)
+                ->first();
+
+            if($user){
+                return response()->json(['success' => true, 'user' => $user]);
+            }
+            else{
+                return redirect('/createspecial')->withErrors(["message" => "Anda tidak dibenarkan untuk melayari halaman ini"]);
+            }
+        }
+    }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -283,10 +305,10 @@ class UserController extends Controller
             ]);
 
         if($result){
-            return redirect()->back()->with('success', 'Successfully Deleted');
+            return redirect()->back()->with('success', 'Berjaya dipadam');
         }
         else{
-            return redirect()->back()->withErrors(["message" => "Failed to Delete"]);
+            return redirect()->back()->withErrors(["message" => "Tidak berjaya dipadam"]);
         }
     }
 

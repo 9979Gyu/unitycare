@@ -113,7 +113,7 @@
         <div class="row">
             <div class="col-sm-10 offset-sm-2">
                 <button type="submit" class="btn btn-primary">Hantar</button>
-                <button type="button" onclick="window.location();" class="btn btn-danger">Tutup</button>
+                <button type="button" onclick="window.location='/'" class="btn btn-danger">Tutup</button>
             </div>
         </div>
 

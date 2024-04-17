@@ -30,6 +30,8 @@
                             <li><a class="dropdown-item" href="/create/3"><b>Syarikat</b></a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="/create/4"><b>Sukarelawan</b></a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/createspecial"><b>Kesukaran</b></a></li>
                         </ul>
                     </li>
                 @endif
