@@ -22,6 +22,15 @@
     @endif
 
     <div id="confirmModal">
+        <p>
+            Halaman ini digunakan khas oleh 
+            <ul>
+                <li><b>orang yang menghadapi masalah kewangan untuk kelangsungan hidup</b></li>
+                <li><b>orang kurang upaya</b></li>
+            </ul>
+            untuk mencari pekerjaan dan membangunkan kemahiran baharu untuk meningkatkan kebolehpasaran seseorang individu.
+        </p>
+
         <!-- Button trigger modal -->
         <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmBox">
             Pengesahan IC

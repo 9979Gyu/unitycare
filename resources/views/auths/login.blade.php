@@ -21,7 +21,7 @@
         </div>
     @endif
 
-    <h2>Login</h2>
+    <h2>Log Masuk</h2>
     <br>
     
     <div class="container">
@@ -43,7 +43,7 @@
 
             <div class="row">
                 <div class="col-sm-10 center">
-                    <button type="submit" class="btn btn-primary">Login</button>
+                    <button type="submit" class="btn btn-primary">Log Masuk</button>
                 </div>
             </div>
 

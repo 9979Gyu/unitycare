@@ -332,8 +332,8 @@ class UserController extends Controller
                 $table->addColumn('action', function ($row) {
                     $token = csrf_token();
                     $btn = '<div class="d-flex justify-content-center">';
-                    $btn = $btn . '<a href="/edituser/' . $row->id . '"><span class="badge badge-warning"> Edit </span></a></div>';
-                    $btn = $btn . '<a class="deleteAnchor" href="#" id="' . $row->id . '"><span class="badge badge-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"> Remove </span></a></div>';
+                    $btn = $btn . '<a href="/edituser/' . $row->id . '"><span class="badge badge-warning"> Kemaskini </span></a></div>';
+                    $btn = $btn . '<a class="deleteAnchor" href="#" id="' . $row->id . '"><span class="badge badge-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"> Padam </span></a></div>';
 
                     return $btn;
                 });
