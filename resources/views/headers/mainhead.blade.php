@@ -57,13 +57,19 @@
                             <li><a class="dropdown-item" href="#"><b>Pekerjaan</b></a></li>
                             <li><hr class="dropdown-divider"></li>
                             @endif
-                            <li><a class="dropdown-item" href="#"><b>Program</b></a></li>
+                            <li><a class="dropdown-item" href="/viewprogram"><b>Program</b></a></li>
                         </ul>
                     </li>
                 @endif
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <b>Pengguna</b>
+                        <b>
+                            @if(Auth::check())
+                                {{Auth::user()->username}}
+                            @else
+                                Pengguna
+                            @endif
+                        </b>
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                         

@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PostcodeController;
+use App\Http\Controllers\ProgramController;
 
 /*
 |--------------------------------------------------------------------------
@@ -65,3 +66,7 @@ Route::get('/search', [PostcodeController::class, 'search']);
 Route::get('/createspecial', [UserController::class, 'createPoorPeople']);
 Route::post('/checkUser', [UserController::class, 'checkUser']);
 
+// Activity / Program
+Route::get('/viewprogram', [ProgramController::class, 'index']);
+Route::get('/createprogram/{roleNo}', [ProgramController::class, 'create']);
+Route::post('/storeprogram', [ProgramController::class, 'store']);
