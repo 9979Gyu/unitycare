@@ -70,3 +70,8 @@ Route::post('/checkUser', [UserController::class, 'checkUser']);
 Route::get('/viewprogram', [ProgramController::class, 'index']);
 Route::get('/createprogram/{roleNo}', [ProgramController::class, 'create']);
 Route::post('/storeprogram', [ProgramController::class, 'store']);
+Route::get('/getprogram', [ProgramController::class, 'getProgramsDatatable']);
+Route::get('/editprogram/{id}', [ProgramController::class, 'edit']);
+Route::post('/updateprogram/{id}', [ProgramController::class, 'update']);
+Route::post('/deleteprogram/{id}', [ProgramController::class, 'destroy']);
+
