@@ -25,39 +25,110 @@
     @endif
 
     @if(Auth::user()->roleID != 5)
-    <button class="btn btn-info float-end" type="button" id="addBtn" onclick="window.location='/createprogram/{{$users[0]->roleID}}'" >
-        <!-- <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-square-fill" viewBox="0 0 16 16">
-            <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm6.5 4.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3a.5.5 0 0 1 1 0"/>
-        </svg> -->
-        Tambah
+    <button class="btn btn-info float-end" type="button" id="addBtn" onclick="window.location='/createprogram/{{ Auth::user()->roleID }}'" >
+       Tambah
     </button>
     @endif
 
     <br>
 
-    <input type="number" id="roleID" value="{{ $users[0]->roleID }}" hidden>
-    <div class="table-responsive">
-        <table id="requestTable" class="table table-bordered table-striped dt-responsive" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
-            <thead>
-                <tr style="text-align:center">
-                    <th> No. </th>
-                    <th>Nama</th>
-                    <th>Tempat</th>
-                    <th>Bermula</th>
-                    <th>Tamat</th>
-                    <th>Description</th>
-                    <th>Hubungi</th>
-                    <th>Tarikh Tutup</th>
-                    <th>Tindakan</th>
-                </tr>
-            </thead>
-            <tbody>
+    <input type="number" id="roleID" value="{{ Auth::user()->roleID }}" hidden>
 
-            </tbody>
-        </table>
+        <div class="card-container">
+        @foreach($programs as $row)
+            <br>
+            <div class="card">
+                <div class="card-body d-flex justify-content-between">
+                    <div>
+                        <h5 class="card-title">{{ $row->name }}</h5>
+                        <p class="card-text">{{ $row->description }}</p>
+                        <p class="card-text">Tempat: {{ $row->venue }}</p>
+                        <p class="card-text">Kejadian: {{ $row->start_date }} {{ $row->start_time }}</p>
+                        <p class="card-text">Tarikh Tutup: {{ $row->close_date }}</p>
+                        <p class="card-text">Hubungi: <br> {{ $row->username }} <br> +60{{ $row->contact_no }} <br> {{ $row->useremail }}</p>
+                    </div>
+
+                    <div>  
+                        @if(Auth::user()->roleID == 1)
+                            @if($row->approved_status == 1)
+                            <a class="approveAnchor btn btn-success" href="#" id="{{ $row->program_id }}" data-bs-toggle="modal" data-bs-target="#approveModal">Lulus</a>
+                            <a class="deleteAnchor btn btn-danger" href="#" id="{{ $row->program_id }}" data-bs-toggle="modal" data-bs-target="#declineModal">Tolak</a>
+                            <a href="/editprogram/{{ $row->program_id }}" class="btn btn-warning">Kemaskini</a>
+                            <a class="deleteAnchor btn btn-danger" href="#" id="{{ $row->program_id }}" data-bs-toggle="modal" data-bs-target="#deleteModal">Padam</a>
+                            @elseif($row->approved_status == 2)
+                            <a href="/joinprogram/{{ $row->program_id }}" class="btn btn-success">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-plus-fill" viewBox="0 0 16 16">
+                                    <path d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+                                    <path fill-rule="evenodd" d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5"/>
+                                </svg>
+                                Mohon
+                            </a>
+                            @endif
+                        @elseif(Auth::user()->roleID == 2)
+                            @if($row->approved_status == 1)
+                                <a class="approveAnchor btn btn-success" href="#" id="{{ $row->program_id }}" data-bs-toggle="modal" data-bs-target="#approveModal">Lulus</a>
+                                <a class="deleteAnchor btn btn-danger" href="#" id="{{ $row->program_id }}" data-bs-toggle="modal" data-bs-target="#declineModal">Tolak</a>
+                                @if($row->user_id == Auth::user()->id)
+                                <a href="/editprogram/{{ $row->program_id }}" class="btn btn-warning">Kemaskini</a>
+                                <a class="deleteAnchor btn btn-danger" href="#" id="{{ $row->program_id }}" data-bs-toggle="modal" data-bs-target="#deleteModal">Padam</a>
+                                @endif
+                            @elseif($row->approved_status == 2)
+                            <a href="/joinprogram/{{ $row->program_id }}" class="btn btn-success">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-plus-fill" viewBox="0 0 16 16">
+                                    <path d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+                                    <path fill-rule="evenodd" d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5"/>
+                                </svg>
+                                Mohon
+                            </a>
+                            @endif
+                        @elseif(Auth::user()->roleID == 5)
+                            <a href="/joinprogram/{{ $row->program_id }}" class="btn btn-success">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-plus-fill" viewBox="0 0 16 16">
+                                    <path d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+                                    <path fill-rule="evenodd" d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5"/>
+                                </svg>
+                                Mohon
+                            </a>
+                        @else
+                            @if($row->approved_status <= 1 && $row->user_id == Auth::user()->id)
+                                <a href="/editprogram/{{ $row->program_id }}" class="btn btn-warning">Kemaskini</a>
+                                <a class="deleteAnchor btn btn-danger" href="#" id="{{ $row->program_id }}" data-bs-toggle="modal" data-bs-target="#deleteModal">Padam</a>
+                            @else
+                                <a href="/joinprogram/{{ $row->program_id }}" class="btn btn-success">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-plus-fill" viewBox="0 0 16 16">
+                                        <path d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+                                        <path fill-rule="evenodd" d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5"/>
+                                    </svg>
+                                    Mohon
+                                </a>
+                            @endif
+                        @endif
+                    </div>
+                </div>
+            </div>
+        @endforeach
+        </div>
+
+    <!-- Approve Modal -->
+    <div class="modal fade" id="approveModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="approveModalLabel">Lulus Program</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Adakah anda pasti untuk meluluskan program?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="approve">Lulus</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Modal -->
+    <!-- Delete Modal -->
     <div class="modal fade" id="deleteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -79,94 +150,6 @@
     <script>
     $(document).ready(function() {
 
-        var requestTable;
-
-        fetch_data();
-        function fetch_data() {
-            requestTable = $('#requestTable').DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: {
-                    url: "/getprogram",
-                    data: {
-                        rid: $("#roleID").val(),
-                    },
-                    type: 'GET',
-
-                },
-                'columnDefs': [{
-                    "targets": [0],
-                    "className": "text-center",
-                    "width": "2%"
-                }, {
-                    "targets": [1, 2, 3, 4, 5, 6, 7, 8],
-                    "className": "text-center",
-                },],
-                
-                order: [
-                    [1, 'asc']
-                ],
-                columns: [{
-                    "data": null,
-                    searchable: false,
-                    "sortable": true,
-                    render: function(data, type, row, meta) {
-                        return meta.row + meta.settings._iDisplayStart + 1;
-                    }
-                }, {
-                    data: "name",
-                    name: 'name',
-                    orderable: true,
-                    searchable: true,
-                },
-                {
-                    data: "address",
-                    name: 'address',
-                    orderable: true,
-                    searchable: true,
-                }, {
-                    data: function(row) {
-                        return row.start_date + ' ' + row.start_time;
-                    },
-                    name: 'start_datetime',
-                    orderable: true,
-                    searchable: true
-                }, {
-                    data: function(row) {
-                        return row.end_date + ' ' + row.end_time;
-                    },
-                    name: 'end_datetime',
-                    orderable: true,
-                    searchable: true
-                }, {
-                    data: "description",
-                    name: 'description',
-                    orderable: true,
-                    searchable: true,
-                },{
-                    data: function(row) {
-                        return 'Nama: ' + row.username.toUpperCase() + 
-                        '<br>Emel: ' + row.useremail + 
-                        '<br>Telefon: 0' + row.usercontact;
-                    },
-                    name: 'contact',
-                    orderable: true,
-                    searchable: true
-                },{
-                    data: 'close_date',
-                    name: 'close_date',
-                    orderable: true,
-                    searchable: true
-                }, {
-                    data: 'action',
-                    name: 'action',
-                    orderable: false,
-                    searchable: false
-                }, ]
-                
-            });
-        }
-
         // csrf token for ajax
         $.ajaxSetup({
             headers: {
@@ -174,29 +157,63 @@
             }
         });
 
-        var idToDelete;
+        var selectedID;
         $(document).on('click', '.deleteAnchor', function() {
-            idToDelete = $(this).attr('id');
-            console.log(idToDelete);
+            selectedID = $(this).attr('id');
+            console.log(selectedID);
+        });
+
+        $(document).on('click', '.approveAnchor', function() {
+            selectedID = $(this).attr('id');
+            console.log("this" + selectedID);
         });
 
         $('#delete').click(function() {
-            if (idToDelete) {
+            if (selectedID) {
                 $.ajax({
                     type: 'POST',
                     dataType: 'html',
-                    url: "/deleteprogram/" + idToDelete,
+                    url: "/deleteprogram/" + selectedID,
                     success: function(data) {
                         $('#deleteModal').modal('hide');
                         $('.condition-message').html(data);
 
-                        requestTable.ajax.reload();
+                        // Fetch the updated programs
+                        // $.ajax({
+                        //     type: 'GET',
+                        //     url: "/getUpdatedPrograms",
+                        //     success: function(response) {
+                        //         // Replace the current programs with the updated ones
+                        //         $('.card-container').html(response.cardContent);
+                        //     },
+                        //     error: function(error) {
+                        //         console.log(error);
+                        //     }
+                        // });
+                        location.reload();
                     },
                     error: function (data) {
                         $('.condition-message').html(data);
                     }
                 })
             }
+        });
+
+        $('#approve').click(function() {
+            $.ajax({
+                type: 'POST',
+                dataType: 'html',
+                url: "/approveprogram/" + selectedID,
+                success: function(data) {
+                    $('#approveModal').modal('hide');
+                    $('.condition-message').html(data);
+
+                    location.reload();
+                },
+                error: function (data) {
+                    $('.condition-message').html(data);
+                }
+            });
         });
 
     });

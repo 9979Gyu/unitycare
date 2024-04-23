@@ -13,6 +13,69 @@ use Illuminate\Support\Facades\Auth;
 class ProgramController extends Controller
 {
     //
+
+    public function getProgramsByApprovedStatus(){
+        $allPrograms = Program::where([
+            ['programs.status', 1],
+        ])
+        ->join('users', 'id', '=', 'user_id')
+        ->select(
+            'programs.*', 
+            'users.name as username', 
+            'users.contactNo as contact_no', 
+            'users.email as useremail'
+        )
+        ->get();
+
+        $approvedPrograms = Program::where([
+            ['programs.status', 1],
+            ['programs.approved_status', 2]
+        ])
+            ->join('users', 'id', '=', 'user_id')
+            ->select(
+                'programs.*', 
+                'users.name as username', 
+                'users.contactNo as contact_no', 
+                'users.email as useremail'
+            )
+            ->get();
+
+        $pendingPrograms = Program::where([
+            ['programs.status', 1],
+            ['programs.approved_status', 1]
+        ])
+            ->join('users', 'id', '=', 'user_id')
+            ->select(
+                'programs.*', 
+                'users.name as username', 
+                'users.contactNo as contact_no', 
+                'users.email as useremail'
+            )
+            ->get();
+
+        $declinedPrograms = Program::where([
+            ['programs.status', 1],
+            ['programs.approved_status', 0]
+        ])
+            ->join('users', 'id', '=', 'user_id')
+            ->select(
+                'programs.*', 
+                'users.name as username', 
+                'users.contactNo as contact_no', 
+                'users.email as useremail'
+            )
+            ->get();
+
+        if(Auth::user()->roleID == 5){
+            $programs = $approvedPrograms;
+        }
+        else{
+            $programs = $allPrograms;
+        }
+
+        return $programs;
+    }
+
     public function index()
     {
         //
@@ -20,12 +83,16 @@ class ProgramController extends Controller
             $logRole = Auth::user()->roleID;
 
             if($logRole){
-                $users = User::where('roleID', $logRole)->get();
-                $rolename = DB::table('roles')
-                    ->where('roleID', $users[0]->roleID)
-                    ->value("name");
+                $roleID = User::where('roleID', $logRole)->value("roleID");
 
-                return view('programs.index', compact('users', 'rolename'));
+                $role = DB::table('roles')
+                    ->where('roleID', $roleID)
+                    ->select('name', 'roleID')
+                    ->first();
+
+                $programs = $this->getProgramsByApprovedStatus();
+
+                return view('programs.index', compact('role', 'programs'));
             }
 
         }
@@ -232,6 +299,38 @@ class ProgramController extends Controller
     }
 
     /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function updateApproval($id)
+    {
+        // Update the program details
+        $update = DB::table('programs')
+            ->where([
+                ['program_id', $id],
+                ['status', 1],
+            ])
+            ->update([
+                'approved_status' => 2,
+                'approved_by' => Auth::user()->id, 
+            ]);
+
+        // If successfully update the program
+        if($update){
+            // direct user to view program page with success messasge
+            return redirect('/viewprogram')->with('success', 'Data berjaya dikemaskini');
+        }
+        else{
+            // direct user to view program page with error messasge
+            return redirect()->back()->withErrors(['message' => "Data tidak berjaya dikemaskini"]);
+        }
+
+    }
+
+    /**
      * Remove the specified resource from storage.
      *
      * @param  int  $id
@@ -254,66 +353,79 @@ class ProgramController extends Controller
         }
     }
 
-    // Function to get list of programs
-    public function getProgramsDatatable(Request $request)
-    {
-        if(request()->ajax()){
-            $rid = $request->rid;
+    // // Function to get list of programs
+    // public function getProgramsDatatable(Request $request)
+    // {
+    //     if(request()->ajax()){
+    //         $rid = $request->rid;
 
-            $selectedPrograms = DB::table('programs')
-            ->join('users', 'users.id', '=', 'programs.user_id')
-            ->where([
-                ['programs.status', 1],
-            ])
-            ->select(
-                'programs.program_id as program_id',
-                'programs.user_id as user_id',
-                'programs.name as name',
-                'programs.start_date as start_date',
-                'programs.end_date as end_date',
-                'programs.start_time as start_time',
-                'programs.end_time as end_time',
-                'programs.close_date as close_date',
-                'programs.venue as address',
-                'programs.description as description',
-                'programs.approved_status as approved_status',
-                'users.name as username',
-                'users.email as useremail',
-                'users.contactNo as usercontact'
-            )
-            ->orderBy('programs.close_date')
-            ->get();
+    //         $selectedPrograms = DB::table('programs')
+    //         ->join('users', 'users.id', '=', 'programs.user_id')
+    //         ->where([
+    //             ['programs.status', 1],
+    //         ])
+    //         ->select(
+    //             'programs.program_id as program_id',
+    //             'programs.user_id as user_id',
+    //             'programs.name as name',
+    //             'programs.start_date as start_date',
+    //             'programs.end_date as end_date',
+    //             'programs.start_time as start_time',
+    //             'programs.end_time as end_time',
+    //             'programs.close_date as close_date',
+    //             'programs.venue as address',
+    //             'programs.description as description',
+    //             'programs.approved_status as approved_status',
+    //             'users.name as username',
+    //             'users.email as useremail',
+    //             'users.contactNo as usercontact'
+    //         )
+    //         ->orderBy('programs.close_date')
+    //         ->get();
 
-            if(isset($selectedPrograms)){
+    //         if(isset($selectedPrograms)){
 
-                $table = Datatables::of($selectedPrograms);
+    //             $table = Datatables::of($selectedPrograms);
 
-                $table->addColumn('action', function ($row) {
-                    $token = csrf_token();
-                    $btn = '<div class="d-flex justify-content-center">';
-                    if($row->approved_status > 1 && (Auth::user()->roleID == 1 || Auth::user()->roleID == 2)){
-                        $btn = $btn . '<a class="deleteAnchor" href="#" id="' . $row->program_id . '"><span class="badge badge-success" data-bs-toggle="modal" data-bs-target="#approveModal"> Lulus </span></a></div>';
-                        $btn = $btn . '<a class="deleteAnchor" href="#" id="' . $row->program_id . '"><span class="badge badge-danger" data-bs-toggle="modal" data-bs-target="#declineModal"> Tolak </span></a></div>';
-                    }
+    //             $table->addColumn('action', function ($row) {
+    //                 $token = csrf_token();
+    //                 $btn = '<div class="d-flex justify-content-center">';
+    //                 if($row->approved_status == 1 && (Auth::user()->roleID == 1 || Auth::user()->roleID == 2)){
+    //                     $btn = $btn . '<a class="approveAnchor" href="#" id="' . $row->program_id . '"><span class="badge badge-success" data-bs-toggle="modal" data-bs-target="#approveModal"> Lulus </span></a></div>';
+    //                     $btn = $btn . '<a class="deleteAnchor" href="#" id="' . $row->program_id . '"><span class="badge badge-danger" data-bs-toggle="modal" data-bs-target="#declineModal"> Tolak </span></a></div>';
+    //                 }
 
-                    if($row->approved_status == 1 && Auth::user()->id == $row->user_id){
+    //                 if($row->approved_status == 1 && Auth::user()->id == $row->user_id){
                        
-                        $btn = $btn . '<a href="/editprogram/' . $row->program_id . '"><span class="badge badge-warning"> Kemaskini </span></a></div>';
-                        $btn = $btn . '<a class="deleteAnchor" href="#" id="' . $row->program_id . '"><span class="badge badge-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"> Padam </span></a></div>';
-                    }
+    //                     $btn = $btn . '<a href="/editprogram/' . $row->program_id . '"><span class="badge badge-warning"> Kemaskini </span></a></div>';
+    //                     $btn = $btn . '<a class="deleteAnchor" href="#" id="' . $row->program_id . '"><span class="badge badge-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"> Padam </span></a></div>';
+    //                 }
 
-                    if($row->approved_status > 1)
-                        $btn = $btn . '<a href="/joinprogram/' . $row->program_id . '"><span class="badge badge-success"> Mohon </span></a></div>';
+    //                 if($row->approved_status > 1)
+    //                     $btn = $btn . '<a href="/joinprogram/' . $row->program_id . '"><span class="badge badge-success"> Mohon </span></a></div>';
 
-                    return $btn;
-                });
+    //                 return $btn;
+    //             });
 
-                $table->rawColumns(['action']);
-                return $table->make(true);
-            }
+    //             $table->rawColumns(['action']);
+    //             return $table->make(true);
+    //         }
 
+    //     }
+
+    //     return view('programs.index');
+    // }
+
+    public function getUpdatedPrograms(){
+        $resultPrograms = $this->getProgramsByApprovedStatus();
+
+        // Generate HTML for the card with the updated data
+        $cardContent = '';
+        foreach ($resultPrograms as $program) {
+            $cardContent .= view('programs.index', ['row' => $program, 'programs' => $resultPrograms])->render();
         }
 
-        return view('programs.index');
+        // Return the updated data
+        return response()->json(['cardContent' => $cardContent]);
     }
 }
