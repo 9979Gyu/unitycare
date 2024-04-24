@@ -80,6 +80,17 @@ class ProgramController extends Controller
     {
         //
         if(Auth::check()){
+            return view('programs.index');
+
+        }
+        return redirect('/')->withErrors(['message' => 'Anda tidak dibenarkan untuk melayari halaman ini']);
+        
+    }
+
+    public function indexNonAdmin()
+    {
+        //
+        if(Auth::check()){
             $logRole = Auth::user()->roleID;
 
             if($logRole){
@@ -298,6 +309,37 @@ class ProgramController extends Controller
         }
     }
 
+    // Return the program details based on given program id
+    public function getProgramById(Request $request)
+    {
+        if(request()->ajax()){
+            $pid = $request->pid;
+
+            $participants = Program_Spec::where('program_id', $pid)
+            ->get();
+
+            // Join programs, program_spec, and users tables (using relationships)
+            $program = DB::table('programs')
+            ->join('users as u', 'u.id', '=', 'programs.user_id')
+            ->where([
+                ['programs.status', 1],
+                ['programs.program_id', $pid],
+            ])
+            ->select([
+                'programs.*',
+                'u.name as username',
+            ])
+            ->first();
+
+            $data = [
+                'program' => $program,
+                'participants' => $participants,
+            ];
+
+            return response()->json($data);
+        }
+    }
+
     /**
      * Update the specified resource in storage.
      *
@@ -317,6 +359,32 @@ class ProgramController extends Controller
                 'approved_status' => 2,
                 'approved_by' => Auth::user()->id, 
             ]);
+
+        // If successfully update the program
+        if($update){
+            // direct user to view program page with success messasge
+            return redirect('/viewprogram')->with('success', 'Data berjaya dikemaskini');
+        }
+        else{
+            // direct user to view program page with error messasge
+            return redirect()->back()->withErrors(['message' => "Data tidak berjaya dikemaskini"]);
+        }
+
+    }
+
+    public function declineApproval(Request $request)
+    {
+        // Update the program details
+        $update = DB::table('programs')
+        ->where([
+            ['program_id', $request->selectedID],
+            ['status', 1],
+        ])
+        ->update([
+            'approved_status' => 0,
+            'approved_by' => Auth::user()->id, 
+            'description' => DB::raw("CONCAT(description, ' - Declined: $request->reason')"),
+        ]);
 
         // If successfully update the program
         if($update){
@@ -354,67 +422,79 @@ class ProgramController extends Controller
     }
 
     // // Function to get list of programs
-    // public function getProgramsDatatable(Request $request)
-    // {
-    //     if(request()->ajax()){
-    //         $rid = $request->rid;
+    public function getProgramsDatatable(Request $request)
+    {
+        if(request()->ajax()){
+            $rid = $request->rid;
 
-    //         $selectedPrograms = DB::table('programs')
-    //         ->join('users', 'users.id', '=', 'programs.user_id')
-    //         ->where([
-    //             ['programs.status', 1],
-    //         ])
-    //         ->select(
-    //             'programs.program_id as program_id',
-    //             'programs.user_id as user_id',
-    //             'programs.name as name',
-    //             'programs.start_date as start_date',
-    //             'programs.end_date as end_date',
-    //             'programs.start_time as start_time',
-    //             'programs.end_time as end_time',
-    //             'programs.close_date as close_date',
-    //             'programs.venue as address',
-    //             'programs.description as description',
-    //             'programs.approved_status as approved_status',
-    //             'users.name as username',
-    //             'users.email as useremail',
-    //             'users.contactNo as usercontact'
-    //         )
-    //         ->orderBy('programs.close_date')
-    //         ->get();
+            $selectedPrograms = DB::table('programs')
+            ->join('users', 'users.id', '=', 'programs.user_id')
+            ->where([
+                ['programs.status', 1],
+            ])
+            ->select(
+                'programs.*',
+                'users.name as username',
+                'users.email as useremail',
+                'users.contactNo as usercontact'
+            )
+            ->get();
 
-    //         if(isset($selectedPrograms)){
+            if(isset($selectedPrograms)){
 
-    //             $table = Datatables::of($selectedPrograms);
+                $table = Datatables::of($selectedPrograms);
 
-    //             $table->addColumn('action', function ($row) {
-    //                 $token = csrf_token();
-    //                 $btn = '<div class="d-flex justify-content-center">';
-    //                 if($row->approved_status == 1 && (Auth::user()->roleID == 1 || Auth::user()->roleID == 2)){
-    //                     $btn = $btn . '<a class="approveAnchor" href="#" id="' . $row->program_id . '"><span class="badge badge-success" data-bs-toggle="modal" data-bs-target="#approveModal"> Lulus </span></a></div>';
-    //                     $btn = $btn . '<a class="deleteAnchor" href="#" id="' . $row->program_id . '"><span class="badge badge-danger" data-bs-toggle="modal" data-bs-target="#declineModal"> Tolak </span></a></div>';
-    //                 }
+                $table->addColumn('action', function ($row) {
+                    $token = csrf_token();
+                    $btn = '<div class="d-flex justify-content-center">';
+                    if(Auth::user()->roleID == 1 || Auth::user()->roleID == 2){
+                        if($row->approved_status == 1){
+                            // User created the program and the program is pending approval
+                            if($row->user_id == Auth::user()->id){
+                                $btn = $btn . '<a href="/editprogram/' . $row->program_id . '"><span class="badge badge-warning"> Kemaskini </span></a></div>';
+                                $btn = $btn . '<a class="deleteAnchor" href="#" id="' . $row->program_id . '"><span class="badge badge-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"> Padam </span></a></div>';
+                            }
+                            $btn = $btn . '<a class="approveAnchor" href="#" id="' . $row->program_id . '"><span class="badge badge-success" data-bs-toggle="modal" data-bs-target="#approveModal"> Lulus </span></a></div>';
+                            $btn = $btn . '<a class="declineAnchor" href="#" id="' . $row->program_id . '"><span class="badge badge-danger" data-bs-toggle="modal" data-bs-target="#declineModal"> Tolak </span></a></div>';
+                        }
+                        // The program is approved
+                        elseif($row->approved_status == 2){
+                            $btn = $btn . '<a href="/joinprogram/' . $row->program_id . '"><span class="badge badge-success"> Mohon </span></a></div>';
+                        }
+                        // The program is declined
+                        elseif($row->approved_status == 0){
+                            if($row->user_id == Auth::user()->id){
+                                $btn = $btn . '<a href="/editprogram/' . $row->program_id . '"><span class="badge badge-warning"> Kemaskini </span></a></div>';
+                                $btn = $btn . '<a class="deleteAnchor" href="#" id="' . $row->program_id . '"><span class="badge badge-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"> Padam </span></a></div>';
+                            }
+                        }
+                    }
+                    // User is enterprise or volunteer
+                    elseif(Auth::user()->roleID == 3 || Auth::user()->roleID == 4){
+                        // User created the program and the program is pending approval
+                        if(($row->approved_status == 1 || $row->approved_status == 0) && $row->user_id == Auth::user()->id){
 
-    //                 if($row->approved_status == 1 && Auth::user()->id == $row->user_id){
-                       
-    //                     $btn = $btn . '<a href="/editprogram/' . $row->program_id . '"><span class="badge badge-warning"> Kemaskini </span></a></div>';
-    //                     $btn = $btn . '<a class="deleteAnchor" href="#" id="' . $row->program_id . '"><span class="badge badge-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"> Padam </span></a></div>';
-    //                 }
+                            $btn = $btn . '<a href="/editprogram/' . $row->program_id . '"><span class="badge badge-warning"> Kemaskini </span></a></div>';
+                            $btn = $btn . '<a class="deleteAnchor" href="#" id="' . $row->program_id . '"><span class="badge badge-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"> Padam </span></a></div>';
+                            
+                        }
+                        // The program is approved
+                        elseif($row->approved_status == 2){
+                            $btn = $btn . '<a href="/joinprogram/' . $row->program_id . '"><span class="badge badge-success"> Mohon </span></a></div>';
+                        }
+                    }
 
-    //                 if($row->approved_status > 1)
-    //                     $btn = $btn . '<a href="/joinprogram/' . $row->program_id . '"><span class="badge badge-success"> Mohon </span></a></div>';
+                    return $btn;
+                });
 
-    //                 return $btn;
-    //             });
+                $table->rawColumns(['action']);
+                return $table->make(true);
+            }
 
-    //             $table->rawColumns(['action']);
-    //             return $table->make(true);
-    //         }
+        }
 
-    //     }
-
-    //     return view('programs.index');
-    // }
+        return view('programs.index');
+    }
 
     public function getUpdatedPrograms(){
         $resultPrograms = $this->getProgramsByApprovedStatus();

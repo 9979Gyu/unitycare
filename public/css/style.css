@@ -10,9 +10,9 @@ body{
     margin-left: 5px;
 }
 
-.touppercase {
+/* .touppercase {
     text-transform: uppercase;
-}
+} */
 
 .error {
     color: red;

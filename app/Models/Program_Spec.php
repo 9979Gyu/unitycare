@@ -17,4 +17,10 @@ class Program_Spec extends Model
         'qty_limit',
         'qty_enrolled',
     ];
+
+    public function program()
+    {
+        // One program_spec belongs to one program
+        return $this->belongsTo(Program::class); 
+    }
 }
