@@ -26,10 +26,14 @@ class Program extends Model
         'close_date',
     ];
 
-    public function programSpec()
-    {
-        // One program has one program_spec
-        return $this->hasOne(Program_Spec::class); 
+    public function user(){
+        return $this->belongsTo(User::class);
     }
+
+    public function programSpecs(){
+        return $this->hasMany(Program_Spec::class);
+    }
+
+
 
 }

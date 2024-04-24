@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Program;
 use App\Models\Program_Spec;
+use App\Models\Participant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use DataTables;
@@ -83,31 +84,7 @@ class ProgramController extends Controller
             if(Auth::user()->roleID == 1 || Auth::user()->roleID == 2)
                 return view('programs.index');
             else{
-                return view('programs.apply');
-            }
-
-        }
-        return redirect('/')->withErrors(['message' => 'Anda tidak dibenarkan untuk melayari halaman ini']);
-        
-    }
-
-    public function indexNonAdmin()
-    {
-        //
-        if(Auth::check()){
-            $logRole = Auth::user()->roleID;
-
-            if($logRole){
-                $roleID = User::where('roleID', $logRole)->value("roleID");
-
-                $role = DB::table('roles')
-                    ->where('roleID', $roleID)
-                    ->select('name', 'roleID')
-                    ->first();
-
-                $programs = $this->getProgramsByApprovedStatus();
-
-                return view('programs.index', compact('role', 'programs'));
+                return view('programs.view');
             }
 
         }
@@ -453,7 +430,7 @@ class ProgramController extends Controller
             return redirect()->back()->withErrors(["message" => "Tidak berjaya dipadam"]);
         }
     }
-
+    
     // // Function to get list of programs
     public function getProgramsDatatable(Request $request)
     {
@@ -464,6 +441,7 @@ class ProgramController extends Controller
             ->join('users', 'users.id', '=', 'programs.user_id')
             ->where([
                 ['programs.status', 1],
+                ['programs.approved_status', 1]
             ])
             ->select(
                 'programs.*',
@@ -494,7 +472,7 @@ class ProgramController extends Controller
                         }
                         // The program is approved
                         elseif($row->approved_status == 2){
-                            $btn = $btn . '<a href="/joinprogram/' . $row->program_id . '"><span class="badge badge-success"> Mohon </span></a></div>';
+                            // $btn = $btn . '<a href="/joinprogram/' . $row->program_id . '"><span class="badge badge-success"> Mohon </span></a></div>';
                         }
                         // The program is declined
                         elseif($row->approved_status == 0){
@@ -549,7 +527,16 @@ class ProgramController extends Controller
         ->orderBy('programs.updated_at', 'desc')
         ->get();
 
-        // Return the updated data
-        return response()->json($allPrograms);
+        $enrolled = Participant::where([
+            ['user_id', Auth::user()->id],
+            ['status', 1],
+        ])
+        ->select('program_id as pid')
+        ->get();
+
+        return response()->json([
+            'allPrograms' => $allPrograms,
+            'enrolled' => $enrolled
+        ]);        
     }
 }
