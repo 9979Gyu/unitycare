@@ -144,6 +144,12 @@ class ProgramController extends Controller
         $validated = $request->validate($rules);
 
         if($validated){
+
+            $desc = [
+                "desc" => $request->get('description'),
+                "reason" => "",
+            ];
+
             $program = new Program([
                 'name' => $request->get('name'),
                 'start_date' => $request->get('start_date'),
@@ -151,7 +157,7 @@ class ProgramController extends Controller
                 'end_date' => $request->get('end_date'),
                 'end_time' => $request->get('end_time'),
                 'close_date' => $request->get('close_date'),
-                'description' => $request->get('description'),
+                'description' => json_encode($desc),
                 'venue' => $request->get('address'),
                 'type_id' => $request->get('programType'),
                 'user_id' => Auth::user()->id,
@@ -209,6 +215,10 @@ class ProgramController extends Controller
             ['status', 1],
             ['approved_status', 1],
         ])
+        ->select(
+            "*",
+            "description->desc as description"
+        )
         ->first();
 
         $volNum = Program_Spec::where([
@@ -257,6 +267,12 @@ class ProgramController extends Controller
         $validated = $request->validate($rules);
 
         if($validated){
+
+            $desc = [
+                "desc" => $request->get('description'),
+                "reason" => "",
+            ];
+
             $result = DB::table('programs')
                 ->where('program_id', $id)
                 ->update([
@@ -266,7 +282,7 @@ class ProgramController extends Controller
                     'end_date' => $request->get('end_date'),
                     'end_time' => $request->get('end_time'),
                     'close_date' => $request->get('close_date'),
-                    'description' => $request->get('description'),
+                    'description' => json_encode($desc),
                     'venue' => $request->get('address'),
                     'user_id' => Auth::user()->id,
                     'status' => 1,
@@ -374,6 +390,20 @@ class ProgramController extends Controller
 
     public function declineApproval(Request $request)
     {
+        // Get the current description
+        $currentDesc = DB::table('programs')
+        ->where('program_id', $request->selectedID)
+        ->value('description');
+
+        // Decode the JSON to an associative array
+        $descArray = json_decode($currentDesc, true);
+
+        // Update the 'reason' field
+        $descArray['reason'] = $request->get('reason');
+
+        // Encode the array back to JSON
+        $newDesc = json_encode($descArray);
+
         // Update the program details
         $update = DB::table('programs')
         ->where([
@@ -383,7 +413,7 @@ class ProgramController extends Controller
         ->update([
             'approved_status' => 0,
             'approved_by' => Auth::user()->id, 
-            'description' => DB::raw("CONCAT(description, ' - Declined: $request->reason')"),
+            'description' => $newDesc
         ]);
 
         // If successfully update the program
@@ -434,6 +464,7 @@ class ProgramController extends Controller
             ])
             ->select(
                 'programs.*',
+                'programs.description->desc as description',
                 'users.name as username',
                 'users.email as useremail',
                 'users.contactNo as usercontact'

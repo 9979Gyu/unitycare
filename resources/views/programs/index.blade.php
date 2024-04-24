@@ -46,8 +46,8 @@
                     <th>Bermula</th>
                     <th>Tamat</th>
                     <th>Penerangan</th>
-                    <th>Tambah Oleh</th>
                     <th>Pengurus</th>
+                    <th>Tarikh Tutup Permohonan</th>
                     <th>Tindakan</th>
                 </tr>
             </thead>
@@ -98,7 +98,7 @@
                         <br>
                         <div id="more">
                             <label for="explain" class="required">Penerangan</label>
-                            <input type="text" name="explain" class="form-control" id="explain" value="{{ old('explain') }}" placeholder="Tidak sesuai untuk peserta" required>
+                            <input type="text" name="explain" class="form-control" id="explain" placeholder="Tidak sesuai untuk peserta" required>
                         </div>
                     </div>      
 
@@ -198,7 +198,7 @@
                     orderable: true,
                     searchable: true
                 }, {
-                    data: "description",
+                    data: 'description',
                     name: 'description',
                     orderable: true,
                     searchable: true,
@@ -236,7 +236,6 @@
         var selectedID;
         $(document).on('click', '.deleteAnchor', function() {
             selectedID = $(this).attr('id');
-            console.log(selectedID);
         });
 
         $('#delete').click(function() {
@@ -324,11 +323,13 @@
             // Disabled the Tolak button in modal
             $("#decline").prop("disabled", true);
             // Hide the explaination input field
+            $("#explain").val("");
             $("#more").hide();
 
             // If select "lain-lain"
             if($(this).val() == "others"){
                 $("#more").show();
+                declineReason = "";
             }
             else{
                 if($(this).val() !== "0"){
@@ -360,8 +361,6 @@
         });
 
         $('#decline').click(function() {
-
-            
 
             $.ajax({
                 type: 'POST',
