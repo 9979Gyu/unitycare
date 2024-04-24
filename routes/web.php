@@ -76,6 +76,6 @@ Route::get('/editprogram/{id}', [ProgramController::class, 'edit']);
 Route::post('/updateprogram/{id}', [ProgramController::class, 'update']);
 Route::post('/approveprogram/{id}', [ProgramController::class, 'updateApproval']);
 Route::post('/declineprogram', [ProgramController::class, 'declineApproval']);
-Route::post('/deleteprogram/{id}', [ProgramController::class, 'destroy']);
+Route::post('/deleteprogram', [ProgramController::class, 'destroy']);
 Route::get('/getUpdatedPrograms', [ProgramController::class, 'getUpdatedPrograms']);
 

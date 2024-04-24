@@ -80,7 +80,11 @@ class ProgramController extends Controller
     {
         //
         if(Auth::check()){
-            return view('programs.index');
+            if(Auth::user()->roleID == 1 || Auth::user()->roleID == 2)
+                return view('programs.index');
+            else{
+                return view('programs.apply');
+            }
 
         }
         return redirect('/')->withErrors(['message' => 'Anda tidak dibenarkan untuk melayari halaman ini']);
@@ -213,7 +217,7 @@ class ProgramController extends Controller
         $program = Program::where([
             ['program_id', $id],
             ['status', 1],
-            ['approved_status', 1],
+            ['approved_status', '<', 2],
         ])
         ->select(
             "*",
@@ -431,14 +435,13 @@ class ProgramController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request)
     {
         //
         $result = DB::table('programs')
-            ->where('program_id', $id)
+            ->where('program_id', $request->selectedID)
             ->update([
                 'status' => 0,
             ]);
@@ -469,6 +472,7 @@ class ProgramController extends Controller
                 'users.email as useremail',
                 'users.contactNo as usercontact'
             )
+            ->orderBy("programs.updated_at", "desc")
             ->get();
 
             if(isset($selectedPrograms)){
@@ -528,15 +532,24 @@ class ProgramController extends Controller
     }
 
     public function getUpdatedPrograms(){
-        $resultPrograms = $this->getProgramsByApprovedStatus();
-
-        // Generate HTML for the card with the updated data
-        $cardContent = '';
-        foreach ($resultPrograms as $program) {
-            $cardContent .= view('programs.index', ['row' => $program, 'programs' => $resultPrograms])->render();
-        }
+        $allPrograms = Program::where([
+            ['programs.status', 1],
+        ])
+        ->join('users', 'id', '=', 'user_id')
+        ->join('types', 'types.type_id', '=', 'programs.type_id')
+        ->select(
+            'programs.*', 
+            'programs.description->desc as description',
+            'programs.description->reason as reason',
+            'users.name as username', 
+            'users.contactNo as contact_no', 
+            'users.email as useremail',
+            'types.name as typename'
+        )
+        ->orderBy('programs.updated_at', 'desc')
+        ->get();
 
         // Return the updated data
-        return response()->json(['cardContent' => $cardContent]);
+        return response()->json($allPrograms);
     }
 }

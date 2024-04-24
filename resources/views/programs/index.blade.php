@@ -24,15 +24,6 @@
         </div>
     @endif
 
-    @if(Auth::user()->roleID != 5)
-    <button class="btn btn-info float-end" type="button" id="addBtn" onclick="window.location='/createprogram/{{ Auth::user()->roleID }}'" >
-        <!-- <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-square-fill" viewBox="0 0 16 16">
-            <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm6.5 4.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3a.5.5 0 0 1 1 0"/>
-        </svg> -->
-        Tambah
-    </button>
-    @endif
-
     <br>
 
     <input type="number" id="roleID" value="{{ Auth::user()->roleID }}" hidden>
@@ -161,10 +152,6 @@
                     "targets": [1, 2, 3, 4, 5, 6, 7, 8],
                     "className": "text-center",
                 },], 
-                
-                order: [
-                    [7, 'desc']
-                ],
                 columns: [{
                     "data": null,
                     searchable: false,
@@ -243,7 +230,8 @@
                 $.ajax({
                     type: 'POST',
                     dataType: 'html',
-                    url: "/deleteprogram/" + selectedID,
+                    url: "/deleteprogram",
+                    data: { selectedID : selectedID },
                     success: function(data) {
                         $('#deleteModal').modal('hide');
                         $('.condition-message').html(data);
