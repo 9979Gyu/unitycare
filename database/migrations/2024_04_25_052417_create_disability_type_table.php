@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddColumnToTablePrograms extends Migration
+class CreateDisabilityTypeTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,11 @@ class AddColumnToTablePrograms extends Migration
      */
     public function up()
     {
-        Schema::table('programs', function (Blueprint $table) {
-            //
-            $table->date('close_date');
+        Schema::create('disability_types', function (Blueprint $table) {
+            $table->id('dis_type_id');
+            $table->string('name');
+            $table->integer('status');
+            $table->timestamps();
         });
     }
 
@@ -26,8 +28,6 @@ class AddColumnToTablePrograms extends Migration
      */
     public function down()
     {
-        Schema::table('programs', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('disability_type');
     }
 }
