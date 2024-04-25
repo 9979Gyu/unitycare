@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Poor;
 use Facade\FlareClient\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -26,6 +27,7 @@ class UserController extends Controller
 
             if($logRole == 1 || ($logRole == 2 && $roleNo > 2)){
                 $users = User::where('roleID', $roleNo)->get();
+                
                 $rolename = DB::table('roles')
                     ->where('roleID', $users[0]->roleID)
                     ->value("name");
@@ -45,21 +47,78 @@ class UserController extends Controller
      */
     public function create($roleNo)
     {
-        //
-        return view('users.add', compact('roleNo'));  
+        // Show add enterprise page
+        if($roleNo == 3)
+            return view('users.enterprise.add', compact('roleNo')); 
+        else
+            return view('users.add', compact('roleNo'));  
     }
 
     public function createPoorPeople(){
-        return view('users.poor.add');
+        
+        if(Auth::check()){
+            $disTypes = DB::table('disability_types')
+            ->where('status', 1)
+            ->select('dis_type_id', 'name')
+            ->get();
+    
+            return view('users.poor.add', compact('disTypes'));
+        }
+        else{
+            return redirect('/login')->withErrors(['message' => 'Anda perlu log masuk untuk mendaftarkan orang kurang upaya.']);
+        }
     }
 
     public function checkUser(Request $request){
-        $ic = $request->get('ic');
 
-        if(isset($ic)){
-            $user = DB::connection('mysqlSecondConnection')
+        $result = 0;
+
+        $type = $request->get('usertype');
+
+        if($type == "poor"){
+            $number = $request->get('ic');
+        }
+        else{
+            $number = $request->get('ssm');
+        }
+
+        if(isset($number)){
+            if($type == "poor"){
+                $result = DB::connection('mysqlSecondConnection')
                 ->table('users')
-                ->where('users.ICNo', $ic)
+                ->where('users.ICNo', $number)
+                ->first();
+            }
+            else{
+                $result = DB::connection('mysqlSSMConnection')
+                ->table('enterprises')
+                ->where([
+                    ['registrationNo', $number],
+                    ['status', 1],
+                ])
+                ->first();
+            }
+
+            if($result){
+                return response()->json(['success' => true, 'user' => $result]);
+            }
+        }
+
+        if($type=="poor"){
+            return redirect('/createspecial')->withErrors(["message" => "Anda tidak dibenarkan untuk melayari halaman ini"]);
+        }
+        else{
+            return redirect('/')->withErrors(["message" => "Pendaftaran tidak berjaya"]);
+        }
+    }
+
+    public function checkEnterprise(Request $request){
+        $ssmRegNo = $request->get('ssm');
+
+        if(isset($ssmRegNo)){
+            $enterprise = DB::connection('mysqlSSMConnection')
+                ->table('enterprises')
+                ->where('enterprises.registrationNo', $ssmRegNo)
                 ->first();
 
             if($user){
@@ -95,17 +154,35 @@ class UserController extends Controller
                 'state' => 'required',
                 'city' => 'required',
                 'postalCode' => 'required',
-                'roleID' => 'required|in:1,2,4,5'
+                'roleID' => 'required|in:1,2,4,5',
+                'disType' => 'required|integer|between:1,7'
             ];
         }
         else if($roleID == 3){
             // store as enterprise
-            
+            $rules = [
+                'name' => 'required',
+                'regNo' => 'required|unique:users,ICNo',
+                'email' => 'required|unique:users,email',
+                'password' => 'required',
+                'username' => 'required|unique:users,username',
+                'contactNo' => 'required|unique:users,contactNo',
+                'address' => 'required',
+                'state' => 'required',
+                'city' => 'required',
+                'postalCode' => 'required',
+                'roleID' => 'required|in:3',
+            ];
         }
 
         $validated = $request->validate($rules);
 
         if($validated){
+            if($roleID == 3)
+                $ic = $request->get('regNo');
+            else
+                $ic = $request->get('ICNo');
+
             $user = new User([
                 'name' => $request->get('name'),
                 'email' => $request->get('email'),
@@ -116,18 +193,40 @@ class UserController extends Controller
                 'state' => $request->get('state'),
                 'city' => $request->get('city'),
                 'postalCode' => $request->get('postalCode'),
-                'status' => 1,
+                'status' => 0,
                 'officeNo' => $request->get('officeNo'),
-                'ICNo' => $request->get('ICNo'),
+                'ICNo' => $ic,
                 'roleID' => $request->get('roleID'),
             ]);
 
             $user->save();
 
+            // Register for poor people
+            if($roleID == 5){
+                // Get the poor people details by given ic
+                $poor = DB::connection('mysqlSecondConnection')
+                ->table('users')
+                ->where('users.ICNo', $ic)
+                ->first();
+
+                // save to poor table in db
+                $poor = new Poor([
+                    'disability_type' => $request->get('disType'),
+                    'instituition_name' => $poor->instituitionName,
+                    'employment_status' => $poor->employmentStatus,
+                    'status' => 1,
+                    'user_id' => $user->id,
+                    'education_level' => $poor->educationLevelID,
+                    'volunteer_id' => Auth::user()->id,
+                ]);
+
+                $poor->save();
+            }
+
             if($roleID == 1 || $roleID == 2)
                 return redirect('/view/' . $roleID )->with('success', 'Pengguna berjaya didaftarkan');
             else
-                return redirect('/login')->with('success', 'Pengguna berjaya didaftarkan');
+                return redirect('/')->with('success', 'Pengguna berjaya didaftarkan');
         }
         else{
             $validator = Validator::make($request->all(), $rules);
@@ -314,6 +413,7 @@ class UserController extends Controller
 
     public function getUsersDatatable(Request $request)
     {
+
         if(request()->ajax()){
             $rid = $request->rid;
 
@@ -332,8 +432,11 @@ class UserController extends Controller
                 $table->addColumn('action', function ($row) {
                     $token = csrf_token();
                     $btn = '<div class="d-flex justify-content-center">';
-                    $btn = $btn . '<a href="/edituser/' . $row->id . '"><span class="badge badge-warning"> Kemaskini </span></a></div>';
-                    $btn = $btn . '<a class="deleteAnchor" href="#" id="' . $row->id . '"><span class="badge badge-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"> Padam </span></a></div>';
+
+                    if(Auth::user()->id == $row->id)
+                        $btn = $btn . '<a href="/edituser/' . $row->id . '"><span class="badge badge-warning"> Kemaskini </span></a></div>';
+                    else
+                        $btn = $btn . '<a class="deleteAnchor" href="#" id="' . $row->id . '"><span class="badge badge-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"> Padam </span></a></div>';
 
                     return $btn;
                 });
@@ -343,8 +446,6 @@ class UserController extends Controller
             }
             
         }
-
-        return view('users.index');
     }
 
     /**

@@ -52,12 +52,21 @@ class ParticipantController extends Controller
         ])
         ->first();
 
+        $participantExist = DB::table('participants')
+        ->join('programs as p', 'p.program_id', '=', 'participants.program_id')
+        ->where([
+            ['p.program_id', $id],
+            ['participants.status', 1],
+            ['participants.user_id', Auth::user()->id]
+        ])
+        ->count();
+
         $volRemain = $volLimit->qty_limit - $volLimit->qty_enrolled;
         $poorRemain = $poorLimit->qty_limit - $poorLimit->qty_enrolled;
 
         // dd($program);
 
-        return view('participants.add', compact('program', 'volRemain', 'poorRemain'));
+        return view('participants.add', compact('program', 'volRemain', 'poorRemain', 'participantExist'));
         
     }
 
@@ -79,7 +88,10 @@ class ParticipantController extends Controller
 
             if($result){
                 $updateEnrolled = DB::table('program_specs')
-                ->where('program_id', $programID)
+                ->where([
+                    ['program_id', $programID],
+                    ['user_type_id', $userType],
+                ])
                 ->increment('qty_enrolled', 1);
 
                 return redirect('/viewprogram')->with('success', 'Berjaya didaftarkan');

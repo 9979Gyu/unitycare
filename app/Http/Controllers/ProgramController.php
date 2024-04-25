@@ -79,7 +79,16 @@ class ProgramController extends Controller
 
     public function index()
     {
-        //
+        $currentDate = date('Y-m-d');
+        
+        // Update outdated program status to 0;
+        Program::where([
+            ['status', 1],
+            // Check for end_date before current date
+            ['end_date', '<', $currentDate],  
+        ])
+        ->update(['status' => 0]);
+
         if(Auth::check()){
             if(Auth::user()->roleID == 1 || Auth::user()->roleID == 2)
                 return view('programs.index');

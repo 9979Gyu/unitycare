@@ -82,18 +82,21 @@
                 <th scope="row">Pilihan</th>
                 <input type="number" name="program_id" value="{{ $program->program_id }}" hidden>
                 <td colspan="3">
-                @if(Auth::user()->roleID == 5)
-                    @if($poorRemain > 0)
-                        <button type="submit" class="btn btn-success" name="button_id" value="3"><b>Jadi Peserta</b></button>
-                    @endif
-                    @if($volRemain > 0)
-                        <button type="submit" class="btn btn-info" name="button_id" value="2"><b>Jadi Sukarelawan</b></button>
-                    @endif
-                @else
-                    @if($volRemain > 0)
-                        <button type="submit" class="btn btn-info" name="button_id" value="2"><b>Jadi Sukarelawan</b></button>
+                @if($participantExist == 0 && $program->close_date >= today())
+                    @if(Auth::user()->roleID == 5)
+                        @if($poorRemain > 0)
+                            <button type="submit" class="btn btn-success" name="button_id" value="3"><b>Jadi Peserta</b></button>
+                        @endif
+                        @if($volRemain > 0)
+                            <button type="submit" class="btn btn-info" name="button_id" value="2"><b>Jadi Sukarelawan</b></button>
+                        @endif
+                    @else
+                        @if($volRemain > 0)
+                            <button type="submit" class="btn btn-info" name="button_id" value="2"><b>Jadi Sukarelawan</b></button>
+                        @endif
                     @endif
                 @endif
+                <button type="button" class="btn btn-secondary" onclick="window.location='/viewprogram'"><b>Tutup</b></button>
                 </td>
             </tr>
         </table>

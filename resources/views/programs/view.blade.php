@@ -81,5 +81,6 @@
     </div>
 
     <script src="{{ asset('js/viewProgramScript.js') }}"></script>
+    <script src="{{ asset('js/dateScript.js') }}"></script>
 
 @endsection

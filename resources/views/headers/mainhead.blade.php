@@ -36,7 +36,6 @@
                     </li>
                 @endif
                 @if(Auth::check())
-                    @if(Auth::user()->roleID != 4)
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <b>Tindakan</b>
@@ -54,14 +53,14 @@
                             <li><a class="dropdown-item" href="/view/5"><b>Kesukaran</b></a></li>
                             <li><hr class="dropdown-divider"></li>
                             @endif
+                            @if(Auth::user()->roleID == 4)
+                            <li><a class="dropdown-item" href="/createspecial"><b>Kesukaran</b></a></li>
+                            @endif
                             @if(Auth::user()->roleID != 4)
                             <li><a class="dropdown-item" href="#"><b>Pekerjaan</b></a></li>
-                            <li><hr class="dropdown-divider"></li>
                             @endif
-                            <li><a class="dropdown-item" href="/viewprogram"><b>Program</b></a></li>
                         </ul>
                     </li>
-                    @endif
 
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -70,6 +69,7 @@
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <li><a class="dropdown-item" href="/viewprogram"><b>View</b></a></li>
                             @if(Auth::user()->roleID != 5)
+                            <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="/createprogram/{{ Auth::user()->roleID }}"><b>Create</b></a></li>
                             @endif
                         </ul>

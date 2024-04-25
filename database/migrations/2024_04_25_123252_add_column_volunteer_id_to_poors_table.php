@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AlterUseridColumnInUsersTable extends Migration
+class AddColumnVolunteerIdToPoorsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,10 @@ class AlterUseridColumnInUsersTable extends Migration
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {
+        Schema::table('poors', function (Blueprint $table) {
             //
+            $table->unsignedBigInteger('volunteer_id');
+            $table->foreign('volunteer_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 
@@ -25,7 +27,7 @@ class AlterUseridColumnInUsersTable extends Migration
      */
     public function down()
     {
-        Schema::table('users', function (Blueprint $table) {
+        Schema::table('poors', function (Blueprint $table) {
             //
         });
     }

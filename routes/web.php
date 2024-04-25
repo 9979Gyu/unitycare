@@ -79,6 +79,7 @@ Route::post('/approveprogram/{id}', [ProgramController::class, 'updateApproval']
 Route::post('/declineprogram', [ProgramController::class, 'declineApproval']);
 Route::post('/deleteprogram', [ProgramController::class, 'destroy']);
 Route::get('/getUpdatedPrograms', [ProgramController::class, 'getUpdatedPrograms']);
+
 Route::get('/joinprogram/{id}', [ParticipantController::class, 'create']);
 Route::post('/dismissprogram', [ParticipantController::class, 'dismiss']);
 Route::post('/storeparticipant', [ParticipantController::class, 'store']);
