@@ -62,6 +62,7 @@ $(document).ready(function() {
     });
 
     function updateCardContainer(){
+        $uid = $("#uid").val();
         $.ajax({
             type: 'GET',
             url: "/getUpdatedPrograms",
@@ -87,7 +88,7 @@ $(document).ready(function() {
                     const day = String(today.getDate()).padStart(2, '0');
                     const currentDate = `${year}-${month}-${day}`;
 
-                    button = '<a class="viewAnchor btn btn-info me-2" href="/joinprogram/' + program.program_id + '">' +
+                    button = '<a class="viewAnchor btn btn-info m-2" href="/joinprogram/' + program.program_id + '">' +
                         '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">' +
                         '<path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>' +
                         '</svg> Lihat </a>';
@@ -101,7 +102,7 @@ $(document).ready(function() {
                         '</svg> Keluar</a>';
                     }
                     else{
-                        if(program.close_date >= currentDate){
+                        if(program.close_date >= currentDate && program.user_id != $uid){
                             button += '<a class="applyAnchor btn btn-success" href="/joinprogram/' + program.program_id + '">' +
                             '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-person-plus-fill" viewBox="0 0 16 16">' +
                             '<path d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>' +

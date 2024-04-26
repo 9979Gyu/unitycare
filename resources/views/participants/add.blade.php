@@ -82,7 +82,7 @@
                 <th scope="row">Pilihan</th>
                 <input type="number" name="program_id" value="{{ $program->program_id }}" hidden>
                 <td colspan="3">
-                @if($participantExist == 0 && $program->close_date >= today())
+                @if($participantExist == 0 && $program->close_date >= today() && $program->user_id != Auth::user()->id)
                     @if(Auth::user()->roleID == 5)
                         @if($poorRemain > 0)
                             <button type="submit" class="btn btn-success" name="button_id" value="3"><b>Jadi Peserta</b></button>
