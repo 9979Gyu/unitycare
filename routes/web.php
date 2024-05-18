@@ -99,6 +99,7 @@ Route::get('/getPositions', [OfferController::class, 'getPositions']);
 Route::post('/storeoffer', [OfferController::class, 'store']);
 Route::get('/viewoffer', [OfferController::class, 'index']);
 Route::get('/getoffers', [OfferController::class, 'getOffersDatatable']);
+Route::post('/deleteoffer', [OfferController::class, 'destroy']);
 
 
 

@@ -88,28 +88,22 @@ class OfferController extends Controller
         return redirect('/viewoffer')->with('error', "Pendaftaran tidak berjaya");
     }
 
-    // Function to display edit offer form
-    public function edit($id){
-
-        if(Auth::check()){
-            $roleNo = Auth::user()->roleID;
-            $offer = DB::table('job_offers')
-            ->join('jobs', '')
-            return view('offers.edit', compact('roleNo', 'offer'));
-        }
-        else{
-            return redirect('/')->withErrors(['message' => 'Anda tidak dibenarkan untuk melayari halaman ini']);
-        }
-
-    }
-
-    // Function to update edited offer
-    public function update(){
-
-    }
-
     // Function to remove offer from database
-    public function destroy(){
+    public function destroy(Request $request){
+
+        $update = DB::table('job_offers')
+        ->where([
+            ['offer_id', $request->selectedID],
+            ['status', 1],
+        ])
+        ->update([
+            'status' => 0,
+        ]);  
+
+        if($update)
+            return redirect()->back()->with('success', 'Berjaya dipadam');
+
+        return redirect()->back()->withErrors(["message" => "Tidak berjaya dipadam"]);
 
     }
 
@@ -155,7 +149,6 @@ class OfferController extends Controller
                 $table->addColumn('action', function ($row) {
                     $token = csrf_token();
                     $btn = '<div class="d-flex justify-content-center">';
-                    $btn = $btn . '<a href="/editoffer/' . $row->offer_id . '"><span class="badge badge-warning"> Kemaskini </span></a></div>';
                     $btn = $btn . '<a class="deleteAnchor" href="#" id="' . $row->offer_id . '"><span class="badge badge-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"> Padam </span></a></div>';
                     return $btn;
                 });

@@ -78,7 +78,7 @@ $(document).ready(function() {
             $.ajax({
                 type: 'POST',
                 dataType: 'html',
-                url: "/deleteprogram",
+                url: "/deleteoffer",
                 data: { selectedID : selectedID },
                 success: function(data) {
                     $('#deleteModal').modal('hide');
