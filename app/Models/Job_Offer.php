@@ -17,13 +17,14 @@ class Job_Offer extends Model
         'description',
         'user_id',
         'start_date',
-        'end_date',
         'salary_range',
-        'address',
         'state',
         'city',
         'postal_code',
-        'sector_id',
+        'job_type_id',
+        'shift_type_id',
+        'approval_status',
+        'status',
     ];
 
 }

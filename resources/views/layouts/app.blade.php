@@ -12,8 +12,7 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <!-- Style -->
-    <link href="{{ asset('css/style.css') }}" rel="stylesheet">
+    <!-- Bootstrap Style -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.datatables.net/2.0.4/css/dataTables.bootstrap5.min.css">
@@ -27,6 +26,13 @@
     <!-- Datatable Script -->
     <script src="https://cdn.datatables.net/2.0.4/js/dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/2.0.4/js/dataTables.bootstrap5.min.js"></script>
+
+    <!-- For searchable dropdown -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+
+    <!-- Style -->
+    <link href="{{ asset('css/style.css') }}" rel="stylesheet">
 
 </head>
 <body>

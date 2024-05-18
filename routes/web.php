@@ -6,6 +6,7 @@ use App\Http\Controllers\PostcodeController;
 use App\Http\Controllers\ProgramController;
 use App\Http\Controllers\ParticipantController;
 use App\Http\Controllers\JobController;
+use App\Http\Controllers\OfferController;
 
 /*
 |--------------------------------------------------------------------------
@@ -90,6 +91,14 @@ Route::get('/createjob', [JobController::class, 'create']);
 Route::get('/viewjob', [JobController::class, 'index']);
 Route::get('/getjob', [JobController::class, 'getJobsDatatable']);
 Route::post('/storejob', [JobController::class, 'store']);
+
+// Offers
+Route::get('/createoffer', [OfferController::class, 'create']);
+Route::get('/getJobs', [OfferController::class, 'getJobs']);
+Route::get('/getPositions', [OfferController::class, 'getPositions']);
+Route::post('/storeoffer', [OfferController::class, 'store']);
+Route::get('/viewoffer', [OfferController::class, 'index']);
+Route::get('/getoffers', [OfferController::class, 'getOffersDatatable']);
 
 
 

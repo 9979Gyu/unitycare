@@ -46,8 +46,8 @@ class JobController extends Controller
 
         if($validated){
             $job = new job([
-                'name' => $request->get('name'),
-                'position' => $request->get('position'),
+                'name' => ucwords($request->get('name')),
+                'position' => ucwords($request->get('position')),
                 'description' => $request->get('description'),
                 'status' => 1,
             ]);

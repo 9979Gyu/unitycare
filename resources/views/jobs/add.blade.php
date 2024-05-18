@@ -48,7 +48,7 @@
         <br>
 
         <div class="row mb-3">
-            <label for="description" class="col-sm-2 col-form-label required">Deskripsi</label>
+            <label for="description" class="col-sm-2 col-form-label required">Penerangan</label>
             <div class="col-sm-10">
                 <input type="text" value="{{ old('description') }}" name="description" class="form-control" id="description" required>
             </div>
