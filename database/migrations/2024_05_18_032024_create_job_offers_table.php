@@ -31,6 +31,8 @@ class CreateJobOffersTable extends Migration
             $table->integer('approval_status');
             $table->unsignedBigInteger('job_id');
             $table->foreign('job_id')->references('job_id')->on('jobs')->onDelete('cascade');
+            $table->unsignedBigInteger('sector_id');
+            $table->foreign('sector_id')->references('sector_id')->on('sectors')->onDelete('cascade');
             $table->timestamps();
         });
     }

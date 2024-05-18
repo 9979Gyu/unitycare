@@ -5,6 +5,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\PostcodeController;
 use App\Http\Controllers\ProgramController;
 use App\Http\Controllers\ParticipantController;
+use App\Http\Controllers\JobController;
 
 /*
 |--------------------------------------------------------------------------
@@ -83,4 +84,11 @@ Route::get('/getUpdatedPrograms', [ProgramController::class, 'getUpdatedPrograms
 Route::get('/joinprogram/{id}', [ParticipantController::class, 'create']);
 Route::post('/dismissprogram', [ParticipantController::class, 'dismiss']);
 Route::post('/storeparticipant', [ParticipantController::class, 'store']);
+
+// Jobs
+Route::get('/createjob', [JobController::class, 'create']);
+Route::get('/viewjob', [JobController::class, 'index']);
+Route::get('/getjob', [JobController::class, 'getJobsDatatable']);
+
+
 
