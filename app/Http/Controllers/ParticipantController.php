@@ -66,7 +66,7 @@ class ParticipantController extends Controller
 
         // dd($program);
 
-        return view('participants.add', compact('program', 'volRemain', 'poorRemain', 'participantExist'));
+        return view('participants.add', compact('program', 'volLimit', 'poorLimit', 'volRemain', 'poorRemain', 'participantExist'));
         
     }
 
@@ -105,24 +105,28 @@ class ParticipantController extends Controller
     public function dismiss(Request $request)
     {
         //
-        $result = DB::table('participants')
+        $update = DB::table('program_specs')
+        ->join('participants as p', 'p.user_type_id', '=', 'program_specs.user_type_id')
+        ->where([
+            ['p.user_id', Auth::user()->id],
+            ['p.status', 1],
+            ['program_specs.program_id', $request->selectedID],
+            ['p.program_id', $request->selectedID],
+        ])
+        ->decrement('program_specs.qty_enrolled', 1);
+
+        if($update){
+
+            $result = DB::table('participants')
             ->where([
                 ['status', 1],
                 ['program_id', $request->selectedID],
             ])
             ->update([
                 'status' => 0,
-            ]);
+            ]);    
 
-        if($result){
-
-            $update = DB::table('program_specs')
-            ->where([
-                ['program_id', $request->selectedID],
-            ])
-            ->decrement('qty_enrolled', 1);
-
-            if($update)
+            if($result)
                 return redirect()->back()->with('success', 'Berjaya dipadam');
         }
 

@@ -20,7 +20,7 @@
         </div>
     @endif
 
-    @if($rolename == "Kesukaran")
+    @if($users[0]->roleID == 5)
     <button class="btn btn-info float-end" type="button" id="addBtn" onclick="window.location='/createspecial'" >
         Tambah
     </button>

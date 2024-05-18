@@ -64,8 +64,8 @@
                 <th colspan="2">Peserta</th>
             </tr>
             <tr>
-                <td>{{ $volRemain }}</td>
-                <td colspan="2">{{ $poorRemain }}</td>
+                <td>{{ $volRemain }} / {{ $volLimit->qty_limit }}</td>
+                <td colspan="2">{{ $poorRemain }} / {{ $poorLimit->qty_limit }}</td>
             </tr>
             <tr>
                 <th scope="row" rowspan="2">Pengurus</th>

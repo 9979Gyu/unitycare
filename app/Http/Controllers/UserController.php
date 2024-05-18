@@ -73,9 +73,9 @@ class UserController extends Controller
 
         $result = 0;
 
-        $type = $request->get('usertype');
+        $role = $request->get('role');
 
-        if($type == "poor"){
+        if($role == 5){
             $number = $request->get('ic');
         }
         else{
@@ -83,7 +83,7 @@ class UserController extends Controller
         }
 
         if(isset($number)){
-            if($type == "poor"){
+            if($role == 5){
                 $result = DB::connection('mysqlSecondConnection')
                 ->table('users')
                 ->where('users.ICNo', $number)
@@ -141,8 +141,23 @@ class UserController extends Controller
 
         $roleID = $request->get('roleID');
 
-        if($roleID == 1 || $roleID == 2 || $roleID == 4 || $roleID == 5){
-            // store as admin / staff / volunteer / poor people
+        if($roleID == 1 || $roleID == 2 || $roleID == 4){
+            // store as admin / staff / volunteer
+            $rules = [
+                'name' => 'required',
+                'ICNo' => 'required|unique:users,ICNo',
+                'email' => 'required|unique:users,email',
+                'password' => 'required',
+                'username' => 'required|unique:users,username',
+                'contactNo' => 'required|unique:users,contactNo',
+                'address' => 'required',
+                'state' => 'required',
+                'city' => 'required',
+                'postalCode' => 'required',
+                'roleID' => 'required|in:1,2,4,5',
+            ];
+        }
+        else if($roleID == 5){
             $rules = [
                 'name' => 'required',
                 'ICNo' => 'required|unique:users,ICNo',

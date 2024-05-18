@@ -30,11 +30,11 @@
     <div class="pb-2">
         <div class="form-check form-check-inline">
             <input class="form-check-input" type="checkbox" id="voluntaryCheckBox" value="1" checked>
-            <label class="form-check-label" for="voluntary">Voluntary</label>
+            <label class="form-check-label" for="voluntary">Sukarelawan</label>
         </div>
         <div class="form-check form-check-inline">
             <input class="form-check-input" type="checkbox" id="skillDevCheckBox" value="2" checked>
-            <label class="form-check-label" for="skillDev">Skill Development</label>
+            <label class="form-check-label" for="skillDev">Pembangunan Kemahiran</label>
         </div>
     </div>
 
@@ -66,14 +66,14 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="dismissModalLabel">Keluar Program</h5>
+                    <h5 class="modal-title" id="dismissModalLabel">Tarik Diri Daripada Program</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     Adakah anda pasti untuk berhenti menyertai program?
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" id="dismiss">Keluar</button>
+                    <button type="button" class="btn btn-danger" id="dismiss">Tarik Diri</button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
                 </div>
             </div>

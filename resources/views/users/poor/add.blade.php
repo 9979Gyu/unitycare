@@ -48,8 +48,7 @@
                         <div class="row mb-3">
                             <label for="ic" class="col-sm-2 col-form-label required">IC</label>
                             <div class="col-sm-10">
-                                <input type="text" name="usertype" id="usertype" value="poor" hidden>
-                                <input type="text" name="ic" class="form-control touppercase" id="ic" pattern="\d{12}" title="Sila berikan nombor IC yang betul" required placeholder="Contoh: 021221041234">
+                                <input type="number" name="ic" class="form-control" id="ic" pattern="\d{12}" title="Sila berikan nombor IC yang betul" required placeholder="Contoh: 021221041234">
                             </div>
                         </div>
                     </div>
@@ -177,31 +176,48 @@
             $("#addForm").hide();
 
             $('#confirmBox .btn-primary').click(function(e) {
+                $.ajax({
+                    // URL of the server endpoint
+                    url: '/checkUser',
+                    // HTTP method
+                    type: 'POST',
+                    // Data to pass
+                    data: {
+                        ic: $('#ic').val(),
+                        role: 5,
+                        _token: '{{ csrf_token() }}' // CSRF token
+                    },
+                    // Expected data type of the response
+                    dataType: 'json',
+                    success: function(data) {
+                        // Callback function to handle the response
+                        if (data.success) {
+                            $("#confirmModal").hide();
+                            $('#confirmBox').modal('hide');
+                            $('#addForm').show();
+                            document.body.style.overflow = 'auto';
 
-                $.post('/checkUser', {
-                    ic: $('#ic').val(), 
-                    _token: '{{ csrf_token() }}'
-                }, 
-                function(data) {
-                    // The server should return a JSON object with a 'success' property
-                    if (data.success) {
-                        $("#confirmModal").hide();
-                        $('#confirmBox').modal('hide');
-                        $('#addForm').show();
-                        document.body.style.overflow = 'auto';
-
-                        $('#name').val(data.user.name);
-                        $('#ICNo').val(data.user.ICNo);
-                        $('#contactNo').val(data.user.contactNo);
-                        $('#address').val(data.user.address);
-                        $('#postalCode').val(data.user.postcode);
-                        $('#state').empty();
-                        $('#city').empty();
-                        $("#state").append('<option>' + data.user.state + '</option>');
-                        $("#city").append('<option>' + data.user.city + '</option>');
-                        $('#email').val(data.user.email);
-                    } else {
-                        alert('Nombor kad pengenalan tidak dikenali');
+                            $('#name').val(data.user.name);
+                            $('#ICNo').val(data.user.ICNo);
+                            $('#contactNo').val(data.user.contactNo);
+                            $('#address').val(data.user.address);
+                            $('#postalCode').val(data.user.postcode);
+                            $('#state').empty();
+                            $('#city').empty();
+                            $("#state").append('<option>' + data.user.state + '</option>');
+                            $("#city").append('<option>' + data.user.city + '</option>');
+                            $('#email').val(data.user.email);
+                        } 
+                        else {
+                            // If the server returns failure
+                            alert('Nombor kad pengenalan tidak dikenali');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        // Error handling if the AJAX request fails
+                        console.error(error); 
+                        // Optionally, you can display an error message to the user
+                        alert('System crashed');
                     }
                 });
             });
