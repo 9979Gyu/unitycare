@@ -20,7 +20,7 @@ $(document).ready(function() {
                 "className": "text-center",
                 "width": "2%"
             }, {
-                "targets": [1, 2, 3, 4, 5, 6],
+                "targets": [1, 2, 3, 4, 5],
                 "className": "text-center",
             },], 
             columns: [{
@@ -47,7 +47,7 @@ $(document).ready(function() {
                 orderable: true,
                 searchable: true
             }, {
-                data: "use",
+                data: "jobOffersCount",
                 name: 'use',
                 orderable: true,
                 searchable: true

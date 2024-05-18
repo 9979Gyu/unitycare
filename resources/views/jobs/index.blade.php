@@ -35,7 +35,7 @@
                     <th>Nama</th>
                     <th>Jawatan</th>
                     <th>Penerangan</th>
-                    <th>Sedang Guna</th>
+                    <th>Bilangan Pengguna</th>
                     <th>Tindakan</th>
                 </tr>
             </thead>

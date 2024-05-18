@@ -89,6 +89,7 @@ Route::post('/storeparticipant', [ParticipantController::class, 'store']);
 Route::get('/createjob', [JobController::class, 'create']);
 Route::get('/viewjob', [JobController::class, 'index']);
 Route::get('/getjob', [JobController::class, 'getJobsDatatable']);
+Route::post('/storejob', [JobController::class, 'store']);
 
 
 

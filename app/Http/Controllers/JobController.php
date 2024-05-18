@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Auth;
 
 class JobController extends Controller
 {
-    //
+    // Function to display the list of job created.
     public function index(){
         if(Auth::check()){
             $roleNo = Auth::user()->roleID;
@@ -21,7 +21,7 @@ class JobController extends Controller
         }
     }
 
-    // Function to create the job name and position
+    // Function to display the add job form
     public function create(){
 
         if(Auth::check()){
@@ -33,6 +33,7 @@ class JobController extends Controller
         }
     }
 
+    // Function to store the data from add form to jobs table in database
     public function store(Request $request){
     
         $rules = [
@@ -43,7 +44,7 @@ class JobController extends Controller
         
         $validated = $request->validate($rules);
 
-        if(validated){
+        if($validated){
             $job = new job([
                 'name' => $request->get('name'),
                 'position' => $request->get('position'),
@@ -54,26 +55,14 @@ class JobController extends Controller
             $result = $job->save();
 
             if($result){
-                return redirect('/viewprogram')->with('success', 'Berjaya didaftarkan');
-            }
-            else{
-                return redirect('/viewprogram')->withErrors(['message' => "Pendaftaran tidak berjaya"]);
+                return redirect('/viewjob')->with('success', 'Berjaya didaftarkan');
             }
         }
+
+        return redirect('/viewjob')->with('error', "Pendaftaran tidak berjaya");
     }
 
-    // Function to edit the job
-    public function edit(){
-
-        if(Auth::check()){
-            $roleNo = Auth::user()->roleID;
-            return view('jobs.add', compact('roleNo'));
-        }
-        else{
-            return redirect('/')->withErrors(['message' => 'Anda tidak dibenarkan untuk melayari halaman ini']);
-        }
-    }
-
+    // Function to remove the job from the display list in index
     public function destroy(Request $request)
     {
         //
@@ -92,7 +81,7 @@ class JobController extends Controller
         return redirect()->back()->withErrors(["message" => "Tidak berjaya dipadam"]);
     }
 
-    // Function to get list of jobs
+    // Function to get list of jobs from database and display in datatable
     public function getJobsDatatable(Request $request)
     {
         if(request()->ajax()){
@@ -106,29 +95,27 @@ class JobController extends Controller
             ])
             ->select(
                 'jobs.job_id',
-                'jobs.name as jobName',
-                'jobs.description as jobDescription',
-                'jobs.position as jobPosition',
+                'jobs.name as name',
+                'jobs.description as description',
+                'jobs.position as position',
                 DB::raw('count(jo.offer_id) as jobOffersCount')
             )
-            ->groupBy('jobs.job_id')
+            ->groupBy('jobs.job_id', 'jobs.name', 'jobs.description', 'jobs.position')
             ->get();
 
-            if($selectedJobs->isEmpty()){
-                return response()->json(['message' => 'No jobs available'], 200);
+            if(isset($selectedJobs)){
+                $table = Datatables::of($selectedJobs);
+
+                $table->addColumn('action', function ($row) {
+                    $token = csrf_token();
+                    $btn = '<div class="d-flex justify-content-center">';
+                    $btn = $btn . '<a class="deleteAnchor" href="#" id="' . $row->job_id . '"><span class="badge badge-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"> Padam </span></a></div>';
+                    return $btn;
+                });
+    
+                $table->rawColumns(['action']);
+                return $table->make(true);
             }
-
-            $table = Datatables::of($selectedJobs);
-
-            $table->addColumn('action', function ($row) {
-                $token = csrf_token();
-                $btn = '<div class="d-flex justify-content-center">';
-                $btn = $btn . '<a class="deleteAnchor" href="#" id="' . $row->job_id . '"><span class="badge badge-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"> Padam </span></a></div>';
-                return $btn;
-            });
-
-            $table->rawColumns(['action']);
-            return $table->make(true);
 
         }
 

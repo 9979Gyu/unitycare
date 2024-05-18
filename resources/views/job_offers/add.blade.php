@@ -20,7 +20,7 @@
         </div>
     @endif
 
-    <form action="/storejob" method="post" class="container" id="addForm">
+    <form action="/storeoffer" method="post" class="container" id="addForm">
         @csrf
         <div class="mb-3">
             <h5>Maklumat Pekerjaan</h5>
