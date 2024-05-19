@@ -66,10 +66,15 @@
                                 <b>Pekerjaan</b>
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <li><a class="dropdown-item" href="/viewprogram"><b>Lihat</b></a></li>
-                                @if(Auth::user()->roleID != 5)
+                                @if(Auth::user()->roleID <= 2)
+                                <li><a class="dropdown-item" href="/viewjob"><b>Lihat</b></a></li>
+                                @else
+                                <li><a class="dropdown-item" href="/viewoffer"><b>Lihat</b></a></li>
+                                @endif
+
+                                @if(Auth::user()->roleID == 3)
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="/createprogram/{{ Auth::user()->roleID }}"><b>Tambah</b></a></li>
+                                <li><a class="dropdown-item" href="/createoffer"><b>Tambah</b></a></li>
                                 @endif
                             </ul>
                         </li>
