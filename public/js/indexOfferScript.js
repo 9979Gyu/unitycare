@@ -6,10 +6,35 @@ $(document).ready(function() {
     });
 
     updateCardContainer();
+    getCityState();
+
+    $("#searchBtn").click(function(){
+        updateCardContainer();
+    });
 
     // Function to add , for every 3 digit on number (10,000)
     function numberWithCommas(x) {
         return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
+    // Funciton to display list of city and states
+    function getCityState(){
+        $.ajax({
+            type: 'GET',
+            url: "/getCityState",
+            success: function(data) {
+                
+                $("#citystate").empty();
+                // Loop through the unique state and city names array
+                for(var item in data){
+                    // Append each item as an option
+                    $("#citystate").append('<option>' + data[item] + '</option>');
+                }
+            },
+            error: function (data) {
+                $('.condition-message').html(data);
+            }
+        });
     }
     
     // Funciton to display list of offers

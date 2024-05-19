@@ -19,6 +19,7 @@ class OfferController extends Controller
         if(Auth::check()){
             $roleNo = Auth::user()->roleID;
             $uid = Auth::user()->id;
+
             return view('offers.index', compact('roleNo', 'uid'));
         }
         else{

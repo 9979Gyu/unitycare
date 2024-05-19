@@ -30,4 +30,25 @@ class PostcodeController extends Controller
 
         return response()->json($result);
     }
+
+    public function getCityState(){
+        $data = File::get(database_path('postcode.json'));
+        $decodedData = json_decode($data, true);
+
+        $citiesstates = [];
+
+        foreach ($decodedData['state'] as $state) {
+            // Get the name of the state
+            $citiesstates[] = $state['name'];
+
+            // Get the names of cities within each state
+            foreach ($state['city'] as $city) {
+                $citiesstates[] = $city['name'];
+            }
+        }
+
+        $uniqueItem = array_unique($citiesstates);
+
+        return $uniqueItem;
+    }
 }

@@ -48,7 +48,7 @@
                 <option></option>
             </select>
             
-            <button type="submit">Cari</button>
+            <button type="button" class="btn btn-primary" id="searchBtn">Cari</button>
         </div>
     </div>
 
@@ -79,6 +79,5 @@
 
     <script src="{{ asset('js/indexOfferScript.js') }}"></script>
     <script src="{{ asset('js/dateScript.js') }}"></script>
-
 
 @endsection

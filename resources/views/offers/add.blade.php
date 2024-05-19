@@ -141,5 +141,6 @@
     </form>
 
     <script src="{{ asset('js/addOfferScript.js') }}"></script>
+    <script src="{{ asset('js/postcodeScript.js') }}"></script>
 
 @endsection
