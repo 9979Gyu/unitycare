@@ -1,13 +1,25 @@
 $(document).ready(function() {
+
+    // Disabled the Tolak button in modal
+    $("#decline").prop("disabled", true);
+    // Hide the explaination input field
+    $("#more").hide();
     
     $('.select2').select2({
         placeholder: 'Bandar atau negeri',
         allowClear: true,
     });
 
-    updateCardContainer();
-    getCityState();
+    var requestTable;
 
+    if($("#roleID").val() == 1 || $("#roleID").val() == 2){
+        fetch_data();
+    }
+    else{
+        updateCardContainer();
+        getCityState();
+    }
+    
     $("#searchBtn").click(function(){
         updateCardContainer();
     });
@@ -95,7 +107,7 @@ $(document).ready(function() {
                             '<p><div class="card" id="' + offer.offer_id + '">' +
                                 '<div class="card-body d-flex justify-content-between">' +
                                     '<div><h4 class="card-title">' + offer.jobposition + '</h4>' +
-                                    '<div><p class="card-text">' + offer.username + '<br>' + offer.city + '</p>' +
+                                    '<div><p class="card-text">' + offer.username + '<br>' + offer.city + ', ' + offer.state + '</p>' +
                                         '<p class="card-text badge badge-primary"> RM ' + minsal + ' - RM ' + maxsal + ' sebulan</p>' +
                                         ' <p class="card-text badge badge-primary">' + offer.typename + '</p>' +
                                         ' <p class="card-text badge badge-primary">' + offer.shiftname + '</p>' +
@@ -108,23 +120,26 @@ $(document).ready(function() {
                         );
 
                     }
-                    else if(offer.approval_status <= 1 && offer.user_id == $("#uid").val()){
+                    else if(offer.user_id == $("#uid").val()){
+
+                        if(offer.approval_status <= 1){
+                            button += '<a href="/editoffer/' + offer.offer_id + '" class="btn btn-warning m-2">Kemaskini</a>' +
+                            '<a class="deleteAnchor btn btn-danger m-2" href="#" id="' + offer.offer_id + '" data-bs-toggle="modal" data-bs-target="#deleteModal">Padam</a>';
+                        }
 
                         if(offer.reason == ""){
                             $(".card-container").append(
                                 '<p><div class="card" id="' + offer.offer_id + '">' +
                                     '<div class="card-body d-flex justify-content-between">' +
                                         '<div><h4 class="card-title">' + offer.jobposition + '</h4>' +
-                                        '<div><p class="card-text">' + offer.username + '<br>' + offer.city + '</p>' +
+                                        '<div><p class="card-text">' + offer.username + '<br>' + offer.city + ', ' + offer.state + '</p>' +
                                             '<p class="card-text badge badge-primary"> RM ' + minsal + ' - RM ' + maxsal + ' sebulan</p>' +
                                             ' <p class="card-text badge badge-primary">' + offer.typename + '</p>' +
                                             ' <p class="card-text badge badge-primary">' + offer.shiftname + '</p>' +
                                             '<p class="card-text">' + offer.description + '</p>' +
                                             '<p class="card-text text-secondary"> kemaskini ' + offer.updateDate + '</p>' +
                                         '</div></div>' +
-                                        '<div>' +
-                                            '<p><a href="/editoffer/' + offer.offer_id + '" class="btn btn-warning">Kemaskini</a></p>' +
-                                            '<p><a class="deleteAnchor btn btn-danger" href="#" id="' + offer.offer_id + '" data-bs-toggle="modal" data-bs-target="#deleteModal">Padam</a></p>' +
+                                        '<div>' + button + 
                                         '</div>' +
                                     '</div>' +
                                 '</div></p>'
@@ -135,7 +150,7 @@ $(document).ready(function() {
                                 '<p><div class="card" id="' + offer.offer_id + '">' +
                                     '<div class="card-body d-flex justify-content-between">' +
                                         '<div><h4 class="card-title">' + offer.jobposition + '</h4>' +
-                                        '<div><p class="card-text">' + offer.username + '<br>' + offer.city + '</p>' +
+                                        '<div><p class="card-text">' + offer.username + '<br>' + offer.city + ', ' + offer.state + '</p>' +
                                             '<p class="card-text badge badge-primary"> RM ' + minsal + ' - RM ' + maxsal + ' sebulan</p>' +
                                             ' <p class="card-text badge badge-primary">' + offer.typename + '</p>' +
                                             ' <p class="card-text badge badge-primary">' + offer.shiftname + '</p>' +
@@ -143,9 +158,7 @@ $(document).ready(function() {
                                             '<p class="card-text"> <b>Declined: ' + offer.reason + '</b></p>' +
                                             '<p class="card-text text-secondary"> kemaskini ' + offer.updateDate + '</p>' +
                                         '</div></div>' +
-                                        '<div>' +
-                                            '<p><a href="/editoffer/' + offer.offer_id + '" class="btn btn-warning">Kemaskini</a></p>' +
-                                            '<p><a class="deleteAnchor btn btn-danger" href="#" id="' + offer.offer_id + '" data-bs-toggle="modal" data-bs-target="#deleteModal">Padam</a></p>' +
+                                        '<div>' + button + 
                                         '</div>' +
                                     '</div>' +
                                 '</div></p>'
@@ -161,9 +174,7 @@ $(document).ready(function() {
         });
     }
     
-    var requestTable;
-
-    fetch_data();
+    
     function fetch_data() {
         requestTable = $('#requestTable').DataTable({
             processing: true,
@@ -181,7 +192,7 @@ $(document).ready(function() {
                 "className": "text-center",
                 "width": "2%"
             }, {
-                "targets": [1, 2, 3, 4, 5],
+                "targets": [1, 2, 3, 4, 5, 6, 7, 8],
                 "className": "text-center",
             },], 
             columns: [{
@@ -192,24 +203,52 @@ $(document).ready(function() {
                     return meta.row + meta.settings._iDisplayStart + 1;
                 }
             }, {
-                data: "job_id",
+                data: "jobname",
                 name: 'name',
                 orderable: true,
                 searchable: true,
             },
             {
-                data: "offer_id",
+                data: "jobposition",
                 name: 'position',
                 orderable: true,
                 searchable: true,
             }, {
+                data: function(row) {
+                    return row.city + ', ' + row.state;
+                },
+                name: 'location',
+                orderable: true,
+                searchable: true
+            }, {
+                data: "typename",
+                name: 'type',
+                orderable: true,
+                searchable: true,
+            }, {
+                data: "shiftname",
+                name: 'shift',
+                orderable: true,
+                searchable: true,
+            }, {
+                data: function(row) {
+                    return 'RM ' + numberWithCommas(row.min_salary) + ' - RM ' + numberWithCommas(row.max_salary);
+                },
+                name: 'salary',
+                orderable: true,
+                searchable: true
+            },{
                 data: "description",
                 name: 'description',
                 orderable: true,
                 searchable: true
             }, {
-                data: "salary_range",
-                name: 'salary',
+                data: function(row) {
+                    return 'Nama: ' + row.username.toUpperCase() + 
+                    '<br>Emel: ' + row.useremail + 
+                    '<br>Telefon: 0' + row.usercontact;
+                },
+                name: 'contact',
                 orderable: true,
                 searchable: true
             }, {
@@ -252,6 +291,99 @@ $(document).ready(function() {
                 }
             })
         }
+    });
+
+    // Function to approve job offer
+    $(document).on('click', '.approveAnchor', function() {
+        selectedID = $(this).attr('id');
+    });
+
+    $('#approve').click(function() {
+        $.ajax({
+            type: 'POST',
+            dataType: 'html',
+            data: {selectedID : selectedID},
+            url: "/approveoffer",
+            success: function(data) {
+                $('#approveModal').modal('hide');
+                $('.condition-message').html(data);
+
+                requestTable.ajax.reload();
+            },
+            error: function (data) {
+                $('.condition-message').html(data);
+            }
+        });
+    });
+
+    $(document).on('click', '.declineAnchor', function() {
+        selectedID = $(this).attr('id');
+    });
+
+    var declineReason = "";
+    
+    $("#reason").change(function() {
+
+        // Disabled the Tolak button in modal
+        $("#decline").prop("disabled", true);
+        // Hide the explaination input field
+        $("#explain").val("");
+        $("#more").hide();
+
+        // If select "lain-lain"
+        if($(this).val() == "others"){
+            $("#more").show();
+            declineReason = "";
+        }
+        else{
+            if($(this).val() !== "0"){
+                // Enable button
+                $("#decline").prop("disabled", false); 
+                
+                declineReason = "";
+                
+                if($(this).val() == "missing")
+                    declineReason = "Kekurangan maklumat"; 
+                else if($(this).val() == "unclear")
+                    declineReason = "Penerangan tidak jelas"; 
+                
+            }
+        }
+    });
+
+    $("#explain").change(function(){
+        // Check if the field has any value
+        if ($(this).val().trim() !== "") {
+            // Enable button
+            $("#decline").prop("disabled", false); 
+            declineReason += $(this).val();
+        } 
+        else {
+            // Disable button
+            $("#decline").prop("disabled", true); 
+        }
+    });
+
+    $('#decline').click(function() {
+
+        $.ajax({
+            type: 'POST',
+            dataType: 'html',
+            url: "/declineoffer",
+            data: {
+                reason: declineReason,
+                selectedID: selectedID
+            },
+            success: function(data) {
+                $('#declineModal').modal('hide');
+                $('.condition-message').html(data);
+
+                requestTable.ajax.reload();
+            },
+            error: function (data) {
+                $('.condition-message').html(data);
+            }
+        });
     });
 
 });

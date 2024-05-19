@@ -67,10 +67,10 @@
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                                 @if(Auth::user()->roleID <= 2)
-                                <li><a class="dropdown-item" href="/viewjob"><b>Lihat</b></a></li>
-                                @else
-                                <li><a class="dropdown-item" href="/viewoffer"><b>Lihat</b></a></li>
+                                <li><a class="dropdown-item" href="/viewjob"><b>Jenis Pekerjaan</b></a></li>
+                                <li><hr class="dropdown-divider"></li>
                                 @endif
+                                <li><a class="dropdown-item" href="/viewoffer"><b>Tawaran</b></a></li>
 
                                 @if(Auth::user()->roleID == 3)
                                 <li><hr class="dropdown-divider"></li>

@@ -105,6 +105,8 @@ Route::get('/getUpdatedOffers', [OfferController::class, 'getUpdatedOffers']);
 Route::post('/deleteoffer', [OfferController::class, 'destroy']);
 Route::get('/editoffer/{id}', [OfferController::class, 'edit']);
 Route::post('/updateoffer', [OfferController::class, 'update']);
+Route::post('/approveoffer', [OfferController::class, 'updateApproval']);
+Route::post('/declineoffer', [OfferController::class, 'declineApproval']);
 
 
 

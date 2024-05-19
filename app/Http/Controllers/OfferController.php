@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use DataTables;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class OfferController extends Controller
 {
@@ -20,11 +21,15 @@ class OfferController extends Controller
             $roleNo = Auth::user()->roleID;
             $uid = Auth::user()->id;
 
-            return view('offers.index', compact('roleNo', 'uid'));
+            if($roleNo == 1 || $roleNo == 2){
+                return view('offers.process', compact('roleNo', 'uid'));
+            }
+            elseif($roleNo == 3 || $roleNo == 5){
+                return view('offers.index', compact('roleNo', 'uid'));
+            }
         }
-        else{
-            return redirect('/')->withErrors(['message' => 'Anda tidak dibenarkan untuk melayari halaman ini']);
-        }
+        
+        return redirect('/')->withErrors(['message' => 'Anda tidak dibenarkan untuk melayari halaman ini']);
 
     }
 
@@ -221,24 +226,58 @@ class OfferController extends Controller
         if(request()->ajax()){
             $rid = $request->rid;
 
-            $selectedOffers = DB::table('job_offers as jo')
-            ->where([
-                ['jo.status', 1],
-                ['user_id', Auth::user()->id],
+            $selectedOffers = Job_Offer::where([
+                ['job_offers.status', 1],
+                ['job_offers.approval_status', 1],
             ])
+            ->join('users as u', 'u.id', '=', 'job_offers.user_id')
+            ->join('job_types as jt', 'jt.job_type_id', '=', 'job_offers.job_type_id')
+            ->join('shift_types as st', 'st.shift_type_id', '=', 'job_offers.shift_type_id')
+            ->join('jobs as j', 'j.job_id', '=', 'job_offers.job_id')
+            ->select(
+                'job_offers.*',
+                'u.name as username', 
+                'u.contactNo as usercontact', 
+                'u.email as useremail',
+                'j.name as jobname',
+                'j.position as jobposition',
+                'jt.name as typename',
+                'st.name as shiftname',
+                DB::raw("DATE(job_offers.updated_at) as updateDate"),
+                'job_offers.description->description as description',
+                'job_offers.description->reason as reason',
+            )
+            ->orderBy('job_offers.updated_at', 'desc')
             ->get();
 
             if(isset($selectedOffers)){
+
                 $table = Datatables::of($selectedOffers);
 
                 $table->addColumn('action', function ($row) {
                     $token = csrf_token();
                     $btn = '<div class="d-flex justify-content-center">';
-                    $btn = $btn . '<a class="deleteAnchor" href="#" id="' . $row->offer_id . '"><span class="badge badge-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"> Padam </span></a></div>';
+                    
+                    if(Auth::user()->roleID == 1 || Auth::user()->roleID == 2){
+                        if($row->approval_status == 1){
+                            // Program is pending approval
+                            $btn = $btn . '<a class="approveAnchor" href="#" id="' . $row->offer_id . '"><span class="badge badge-success" data-bs-toggle="modal" data-bs-target="#approveModal"> Lulus </span></a>';
+                            $btn = $btn . '<a class="declineAnchor" href="#" id="' . $row->offer_id . '"><span class="badge badge-danger" data-bs-toggle="modal" data-bs-target="#declineModal"> Tolak </span></a>';
+                        }
+                        else{
+                            $btn = $btn . '<a class="declineAnchor" href="#" id="' . $row->offer_id . '"><span class="badge badge-danger" data-bs-toggle="modal" data-bs-target="#declineModal"> Tolak </span></a>';
+
+                        }
+                    }
+
+                    $btn = $btn . '</div>';
+
                     return $btn;
+
                 });
     
                 $table->rawColumns(['action']);
+
                 return $table->make(true);
             }
 
@@ -310,4 +349,80 @@ class OfferController extends Controller
             'allOffers' => $allOffers
         ]);        
     }
+
+    public function updateApproval(Request $request){
+        $id = $request->get("selectedID");
+        
+        // Get the current date and time
+        $currentDateTime = Carbon::now();
+
+        if(isset($id) && isset($currentDateTime)){
+            // Update the program details
+            $update = Job_Offer::where([
+                ['offer_id', $id],
+                ['status', 1],
+            ])
+            ->update([
+                'approval_status' => 2,
+                'approved_by' => Auth::user()->id, 
+                'approved_at' => $currentDateTime,
+            ]);
+
+            // If successfully update the program
+            if($update){
+                // direct user to view program page with success messasge
+                return redirect('/viewoffer')->with('success', 'Data berjaya dikemaskini');
+            }
+        }
+
+        // direct user to view program page with error messasge
+        return redirect()->back()->withErrors(['message' => "Data tidak berjaya dikemaskini"]);
+
+    }
+
+    public function declineApproval(Request $request){
+
+        // Get the current date and time
+        $currentDateTime = Carbon::now();
+
+        $id = $request->get("selectedID");
+
+        // Get the current description
+        $currentDesc = Job_Offer::where('offer_id', $id)
+        ->value('description');
+
+        // Decode the JSON to an associative array
+        $descArray = json_decode($currentDesc, true);
+
+        // Update the 'reason' field
+        $descArray['reason'] = $request->get('reason');
+
+        // Encode the array back to JSON
+        $newDesc = json_encode($descArray);
+
+        if(isset($id)){
+            // Update the program details
+            $update = Job_Offer::where([
+                ['offer_id', $id],
+                ['status', 1],
+            ])
+            ->update([
+                'approval_status' => 0,
+                'approved_by' => Auth::user()->id, 
+                'description' => $newDesc,
+                'approved_at' => $currentDateTime,
+            ]);
+
+            // If successfully update the program
+            if($update){
+                // direct user to view program page with success messasge
+                return redirect('/viewoffer')->with('success', 'Data berjaya dikemaskini');
+            }
+        }
+
+        // direct user to view program page with error messasge
+        return redirect()->back()->withErrors(['message' => "Data tidak berjaya dikemaskini"]);
+
+    }
 }
+
