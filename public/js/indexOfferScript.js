@@ -12,6 +12,7 @@ $(document).ready(function() {
         return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     }
     
+    // Funciton to display list of offers
     function updateCardContainer(){
         $uid = $("#uid").val();
         $.ajax({
@@ -22,12 +23,29 @@ $(document).ready(function() {
                 $(".card-container").empty();
 
                 // Get the value of the input box and selected option
-                var keyword = $('#keyword').val();
-                var citystate = $('#citystate option:selected').val();
+                var keyword = $('#keyword').val().toLowerCase();
+                var citystate = $('#citystate option:selected').val().toLowerCase();
 
-                // var enrolledPrograms = $.map(data.enrolled, function(el) { return el.pid; });
+                // Filter offers based on keyword and citystate
+                var filteredOffers = data.allOffers.filter(function(offer) {
+                    var matchKeyword = true;
+                    var matchCityState = true;
+        
+                    if (keyword) {
+                        matchKeyword = offer.jobname.toLowerCase().includes(keyword) ||
+                                       offer.jobposition.toLowerCase().includes(keyword) ||
+                                       offer.username.toLowerCase().includes(keyword);
+                    }
+        
+                    if (citystate) {
+                        matchCityState = offer.city.toLowerCase() === citystate ||
+                                         offer.state.toLowerCase() === citystate;
+                    }
+        
+                    return matchKeyword && matchCityState;
+                });
 
-                $.each(data.allOffers, function(index, offer){
+                $.each(filteredOffers, function(index, offer){
 
                     var button;
 
