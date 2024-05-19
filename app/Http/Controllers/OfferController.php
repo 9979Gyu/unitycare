@@ -18,7 +18,8 @@ class OfferController extends Controller
 
         if(Auth::check()){
             $roleNo = Auth::user()->roleID;
-            return view('offers.index', compact('roleNo'));
+            $uid = Auth::user()->id;
+            return view('offers.index', compact('roleNo', 'uid'));
         }
         else{
             return redirect('/')->withErrors(['message' => 'Anda tidak dibenarkan untuk melayari halaman ini']);
@@ -51,7 +52,6 @@ class OfferController extends Controller
             'postalCode' => 'required',
             'state' => 'required',
             'city' => 'required',
-            'startDate' => 'required',
             'description' => 'required',
             'salaryStart' => 'required',
             'salaryEnd' => 'required',
@@ -61,7 +61,10 @@ class OfferController extends Controller
 
         if($validated){
 
-            $range = $request->get('salaryStart') . ' - ' . $request->get('salaryEnd');
+            $desc = [
+                "description" => $request->get('description'),
+                "reason" => "",
+            ];
 
             $job_offer = new job_offer([
                 'job_id' => $request->get('position'),
@@ -70,10 +73,10 @@ class OfferController extends Controller
                 'postal_code' => $request->get('postalCode'),
                 'state' => $request->get('state'),
                 'city' => $request->get('city'),
-                'start_date' => $request->get('startDate'),
-                'description' => $request->get('description'),
+                'description' => json_encode($desc),
                 'status' => 1,
-                'salary_range' => $range,
+                'min_salary' => $request->get('salaryStart'),
+                'max_salary' => $request->get('salaryEnd'),
                 'user_id' => Auth::user()->id,
                 'approval_status' => 1,
             ]);
@@ -162,5 +165,36 @@ class OfferController extends Controller
         $roleNo = Auth::user()->roleID;
 
         return view('offers.index', compact('roleNo'));
+    }
+
+    // Function to get list of job offers
+    public function getUpdatedOffers(){
+
+        $allOffers = Job_Offer::where([
+            ['job_offers.status', 1],
+        ])
+        ->join('users as u', 'u.id', '=', 'job_offers.user_id')
+        ->join('job_types as jt', 'jt.job_type_id', '=', 'job_offers.job_type_id')
+        ->join('shift_types as st', 'st.shift_type_id', '=', 'job_offers.shift_type_id')
+        ->join('jobs as j', 'j.job_id', '=', 'job_offers.job_id')
+        ->select(
+            'job_offers.*',
+            'u.name as username', 
+            'u.contactNo as usercontact', 
+            'u.email as useremail',
+            'j.name as jobname',
+            'j.position as jobposition',
+            'jt.name as typename',
+            'st.name as shiftname',
+            DB::raw("DATE(job_offers.updated_at) as updateDate"),
+            'job_offers.description->description as description',
+            'job_offers.description->reason as reason',
+        )
+        ->orderBy('job_offers.updated_at', 'desc')
+        ->get();
+
+        return response()->json([
+            'allOffers' => $allOffers
+        ]);        
     }
 }

@@ -1,4 +1,9 @@
 @extends('layouts.app')
+
+@push('styles')
+    <link href="{{ asset('css/offerAddStyle.css') }}" rel="stylesheet">
+@endpush
+
 @section('title')
     UnityCare-Pekerjaan
 @endsection
@@ -92,15 +97,6 @@
                 <select name="city" id="city" class="form-select">
                     <option selected>Pilih Bandar</option>
                 </select>
-            </div>
-        </div>
-
-        <br>
-
-        <div class="row mb-3">            
-            <label for="startDate" class="col-sm-2 col-form-label required">Tarikh Buka Permohonan</label>
-            <div class="col-sm-10">
-                <input type="date" value="{{ old('startDate') }}" name="startDate" class="form-control" id="startDate" required>
             </div>
         </div>
         

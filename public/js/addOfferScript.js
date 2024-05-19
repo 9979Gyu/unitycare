@@ -1,4 +1,5 @@
 $(document).ready(function(){
+
     $('.select2').select2();
 
     // To get list of job name

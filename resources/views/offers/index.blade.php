@@ -1,4 +1,9 @@
 @extends('layouts.app')
+
+@push('styles')
+    <link href="{{ asset('css/offerStyle.css') }}" rel="stylesheet">
+@endpush
+
 @section('title')
     UnityCare-Pekerjaan
 @endsection
@@ -27,22 +32,30 @@
     <br>
 
     <input type="number" id="roleID" value="{{ $roleNo }}" hidden>
-    <div class="table-responsive">
-        <table id="requestTable" class="table table-bordered table-striped dt-responsive" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
-            <thead>
-                <tr style="text-align:center">
-                    <th> No. </th>
-                    <th>Nama</th>
-                    <th>Jawatan</th>
-                    <th>Penerangan</th>
-                    <th>Salary</th>
-                    <th>Tindakan</th>
-                </tr>
-            </thead>
-            <tbody>
+    <input type="number" id="uid" value="{{ $uid }}" hidden>
 
-            </tbody>
-        </table>
+    <div class="container t-5">
+        <div class="search-bar">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-briefcase-fill" viewBox="0 0 16 16">
+                <path d="M6.5 1A1.5 1.5 0 0 0 5 2.5V3H1.5A1.5 1.5 0 0 0 0 4.5v1.384l7.614 2.03a1.5 1.5 0 0 0 .772 0L16 5.884V4.5A1.5 1.5 0 0 0 14.5 3H11v-.5A1.5 1.5 0 0 0 9.5 1zm0 1h3a.5.5 0 0 1 .5.5V3H6v-.5a.5.5 0 0 1 .5-.5"/>
+                <path d="M0 12.5A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5V6.85L8.129 8.947a.5.5 0 0 1-.258 0L0 6.85z"/>
+            </svg>
+            <input type="text" name="keyword" id="keyword" placeholder="Pekerjaan, kata kunci atau syarikat">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-geo-alt-fill" viewBox="0 0 16 16">
+                <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10m0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6"/>
+            </svg>
+            <select name="citystate" id="citystate" class="select2">
+                <option></option>
+            </select>
+            
+            <button type="submit">Cari</button>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="card-container">
+
     </div>
 
     <!-- Delete Modal -->
@@ -65,6 +78,7 @@
     </div>
 
     <script src="{{ asset('js/indexOfferScript.js') }}"></script>
+    <script src="{{ asset('js/dateScript.js') }}"></script>
 
 
 @endsection

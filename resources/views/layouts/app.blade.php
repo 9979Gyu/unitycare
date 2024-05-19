@@ -33,6 +33,7 @@
 
     <!-- Style -->
     <link href="{{ asset('css/style.css') }}" rel="stylesheet">
+    @stack('styles')
 
 </head>
 <body>

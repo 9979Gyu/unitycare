@@ -17,7 +17,7 @@ class CreatePoorsTable extends Migration
             $table->id('poor_id');
             $table->unsignedBigInteger('disability_type');
             $table->foreign('disability_type')->references('dis_type_id')->on('disability_types')->onDelete('cascade');
-            $table->string('instituition_name')->nullable;
+            $table->string('instituition_name')->nullable();
             $table->integer('employment_status');
             $table->integer('status');
             $table->unsignedBigInteger('user_id');

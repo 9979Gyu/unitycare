@@ -1,0 +1,57 @@
+.select2-container--default .select2-selection--single {
+    border: none;
+    outline: none;
+    box-shadow: none;
+    height: 38px;
+    display: flex;
+    align-items: center;
+}
+
+.select2-container .select2-selection--single .select2-selection__rendered {
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+.select2-container .select2-selection--single .select2-selection__arrow {
+    height: 38px;
+    right: 8px;
+}
+
+.search-bar input, .select2-container .select2-selection--single {
+    border-radius: 20px;
+}
+
+.search-bar {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 25px;
+    padding: 5px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.search-bar svg {
+    margin: 10px;
+}
+
+.search-bar select, .search-bar input {
+    border: none;
+    outline: none;
+    padding: 10px;
+    flex: 1;
+}
+
+.search-bar button {
+    border: none;
+    outline: none;
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 25px;
+    margin: 5px 5px;
+}
+
+.badge {
+    font-size: 15px;
+}
