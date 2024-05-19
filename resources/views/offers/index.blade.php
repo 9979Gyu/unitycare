@@ -77,7 +77,25 @@
         </div>
     </div>
 
+    <!-- Dismiss Modal -->
+    <div class="modal fade" id="dismissModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="dismissModalLabel">Tarik Diri Daripada Tawaran</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Adakah anda pasti untuk berhenti memohon pekerjaan ini?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="dismiss">Tarik Diri</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="{{ asset('js/indexOfferScript.js') }}"></script>
-    <script src="{{ asset('js/dateScript.js') }}"></script>
 
 @endsection

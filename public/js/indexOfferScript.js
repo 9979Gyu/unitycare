@@ -398,4 +398,28 @@ $(document).ready(function() {
         });
     });
 
+    $(document).on('click', '.dismissAnchor', function() {
+        selectedID = $(this).attr('id');
+    });
+
+    $('#dismiss').click(function() {
+        if (selectedID) {
+            $.ajax({
+                type: 'POST',
+                dataType: 'html',
+                url: "/dismissoffer",
+                data: { selectedID : selectedID },
+                success: function(data) {
+                    $('#dismissModal').modal('hide');
+                    $('.condition-message').html(data);
+                    
+                    updateCardContainer();
+                },
+                error: function (data) {
+                    $('.condition-message').html(data);
+                }
+            })
+        }
+    });
+
 });
