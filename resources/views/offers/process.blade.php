@@ -34,7 +34,7 @@
                     <th> No. </th>
                     <th>Nama</th>
                     <th>Jawatan</th>
-                    <th>Lokasi</th>
+                    <th>Tempat</th>
                     <th>Jenis</th>
                     <th>Syif</th>
                     <th>Purata Gaji</th>

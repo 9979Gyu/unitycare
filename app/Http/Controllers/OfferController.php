@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Job;
+use App\Models\Application;
 use App\Models\Job_Type;
 use App\Models\Job_Offer;
 use App\Models\Shift_Type;
@@ -314,8 +315,18 @@ class OfferController extends Controller
         ->orderBy('job_offers.updated_at', 'desc')
         ->get();
 
+        $enrolledOffers = Application::join('poors as p', 'p.poor_id', '=', 'applications.poor_id')
+        ->join('users as u', 'u.id', '=', 'p.user_id')
+        ->where([
+            ["u.id", Auth::user()->id],
+            ['applications.status', 1],
+        ])
+        ->select('applications.offer_id as oid')
+        ->get();
+
         return response()->json([
-            'allOffers' => $allOffers
+            'allOffers' => $allOffers,
+            'enrolledOffers' => $enrolledOffers
         ]);        
     }
 

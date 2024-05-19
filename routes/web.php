@@ -7,6 +7,7 @@ use App\Http\Controllers\ProgramController;
 use App\Http\Controllers\ParticipantController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\OfferController;
+use App\Http\Controllers\ApplicationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -108,7 +109,9 @@ Route::post('/updateoffer', [OfferController::class, 'update']);
 Route::post('/approveoffer', [OfferController::class, 'updateApproval']);
 Route::post('/declineoffer', [OfferController::class, 'declineApproval']);
 
-
+Route::get('/joinoffer/{id}', [ApplicationController::class, 'create']);
+Route::post('/dismissoffer', [ApplicationController::class, 'dismiss']);
+Route::post('/storeapplication', [ApplicationController::class, 'store']);
 
 
 

@@ -9,11 +9,15 @@ class Application extends Model
 {
     use HasFactory;
 
-    protected $table = 'job_offers';
+    protected $table = 'applications';
 
     protected $fillable = [
-        'applied_at',
+        'applied_date',
         'offer_id',
         'poor_id',
+        'approved_by',
+        'approved_at',
+        'approval_status',
+        'status',
     ];
 }

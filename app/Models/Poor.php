@@ -9,6 +9,8 @@ class Poor extends Model
 {
     use HasFactory;
 
+    protected $table = 'poors';
+
     protected $fillable = [
         'disability_type',
         'education_level',
