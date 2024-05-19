@@ -202,7 +202,7 @@ $(document).ready(function() {
                     $('#deleteModal').modal('hide');
                     $('.condition-message').html(data);
 
-                    requestTable.ajax.reload();
+                    updateCardContainer();
                 },
                 error: function (data) {
                     $('.condition-message').html(data);

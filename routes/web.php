@@ -101,6 +101,11 @@ Route::get('/viewoffer', [OfferController::class, 'index']);
 Route::get('/getoffers', [OfferController::class, 'getOffersDatatable']);
 Route::post('/deleteoffer', [OfferController::class, 'destroy']);
 Route::get('/getUpdatedOffers', [OfferController::class, 'getUpdatedOffers']);
+Route::post('/deleteoffer', [OfferController::class, 'destroy']);
+Route::get('/editoffer/{id}', [OfferController::class, 'edit']);
+Route::post('/updateoffer', [OfferController::class, 'update']);
+
+
 
 
 

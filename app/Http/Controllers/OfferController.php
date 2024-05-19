@@ -44,7 +44,6 @@ class OfferController extends Controller
 
     // Function to store offer into job_offers table in database
     public function store(Request $request){
-
         $rules = [
             'position' => 'required',
             'jobType' => 'required',
@@ -89,6 +88,88 @@ class OfferController extends Controller
         }
 
         return redirect('/viewoffer')->with('error', "Pendaftaran tidak berjaya");
+    }
+
+    // Function to edit offer
+    public function edit($id){
+
+        $offer = Job_Offer::where([
+            ['job_offers.offer_id', $id],
+            ['job_offers.status', 1],
+            ['job_offers.approval_status', '<', 2],
+        ])
+        ->join('job_types as jt', 'jt.job_type_id', '=', 'job_offers.job_type_id')
+        ->join('shift_types as st', 'st.shift_type_id', '=', 'job_offers.shift_type_id')
+        ->join('jobs as j', 'j.job_id', '=', 'job_offers.job_id')
+        ->select(
+            'job_offers.*',
+            'j.name as jobname',
+            'j.position as jobposition',
+            'jt.name as typename',
+            'st.name as shiftname',
+            DB::raw("DATE(job_offers.updated_at) as updateDate"),
+            'job_offers.description->description as description',
+            'job_offers.description->reason as reason',
+        )
+        ->first();
+
+        if(Auth::check() && Auth::user()->id == $offer->user_id){
+            return view('offers.edit', compact('offer'));
+        }
+        else{
+            return redirect('/')->withErrors(['message' => 'Anda tidak dibenarkan untuk melayari halaman ini']);
+        }
+    }
+
+    // Function to update edited offer into job_offers table in database
+    public function update(Request $request){
+
+        $rules = [
+            'position' => 'required',
+            'jobType' => 'required',
+            'shiftType' => 'required',
+            'postalCode' => 'required',
+            'state' => 'required',
+            'city' => 'required',
+            'description' => 'required',
+            'salaryStart' => 'required',
+            'salaryEnd' => 'required',
+        ];
+
+        $validated = $request->validate($rules);
+
+        if($validated){
+
+            $desc = [
+                "description" => $request->get('description'),
+                "reason" => "",
+            ];
+
+            $id = $request->get('offerID');
+
+            $result = Job_Offer::where('offer_id', $id)
+            ->update([
+                'job_id' => $request->get('position'),
+                'job_type_id' => $request->get('jobType'),
+                'shift_type_id' => $request->get('shiftType'),
+                'postal_code' => $request->get('postalCode'),
+                'state' => $request->get('state'),
+                'city' => $request->get('city'),
+                'description' => json_encode($desc),
+                'status' => 1,
+                'min_salary' => $request->get('salaryStart'),
+                'max_salary' => $request->get('salaryEnd'),
+                'user_id' => Auth::user()->id,
+                'approval_status' => 1,
+            ]);
+
+            if($result){
+                return redirect('/viewoffer')->with('success', 'Data berjaya dikemaskini');
+            }
+        }
+
+        return redirect('/viewoffer')->with('error', "Kemaskini data tidak berjaya");
+
     }
 
     // Function to remove offer from database
