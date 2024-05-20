@@ -19,5 +19,6 @@ class Application extends Model
         'approved_at',
         'approval_status',
         'status',
+        'description',
     ];
 }

@@ -4,10 +4,11 @@ $(document).ready(function(){
 
     // To get list of job name
     $.ajax({
-        url: '/getJobs',
+        url: '/getJobsFromDB',
         type: 'GET',
         success: function(data){
             $('#job').empty();
+
             data.forEach(function(item){
                 $("#job").append('<option value="' + item.job_id + '">' + item.name + '</option>');
                 $('#job').trigger("change");

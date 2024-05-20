@@ -97,7 +97,7 @@ Route::post('/storejob', [JobController::class, 'store']);
 
 // Offers
 Route::get('/createoffer', [OfferController::class, 'create']);
-Route::get('/getJobs', [OfferController::class, 'getJobs']);
+Route::get('/getJobsFromDB', [OfferController::class, 'getJobs']);
 Route::get('/getPositions', [OfferController::class, 'getPositions']);
 Route::post('/storeoffer', [OfferController::class, 'store']);
 Route::get('/viewoffer', [OfferController::class, 'index']);
@@ -113,6 +113,10 @@ Route::post('/declineoffer', [OfferController::class, 'declineApproval']);
 Route::get('/joinoffer/{id}', [ApplicationController::class, 'create']);
 Route::post('/dismissoffer', [ApplicationController::class, 'dismiss']);
 Route::post('/storeapplication', [ApplicationController::class, 'store']);
+Route::get('/getapplications', [ApplicationController::class, 'getApplicationsDatatable']);
+Route::get('/viewapplication', [ApplicationController::class, 'index']);
+Route::post('/approveapplication', [ApplicationController::class, 'updateApproval']);
+Route::post('/declineapplication', [ApplicationController::class, 'declineApproval']);
 
 Route::get('/getPrograms', [LandingController::class, 'getPrograms']);
 Route::get('/getJobs', [LandingController::class, 'getJobs']);

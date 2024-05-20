@@ -75,6 +75,8 @@
                                 @if(Auth::user()->roleID == 3)
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="/createoffer"><b>Tambah</b></a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="/viewapplication"><b>Permohonan</b></a></li>
                                 @endif
                             </ul>
                         </li>

@@ -1,5 +1,92 @@
 $(document).ready(function() {
 
+    $('.select2').select2();
+
+    // To get list of job name
+    $.ajax({
+        url: '/getJobsFromDB',
+        type: 'GET',
+        success: function(data){
+            
+            $('#job').empty();
+
+            // Check if data is an array
+            // Assuming data is an array of job objects with properties 'job_id' and 'name'
+            data.forEach(function(job){
+                // Append each job as an option to the job select element
+                $("#job").append('<option value="' + job.job_id + '">' + job.name + '</option>');
+            });
+
+            $('#job').trigger("change");
+
+        }
+    });
+
+    $("#job").on('change', function(){
+        var jobName = $("#job option:selected").text();
+
+        console.log(jobName);
+        if(jobName){
+            $.ajax({
+                url: '/getPositions',
+                type: 'GET',
+                data: {jobName: jobName},
+                success: function(data){
+                    $('#position').empty();
+                    data.forEach(function(item){
+                        $("#position").append('<option value="' + item.job_id + '">' + item.position + '</option>');
+                    });
+                }
+            });
+        }
+        else{
+            $('#position').empty();
+            $("#position").append('<option selected>Pilih Jawatan</option>');
+        }
+    });
+
+    $("#position").on('change', function(){
+        var selectedPosition = $(this).val(); // Get the selected position
+        fetch_data(selectedPosition); // Call fetch_data() with the selected position
+    });
+
+    $('#pendingCheckBox, #approveCheckBox, #declineCheckBox').change(function() {
+        var selectedState = null;
+        if ($('#pendingCheckBox').is(':checked')) {
+            selectedState = 1;
+        } 
+        else if ($('#approveCheckBox').is(':checked')) {
+            selectedState = 2;
+        } 
+        else if ($('#declineCheckBox').is(':checked')) {
+            selectedState = 0;
+        }
+        
+        // Fetch data based on the selected position
+        fetch_data(selectedState);
+    });
+
+    // function fetch_data(selectedState) {
+    
+    //     console.log("this " + selectedState);
+
+    //     // Make AJAX request to fetch data based on the selected position
+    //     $.ajax({
+    //         url: '/getapplications',
+    //         type: 'GET',
+    //         data: {
+    //             selectedState: selectedState
+    //         },
+    //         success: function(data) {
+    //             // Reload DataTable with new data
+    //             $('#requestTable').DataTable().clear().rows.add(data).draw();
+    //         },
+    //         error: function(jqXHR, textStatus, errorThrown) {
+    //             console.error("AJAX request failed:", textStatus, errorThrown);
+    //         }
+    //     });
+    // }
+
     // Disabled the Tolak button in modal
     $("#decline").prop("disabled", true);
     // Hide the explaination input field
@@ -7,8 +94,14 @@ $(document).ready(function() {
 
     var requestTable;
 
-    fetch_data();
-    function fetch_data() {
+    fetch_data("");
+    function fetch_data(selectedPosition) {
+
+        if ($.fn.DataTable.isDataTable('#requestTable')) {
+            // If DataTable already initialized, destroy it
+            $('#requestTable').DataTable().destroy();
+        }
+
         requestTable = $('#requestTable').DataTable({
             language: {
                 "sEmptyTable":     "Tiada data tersedia dalam jadual",
@@ -39,6 +132,7 @@ $(document).ready(function() {
                 url: "/getapplications",
                 data: {
                     rid: $("#roleID").val(),
+                    position: selectedPosition
                 },
                 type: 'GET',
 
@@ -48,7 +142,7 @@ $(document).ready(function() {
                 "className": "text-center",
                 "width": "2%"
             }, {
-                "targets": [1, 2, 3, 4, 5, 6, 7, 8],
+                "targets": [1, 2, 3, 4, 5],
                 "className": "text-center",
             },], 
             columns: [{
@@ -59,47 +153,37 @@ $(document).ready(function() {
                     return meta.row + meta.settings._iDisplayStart + 1;
                 }
             }, {
-                data: "name",
-                name: 'name',
+                data: function(row) {
+                    return row.useremail + ' <br>+60' + row.usercontact;
+                },
+                name: 'user',
                 orderable: true,
                 searchable: true,
-            },
-            {
-                data: "venue",
-                name: 'venue',
+            }, {
+                data: "edu_level",
+                name: 'edu_level',
+                orderable: true,
+                searchable: true,
+            }, {
+                data: "category",
+                name: 'category',
                 orderable: true,
                 searchable: true,
             }, {
                 data: function(row) {
-                    return row.start_date + ' ' + row.start_time;
+                    if(row.reason != "" && row.description != "")
+                        return row.description + ' <br><b>Ditolak: ' + row.reason + '</b>';
+                    else if(row.reason != "" && row.description == "")
+                        return '<b>Ditolak: ' + row.reason + '</b>';
+                    else
+                        return row.description;
                 },
-                name: 'start_datetime',
-                orderable: true,
-                searchable: true
-            }, {
-                data: function(row) {
-                    return row.end_date + ' ' + row.end_time;
-                },
-                name: 'end_datetime',
-                orderable: true,
-                searchable: true
-            }, {
-                data: 'description',
                 name: 'description',
-                orderable: true,
+                orderable: false,
                 searchable: true,
-            },{
-                data: function(row) {
-                    return 'Nama: ' + row.username.toUpperCase() + 
-                    '<br>Emel: ' + row.useremail + 
-                    '<br>Telefon: 0' + row.usercontact;
-                },
-                name: 'contact',
-                orderable: true,
-                searchable: true
-            },{
-                data: 'close_date',
-                name: 'close_date',
+            }, {
+                data: "applied_date",
+                name: 'applied_date',
                 orderable: true,
                 searchable: true
             }, {
@@ -146,39 +230,6 @@ $(document).ready(function() {
 
     $(document).on('click', '.approveAnchor', function() {
         selectedID = $(this).attr('id');
-
-        // Get details of selected program based on given id
-        $.ajax({
-            url: '/getProgramById',
-            type: 'GET',
-            data: { pid: selectedID },
-            success: function(data){
-                $('.modal-body').empty();
-                $('.modal-body').append(
-                    '<p>Adakah anda pasti untuk meluluskan <b>' + data.program.name + '</b> ? </p>' + 
-                    '<p>Tempat: ' + data.program.venue + 
-                    '<br>Bermula: ' + data.program.start_date + ' ' + data.program.start_time +
-                    '<br>Tamat: ' + data.program.end_date + ' ' + data.program.end_time +
-                    '<br>Tarikh Tutup Pendaftaran: ' + data.program.close_date +
-                    '<br>Pengurus: ' + data.program.username +
-                    '</p>'
-                );
-                data.forEach(function(item){
-                    // volunteer
-                    if(item.participants.user_type_id == 2){
-                        $('.modal-body').append(
-                            '<p>Bilangan Sukarelawan: ' + data.participants.qty_limit + '</p>' 
-                        );
-                    }
-                    // poor people
-                    else if(item.participants.user_type_id == 3){
-                        $('.modal-body').append(
-                            '<p>Bilangan Peserta: ' + data.participants.qty_limit + '</p>' 
-                        );
-                    }
-                });
-            }
-        });
     });
 
     $('#approve').click(function() {
@@ -186,7 +237,8 @@ $(document).ready(function() {
         $.ajax({
             type: 'POST',
             dataType: 'html',
-            url: "/approveprogram/" + selectedID,
+            url: "/approveapplication",
+            data: {selectedID : selectedID },
             success: function(data) {
                 $('#approveModal').modal('hide');
                 $('.condition-message').html(data);
@@ -252,7 +304,7 @@ $(document).ready(function() {
         $.ajax({
             type: 'POST',
             dataType: 'html',
-            url: "/declineprogram",
+            url: "/declineapplication",
             data: {
                 reason: declineReason,
                 selectedID: selectedID

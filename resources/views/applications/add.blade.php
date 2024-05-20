@@ -62,6 +62,10 @@
                 <td>{{ $offer->useremail }}</td>
             </tr>
             <tr>
+                <th scope="row" class="required">Sebab mohon</th>
+                <td colspan="3"><input type="text" class="form-control" name="desc" id="desc" value="{{ old('description') }}" required></td>
+            </tr>
+            <tr>
                 <th scope="row">Pilihan</th>
                 <input type="number" name="offer_id" value="{{ $offer->offer_id }}" hidden>
                 <td colspan="3">

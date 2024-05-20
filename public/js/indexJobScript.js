@@ -5,6 +5,29 @@ $(document).ready(function() {
     fetch_data();
     function fetch_data() {
         requestTable = $('#requestTable').DataTable({
+            language: {
+                "sEmptyTable":     "Tiada data tersedia dalam jadual",
+                "sInfo":           "Memaparkan _START_ hingga _END_ daripada _TOTAL_ rekod",
+                "sInfoEmpty":      "Memaparkan 0 hingga 0 daripada 0 rekod",
+                "sInfoFiltered":   "(ditapis daripada jumlah _MAX_ rekod)",
+                "sInfoPostFix":    "",
+                "sInfoThousands":  ",",
+                "sLengthMenu":     "Tunjukkan _MENU_ rekod",
+                "sLoadingRecords": "Sedang memuatkan...",
+                "sProcessing":     "Sedang memproses...",
+                "sSearch":         "Cari:",
+                "sZeroRecords":    "Tiada padanan rekod yang dijumpai",
+                "oPaginate": {
+                    "sFirst":    "<<",
+                    "sLast":     ">>",
+                    "sNext":     ">",
+                    "sPrevious": "<"
+                },
+                "oAria": {
+                    "sSortAscending":  ": diaktifkan kepada susunan lajur menaik",
+                    "sSortDescending": ": diaktifkan kepada susunan lajur menurun"
+                }
+            },
             processing: true,
             serverSide: true,
             ajax: {

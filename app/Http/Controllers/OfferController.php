@@ -262,8 +262,8 @@ class OfferController extends Controller
                     if(Auth::user()->roleID == 1 || Auth::user()->roleID == 2){
                         if($row->approval_status == 1){
                             // Program is pending approval
-                            $btn = $btn . '<a class="approveAnchor" href="#" id="' . $row->offer_id . '"><span class="badge badge-success" data-bs-toggle="modal" data-bs-target="#approveModal"> Lulus </span></a>';
-                            $btn = $btn . '<a class="declineAnchor" href="#" id="' . $row->offer_id . '"><span class="badge badge-danger" data-bs-toggle="modal" data-bs-target="#declineModal"> Tolak </span></a>';
+                            $btn = $btn . '<a class="approveAnchor m-1" href="#" id="' . $row->offer_id . '"><span class="badge badge-success" data-bs-toggle="modal" data-bs-target="#approveModal"> Lulus </span></a>';
+                            $btn = $btn . '<a class="declineAnchor m-1" href="#" id="' . $row->offer_id . '"><span class="badge badge-danger" data-bs-toggle="modal" data-bs-target="#declineModal"> Tolak </span></a>';
                         }
                         else{
                             $btn = $btn . '<a class="declineAnchor" href="#" id="' . $row->offer_id . '"><span class="badge badge-danger" data-bs-toggle="modal" data-bs-target="#declineModal"> Tolak </span></a>';
@@ -327,7 +327,13 @@ class OfferController extends Controller
             ["u.id", $uid],
             ['applications.status', 1],
         ])
-        ->select('applications.offer_id as oid')
+        ->select(
+            'applications.approval_status',
+            'applications.description->reason as reason',
+            'applications.description->description as description',
+            'applications.offer_id as oid',
+            'u.id as user_id'
+        )
         ->get();
 
         return response()->json([

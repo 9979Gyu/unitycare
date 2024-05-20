@@ -12,9 +12,23 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use DataTables;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class ApplicationController extends Controller
 {
+
+    public function index(){
+        if(Auth::check()){
+
+            $roleNo = Auth::user()->roleID;
+
+            if($roleNo == 1 || $roleNo == 3){
+                return view('applications.index', compact('roleNo'));
+            }
+
+        }
+        return redirect('/')->withErrors(['message' => 'Anda tidak dibenarkan untuk melayari halaman ini']);
+    }
 
     public function create($id){
 
@@ -63,6 +77,8 @@ class ApplicationController extends Controller
     public function store(Request $request){
     
         $offerID = $request->get("offer_id");
+        $description = $request->get('desc');
+
         $uid = Auth::user()->id;
 
         // Get the current date
@@ -74,6 +90,13 @@ class ApplicationController extends Controller
         ])
         ->value("poor_id");
 
+        if(isset($description)){
+            $desc = [
+                "description" => $description,
+                "reason" => "",
+            ];
+        }
+
         if(isset($offerID) && isset($poorID)){
             $application = new Application([
                 'applied_date' => $currentDateTime,
@@ -81,6 +104,7 @@ class ApplicationController extends Controller
                 'poor_id' => $poorID,
                 'status' => 1,
                 'approval_status' => 1,
+                'description' => json_encode($desc),
             ]);
 
             $result = $application->save();
@@ -114,5 +138,173 @@ class ApplicationController extends Controller
         }
 
         return redirect()->back()->withErrors(["message" => "Tidak berjaya dipadam"]);
+    }
+
+    // Function to get list of application
+    public function getApplicationsDatatable(Request $request)
+    {
+        if(request()->ajax()){
+            $rid = $request->rid;
+            $selectedState = $request->selectedState;
+
+            // dd($selectedState);/
+
+            if(isset($selectedState)){
+                $selectedApplication = Application::join('poors', 'poors.poor_id', '=', 'applications.poor_id')
+                ->join('users', 'users.id', '=', 'poors.user_id')
+                ->join('job_offers as jo', 'jo.offer_id', '=', 'applications.offer_id')
+                ->join('jobs as j', 'j.job_id', '=', 'jo.job_id')
+                ->join('disability_types as dt', 'dt.dis_type_id', '=', 'poors.disability_type')
+                ->join('education_levels as el', 'el.edu_level_id', '=', 'poors.education_level')
+                ->where([
+                    ['applications.status', 1],
+                    ['jo.status', 1],
+                    ['j.status', 1],
+                    ['applications.approval_status', $selectedState]
+                ])
+                ->select(
+                    'applications.*',
+                    'applications.description->description as description',
+                    'applications.description->reason as reason',
+                    'users.name as username',
+                    'users.email as useremail',
+                    'users.contactNo as usercontact',
+                    'poors.disability_type',
+                    'dt.name as category',
+                    'el.name as edu_level',
+                )
+                ->orderBy("applications.applied_date", "asc")
+                ->get();
+            }
+            else{
+                $selectedApplication = Application::join('poors', 'poors.poor_id', '=', 'applications.poor_id')
+                ->join('users', 'users.id', '=', 'poors.user_id')
+                ->join('job_offers as jo', 'jo.offer_id', '=', 'applications.offer_id')
+                ->join('jobs as j', 'j.job_id', '=', 'jo.job_id')
+                ->join('disability_types as dt', 'dt.dis_type_id', '=', 'poors.disability_type')
+                ->join('education_levels as el', 'el.edu_level_id', '=', 'poors.education_level')
+                ->where([
+                    ['applications.status', 1],
+                    ['jo.status', 1],
+                    ['j.status', 1],
+                ])
+                ->select(
+                    'applications.*',
+                    'applications.description->description as description',
+                    'applications.description->reason as reason',
+                    'users.name as username',
+                    'users.email as useremail',
+                    'users.contactNo as usercontact',
+                    'poors.disability_type',
+                    'dt.name as category',
+                    'el.name as edu_level',
+                )
+                ->orderBy("applications.applied_date", "asc")
+                ->get();
+            }
+
+            if(isset($selectedApplication)){
+
+                $table = Datatables::of($selectedApplication);
+
+                $table->addColumn('action', function ($row) {
+                    $token = csrf_token();
+                    $btn = '<div class="d-flex justify-content-center">';
+                    if(Auth::user()->roleID == 3){
+                        if($row->approval_status == 1){
+                            // pending approval
+                            $btn = $btn . '<div><a class="approveAnchor m-1" href="#" id="' . $row->application_id . '"><span class="badge badge-success" data-bs-toggle="modal" data-bs-target="#approveModal"> Lulus </span></a></div>';
+                            $btn = $btn . '<div><a class="declineAnchor m-1" href="#" id="' . $row->application_id . '"><span class="badge badge-danger" data-bs-toggle="modal" data-bs-target="#declineModal"> Tolak </span></a></div>';
+                        }
+                    }
+                    $btn .= '</div>';
+                
+                    return $btn;
+                });
+
+                $table->rawColumns(['action']);
+                return $table->make(true);
+            }
+
+        }
+
+        $roleNo = Auth::user()->roleID;
+
+        return view('applications.index', compact('roleNo'));
+    }
+
+    public function updateApproval(Request $request){
+        $id = $request->get("selectedID");
+        
+        // Get the current date and time
+        $currentDateTime = Carbon::now();
+
+        if(isset($id) && isset($currentDateTime)){
+            // Update the program details
+            $update = Application::where([
+                ['application_id', $id],
+                ['status', 1],
+            ])
+            ->update([
+                'approval_status' => 2,
+                'approved_by' => Auth::user()->id, 
+                'approved_at' => $currentDateTime,
+            ]);
+
+            // If successfully update the program
+            if($update){
+                // direct user to view program page with success messasge
+                return redirect('/viewapplication')->with('success', 'Data berjaya dikemaskini');
+            }
+        }
+
+        // direct user to view program page with error messasge
+        return redirect()->back()->withErrors(['message' => "Data tidak berjaya dikemaskini"]);
+
+    }
+
+    public function declineApproval(Request $request){
+
+        // Get the current date and time
+        $currentDateTime = Carbon::now();
+
+        $id = $request->get("selectedID");
+
+        // Get the current description
+        $currentDesc = Application::where('application_id', $id)
+        ->value('description');
+
+        // Decode the JSON to an associative array
+        $descArray = json_decode($currentDesc, true);
+
+        // Update the 'reason' field
+        $descArray['reason'] = $request->get('reason');
+
+        // Encode the array back to JSON
+        $newDesc = json_encode($descArray);
+
+        if(isset($id)){
+            // Update the program details
+            $update = Application::where([
+                ['application_id', $id],
+                ['status', 1],
+            ])
+            ->update([
+                'approval_status' => 0,
+                'approved_by' => Auth::user()->id, 
+                'description' => $newDesc,
+                'approved_at' => $currentDateTime,
+            ]);
+
+            // If successfully update the program
+            if($update){
+                // direct user to view program page with success messasge
+                return redirect('/viewapplication')->with('success', 'Data berjaya dikemaskini');
+            }
+        }
+
+        // direct user to view program page with error messasge
+        return redirect()->back()->withErrors(['message' => "Data tidak berjaya dikemaskini"]);
+
     }
 }

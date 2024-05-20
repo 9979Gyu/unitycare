@@ -447,7 +447,7 @@ class ProgramController extends Controller
         }
     }
     
-    // // Function to get list of programs
+    // Function to get list of programs
     public function getProgramsDatatable(Request $request)
     {
         if(request()->ajax()){
