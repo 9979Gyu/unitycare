@@ -292,6 +292,12 @@ class OfferController extends Controller
     // Function to get list of job offers
     public function getUpdatedOffers(){
 
+        $uid = 0;
+
+        if(Auth::check()){
+            $uid = Auth::user()->id;
+        }
+
         $allOffers = Job_Offer::where([
             ['job_offers.status', 1],
         ])
@@ -318,7 +324,7 @@ class OfferController extends Controller
         $enrolledOffers = Application::join('poors as p', 'p.poor_id', '=', 'applications.poor_id')
         ->join('users as u', 'u.id', '=', 'p.user_id')
         ->where([
-            ["u.id", Auth::user()->id],
+            ["u.id", $uid],
             ['applications.status', 1],
         ])
         ->select('applications.offer_id as oid')

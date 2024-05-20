@@ -28,7 +28,7 @@
 
     <input type="number" id="roleID" value="{{ $roleNo }}" hidden>
     <div class="table-responsive">
-        <table id="requestTable" class="table table-bordered table-striped dt-responsive" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+        <table id="requestTable" class="table table-bordered table-striped dt-responsive display datatable" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
             <thead>
                 <tr style="text-align:center">
                     <th> No. </th>

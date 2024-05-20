@@ -27,6 +27,9 @@
     <script src="https://cdn.datatables.net/2.0.4/js/dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/2.0.4/js/dataTables.bootstrap5.min.js"></script>
 
+    <!-- FullCalendar Script -->
+    @stack('scripts')
+
     <!-- For searchable dropdown -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
@@ -88,9 +91,41 @@
 
     <script type="text/javascript">
         $(document).ready(function(){
+
+            // Transition for the alert message
             setTimeout(function(){
                 $('.alert').fadeOut("slow");
             }, 2000);
+
+            // Set default language to Malay for all DataTables
+            $.extend(true, $.fn.dataTable.defaults, {
+                language: {
+                    "sEmptyTable":     "Tiada data tersedia dalam jadual",
+                    "sInfo":           "Memaparkan _START_ hingga _END_ daripada _TOTAL_ rekod",
+                    "sInfoEmpty":      "Memaparkan 0 hingga 0 daripada 0 rekod",
+                    "sInfoFiltered":   "(ditapis daripada jumlah _MAX_ rekod)",
+                    "sInfoPostFix":    "",
+                    "sInfoThousands":  ",",
+                    "sLengthMenu":     "Tunjukkan _MENU_ rekod",
+                    "sLoadingRecords": "Sedang memuatkan...",
+                    "sProcessing":     "Sedang memproses...",
+                    "sSearch":         "Cari:",
+                    "sZeroRecords":    "Tiada padanan rekod yang dijumpai",
+                    "oPaginate": {
+                        "sFirst":    "<<",
+                        "sLast":     ">>",
+                        "sNext":     ">",
+                        "sPrevious": "<"
+                    },
+                    "oAria": {
+                        "sSortAscending":  ": diaktifkan kepada susunan lajur menaik",
+                        "sSortDescending": ": diaktifkan kepada susunan lajur menurun"
+                    }
+                },
+            });
+
+            // Initialize DataTables for all tables with the 'datatable' class
+            $('.datatable').DataTable();
         });
     </script>
 </body>

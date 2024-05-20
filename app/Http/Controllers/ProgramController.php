@@ -16,6 +16,13 @@ class ProgramController extends Controller
     //
 
     public function getProgramsByApprovedStatus(){
+
+        $roleNo = 0;
+
+        if(Auth::check()){
+            $roleNo = Auth::user()->roleID;
+        }
+
         $allPrograms = Program::where([
             ['programs.status', 1],
         ])
@@ -67,7 +74,7 @@ class ProgramController extends Controller
             )
             ->get();
 
-        if(Auth::user()->roleID == 5){
+        if($roleNo == 5){
             $programs = $approvedPrograms;
         }
         else{

@@ -1,4 +1,10 @@
 @extends('layouts.app')
+
+@push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+@endpush
+
+
 @section('title')
     UnityCare
 @endsection
@@ -22,6 +28,35 @@
     @endif
 
     <div>
+        <!-- Tab for program and job -->
+
+        <div>
+
+            <!-- Show the tab for program and job -->
+            <ul class="nav nav-tabs" id="tab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="program-tab" data-bs-toggle="tab" data-bs-target="#program" type="button" role="tab" aria-controls="program" aria-selected="true">Program</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="pekerjaan-tab" data-bs-toggle="tab" data-bs-target="#pekerjaan" type="button" role="tab" aria-controls="pekerjaan" aria-selected="false">Pekerjaan</button>
+                </li>
+            </ul>
+
+            <!-- content for tab -->
+            <div class="tab-content m-3" id="tabContent">
+                <div class="tab-pane fade show active" id="program" role="tabpanel" aria-labelledby="program-tab">
+                    <!-- Calendar -->
+                    <div id='calendar'></div>
+                </div>
+                <div class="tab-pane fade" id="pekerjaan" role="tabpanel" aria-labelledby="pekerjaan-tab">
+                    <p>Content for Pekerjaan goes here.</p>
+                </div>
+            </div>
+
+        </div>
+
+        <br>
+
         <h3>Misi</h3>
         <p>
             Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
@@ -137,4 +172,7 @@
             </div>
         @endif
     </div>
+
+    <script src="{{ asset('js/landingScript.js') }}"></script>
+
 @endsection

@@ -8,6 +8,7 @@ use App\Http\Controllers\ParticipantController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\OfferController;
 use App\Http\Controllers\ApplicationController;
+use App\Http\Controllers\LandingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -112,6 +113,8 @@ Route::post('/declineoffer', [OfferController::class, 'declineApproval']);
 Route::get('/joinoffer/{id}', [ApplicationController::class, 'create']);
 Route::post('/dismissoffer', [ApplicationController::class, 'dismiss']);
 Route::post('/storeapplication', [ApplicationController::class, 'store']);
+
+Route::get('/getEvents', [LandingController::class, 'getProgramsAndJobs']);
 
 
 

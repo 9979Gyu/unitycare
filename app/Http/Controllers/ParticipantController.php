@@ -19,55 +19,59 @@ class ParticipantController extends Controller
     }
 
     public function create($id){
-        $program = Program::with('user')
-        ->where([
-            ['program_id', $id],
-            ['status', 1],
-            ['approved_status', 2]
-        ])
-        ->select(
-            '*',
-            'description->desc as description',
-            'description->reason as reason'
-        )
-        ->first();
 
-        $volLimit = DB::table("programs")
-        ->join('program_specs as ps', 'ps.program_id', '=', 'programs.program_id')
-        ->where([
-            ['programs.program_id', $id],
-            ['programs.status', 1],
-            ['programs.approved_status', 2],
-            ['ps.user_type_id', 2],
-        ])
-        ->first();
+        if(Auth::check()){
+            $program = Program::with('user')
+            ->where([
+                ['program_id', $id],
+                ['status', 1],
+                ['approved_status', 2]
+            ])
+            ->select(
+                '*',
+                'description->desc as description',
+                'description->reason as reason'
+            )
+            ->first();
 
-        $poorLimit = DB::table("programs")
-        ->join('program_specs as ps', 'ps.program_id', '=', 'programs.program_id')
-        ->where([
-            ['programs.program_id', $id],
-            ['programs.status', 1],
-            ['programs.approved_status', 2],
-            ['ps.user_type_id', 3],
-        ])
-        ->first();
+            $volLimit = DB::table("programs")
+            ->join('program_specs as ps', 'ps.program_id', '=', 'programs.program_id')
+            ->where([
+                ['programs.program_id', $id],
+                ['programs.status', 1],
+                ['programs.approved_status', 2],
+                ['ps.user_type_id', 2],
+            ])
+            ->first();
 
-        $participantExist = DB::table('participants')
-        ->join('programs as p', 'p.program_id', '=', 'participants.program_id')
-        ->where([
-            ['p.program_id', $id],
-            ['participants.status', 1],
-            ['participants.user_id', Auth::user()->id]
-        ])
-        ->count();
+            $poorLimit = DB::table("programs")
+            ->join('program_specs as ps', 'ps.program_id', '=', 'programs.program_id')
+            ->where([
+                ['programs.program_id', $id],
+                ['programs.status', 1],
+                ['programs.approved_status', 2],
+                ['ps.user_type_id', 3],
+            ])
+            ->first();
 
-        $volRemain = $volLimit->qty_limit - $volLimit->qty_enrolled;
-        $poorRemain = $poorLimit->qty_limit - $poorLimit->qty_enrolled;
+            $participantExist = DB::table('participants')
+            ->join('programs as p', 'p.program_id', '=', 'participants.program_id')
+            ->where([
+                ['p.program_id', $id],
+                ['participants.status', 1],
+                ['participants.user_id', Auth::user()->id]
+            ])
+            ->count();
 
-        // dd($program);
+            $volRemain = $volLimit->qty_limit - $volLimit->qty_enrolled;
+            $poorRemain = $poorLimit->qty_limit - $poorLimit->qty_enrolled;
 
-        return view('participants.add', compact('program', 'volLimit', 'poorLimit', 'volRemain', 'poorRemain', 'participantExist'));
-        
+            return view('participants.add', compact('program', 'volLimit', 'poorLimit', 'volRemain', 'poorRemain', 'participantExist'));
+            
+        }
+
+        return redirect('/login')->withErrors(['message' => 'Sila log masuk untuk melayari halaman']);
+
     }
 
     public function store(Request $request){
