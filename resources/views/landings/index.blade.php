@@ -38,7 +38,7 @@
                     <button class="nav-link active" id="program-tab" data-bs-toggle="tab" data-bs-target="#program" type="button" role="tab" aria-controls="program" aria-selected="true">Program</button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="pekerjaan-tab" data-bs-toggle="tab" data-bs-target="#pekerjaan" type="button" role="tab" aria-controls="pekerjaan" aria-selected="false">Pekerjaan</button>
+                    <button class="nav-link" id="job-tab" data-bs-toggle="tab" data-bs-target="#job" type="button" role="tab" aria-controls="job" aria-selected="false">Pekerjaan</button>
                 </li>
             </ul>
 
@@ -48,8 +48,11 @@
                     <!-- Calendar -->
                     <div id='calendar'></div>
                 </div>
-                <div class="tab-pane fade" id="pekerjaan" role="tabpanel" aria-labelledby="pekerjaan-tab">
-                    <p>Content for Pekerjaan goes here.</p>
+                <div class="tab-pane fade" id="job" role="tabpanel" aria-labelledby="job-tab">
+                    <!-- Job offer -->
+                    <div id="job">
+                        <div class="card-container"></div>
+                    </div>
                 </div>
             </div>
 

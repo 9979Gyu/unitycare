@@ -441,5 +441,34 @@ class OfferController extends Controller
         return redirect()->back()->withErrors(['message' => "Data tidak berjaya dikemaskini"]);
 
     }
+
+    // Function to get all approved offers
+    public function getApprovedOffers(){
+        $allOffers = Job_Offer::where([
+            ['job_offers.status', 1],
+            ['job_offers.approval_status', 2]
+        ])
+        ->join('users as u', 'u.id', '=', 'job_offers.user_id')
+        ->join('job_types as jt', 'jt.job_type_id', '=', 'job_offers.job_type_id')
+        ->join('shift_types as st', 'st.shift_type_id', '=', 'job_offers.shift_type_id')
+        ->join('jobs as j', 'j.job_id', '=', 'job_offers.job_id')
+        ->select(
+            'job_offers.*',
+            'u.name as username', 
+            'u.contactNo as usercontact', 
+            'u.email as useremail',
+            'j.name as jobname',
+            'j.position as jobposition',
+            'jt.name as typename',
+            'st.name as shiftname',
+            DB::raw("DATE(job_offers.updated_at) as updateDate"),
+            'job_offers.description->description as description',
+            'job_offers.description->reason as reason',
+        )
+        ->orderBy('job_offers.updated_at', 'desc')
+        ->get();
+
+        return $allOffers;
+    }
 }
 

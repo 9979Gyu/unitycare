@@ -56,7 +56,7 @@ class ApplicationController extends Controller
             return view('applications.add', compact('offer', 'applicationExist'));
         }
 
-        return redirect('/')->withErrors(['message' => 'Anda tidak dibenarkan untuk melayari halaman ini']);
+        return redirect('/login')->withErrors(['message' => 'Anda tidak dibenarkan untuk melayari halaman ini']);
 
     }
 

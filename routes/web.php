@@ -114,7 +114,8 @@ Route::get('/joinoffer/{id}', [ApplicationController::class, 'create']);
 Route::post('/dismissoffer', [ApplicationController::class, 'dismiss']);
 Route::post('/storeapplication', [ApplicationController::class, 'store']);
 
-Route::get('/getEvents', [LandingController::class, 'getProgramsAndJobs']);
+Route::get('/getPrograms', [LandingController::class, 'getPrograms']);
+Route::get('/getJobs', [LandingController::class, 'getJobs']);
 
 
 
