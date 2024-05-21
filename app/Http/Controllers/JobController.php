@@ -55,11 +55,17 @@ class JobController extends Controller
             $result = $job->save();
 
             if($result){
-                return redirect('/viewjob')->with('success', 'Berjaya didaftarkan');
+                if(Auth::user()->roleID <= 2)
+                    return redirect('/viewjob')->with('success', 'Berjaya didaftarkan');
+                else
+                    return redirect('/viewoffer')->with('success', 'Berjaya didaftarkan');
             }
         }
 
-        return redirect('/viewjob')->with('error', "Pendaftaran tidak berjaya");
+        if(Auth::user()->roleID <= 2)
+            return redirect('/viewjob')->with('error', "Pendaftaran tidak berjaya");
+        else
+            return redirect('/viewoffer')->with('error', 'Pendaftaran tidak berjaya');
     }
 
     // Function to remove the job from the display list in index

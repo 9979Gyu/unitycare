@@ -36,7 +36,7 @@ $(document).ready(function() {
             processing: true,
             serverSide: true,
             ajax: {
-                url: "/getapplications",
+                url: "/getprogram",
                 data: {
                     rid: $("#roleID").val(),
                 },
