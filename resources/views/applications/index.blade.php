@@ -43,15 +43,15 @@
 
     <div class="pb-2">
         <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" id="pendingCheckBox" value="1">
+            <input class="form-check-input" type="radio" name="statusFilter" id="pendingCheckBox" value="1">
             <label class="form-check-label" for="pending">Belum selesai</label>
         </div>
         <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" id="approveCheckBox" value="2">
+            <input class="form-check-input" type="radio" name="statusFilter" id="approveCheckBox" value="2">
             <label class="form-check-label" for="approve">Diterima</label>
         </div>
         <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" id="declineCheckBox" value="0">
+            <input class="form-check-input" type="radio" name="statusFilter" id="declineCheckBox" value="0">
             <label class="form-check-label" for="decline">Ditolak</label>
         </div>
     </div>
