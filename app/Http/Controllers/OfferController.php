@@ -449,7 +449,7 @@ class OfferController extends Controller
     }
 
     // Function to get all approved offers
-    public function getApprovedOffers(){
+    public static function getApprovedOffers(){
         $allOffers = Job_Offer::where([
             ['job_offers.status', 1],
             ['job_offers.approval_status', 2]

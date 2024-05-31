@@ -144,63 +144,74 @@ class ApplicationController extends Controller
     public function getApplicationsDatatable(Request $request)
     {
         if(request()->ajax()){
-            $rid = $request->rid;
-            $selectedState = $request->selectedState;
+            $rid = $request->get("rid");
+            $selectedState = $request->get("selectedState");
+            $selectedPosition = $request->get("positionID");
+            $userID = Auth::user()->id;
 
-            // dd($selectedState);/
+            if(isset($selectedPosition)){
 
-            if(isset($selectedState)){
-                $selectedApplication = Application::join('poors', 'poors.poor_id', '=', 'applications.poor_id')
-                ->join('users', 'users.id', '=', 'poors.user_id')
-                ->join('job_offers as jo', 'jo.offer_id', '=', 'applications.offer_id')
-                ->join('jobs as j', 'j.job_id', '=', 'jo.job_id')
-                ->join('disability_types as dt', 'dt.dis_type_id', '=', 'poors.disability_type')
-                ->join('education_levels as el', 'el.edu_level_id', '=', 'poors.education_level')
-                ->where([
-                    ['applications.status', 1],
-                    ['jo.status', 1],
-                    ['j.status', 1],
-                    ['applications.approval_status', $selectedState]
-                ])
-                ->select(
-                    'applications.*',
-                    'applications.description->description as description',
-                    'applications.description->reason as reason',
-                    'users.name as username',
-                    'users.email as useremail',
-                    'users.contactNo as usercontact',
-                    'poors.disability_type',
-                    'dt.name as category',
-                    'el.name as edu_level',
-                )
-                ->orderBy("applications.applied_date", "asc")
-                ->get();
-            }
-            else{
-                $selectedApplication = Application::join('poors', 'poors.poor_id', '=', 'applications.poor_id')
-                ->join('users', 'users.id', '=', 'poors.user_id')
-                ->join('job_offers as jo', 'jo.offer_id', '=', 'applications.offer_id')
-                ->join('jobs as j', 'j.job_id', '=', 'jo.job_id')
-                ->join('disability_types as dt', 'dt.dis_type_id', '=', 'poors.disability_type')
-                ->join('education_levels as el', 'el.edu_level_id', '=', 'poors.education_level')
-                ->where([
-                    ['applications.status', 1],
-                    ['jo.status', 1],
-                    ['j.status', 1],
-                ])
-                ->select(
-                    'applications.*',
-                    'applications.description->description as description',
-                    'applications.description->reason as reason',
-                    'users.name as username',
-                    'users.email as useremail',
-                    'users.contactNo as usercontact',
-                    'poors.disability_type',
-                    'dt.name as category',
-                    'el.name as edu_level',
-                )
-                ->orderBy("applications.applied_date", "asc")
-                ->get();
+                if(isset($selectedState) && $selectedState != 3){
+
+                    $selectedApplication = Application::join('poors', 'poors.poor_id', '=', 'applications.poor_id')
+                    ->join('users', 'users.id', '=', 'poors.user_id')
+                    ->join('job_offers as jo', 'jo.offer_id', '=', 'applications.offer_id')
+                    ->join('jobs as j', 'j.job_id', '=', 'jo.job_id')
+                    ->join('disability_types as dt', 'dt.dis_type_id', '=', 'poors.disability_type')
+                    ->join('education_levels as el', 'el.edu_level_id', '=', 'poors.education_level')
+                    ->where([
+                        ['applications.status', 1],
+                        ['jo.status', 1],
+                        ['j.status', 1],
+                        ['j.job_id', $selectedPosition],
+                        ['applications.approval_status', $selectedState],
+                        ['jo.user_id', $userID],
+                    ])
+                    ->select(
+                        'applications.*',
+                        'applications.description->description as description',
+                        'applications.description->reason as reason',
+                        'users.name as username',
+                        'users.email as useremail',
+                        'users.contactNo as usercontact',
+                        'poors.disability_type',
+                        'dt.name as category',
+                        'el.name as edu_level',
+                        'j.position as position'
+                    )
+                    ->orderBy("applications.applied_date", "asc")
+                    ->get();
+                }
+                else{
+
+                    $selectedApplication = Application::join('poors', 'poors.poor_id', '=', 'applications.poor_id')
+                    ->join('users', 'users.id', '=', 'poors.user_id')
+                    ->join('job_offers as jo', 'jo.offer_id', '=', 'applications.offer_id')
+                    ->join('jobs as j', 'j.job_id', '=', 'jo.job_id')
+                    ->join('disability_types as dt', 'dt.dis_type_id', '=', 'poors.disability_type')
+                    ->join('education_levels as el', 'el.edu_level_id', '=', 'poors.education_level')
+                    ->where([
+                        ['applications.status', 1],
+                        ['jo.status', 1],
+                        ['j.status', 1],
+                        ['jo.user_id', $userID],
+                        ['j.job_id', $selectedPosition],
+                    ])
+                    ->select(
+                        'applications.*',
+                        'applications.description->description as description',
+                        'applications.description->reason as reason',
+                        'users.name as username',
+                        'users.email as useremail',
+                        'users.contactNo as usercontact',
+                        'poors.disability_type',
+                        'dt.name as category',
+                        'el.name as edu_level',
+                        'j.position as position'
+                    )
+                    ->orderBy("applications.applied_date", "asc")
+                    ->get();
+                }
             }
 
             if(isset($selectedApplication)){

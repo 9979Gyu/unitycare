@@ -15,7 +15,7 @@ class ProgramController extends Controller
 {
     //
 
-    public function getProgramsByApprovedStatus(){
+    public static function getProgramsByApprovedStatus(){
 
         $roleNo = 0;
 

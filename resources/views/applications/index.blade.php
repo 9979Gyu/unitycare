@@ -43,15 +43,19 @@
 
     <div class="pb-2">
         <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="statusFilter" id="pendingCheckBox" value="1">
+            <input class="form-check-input" type="radio" name="statusFilter" id="allRadio" value="3" checked>
+            <label class="form-check-label" for="all">Semua</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="statusFilter" id="pendingRadio" value="1">
             <label class="form-check-label" for="pending">Belum selesai</label>
         </div>
         <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="statusFilter" id="approveCheckBox" value="2">
+            <input class="form-check-input" type="radio" name="statusFilter" id="approveRadio" value="2">
             <label class="form-check-label" for="approve">Diterima</label>
         </div>
         <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="statusFilter" id="declineCheckBox" value="0">
+            <input class="form-check-input" type="radio" name="statusFilter" id="declineRadio" value="0">
             <label class="form-check-label" for="decline">Ditolak</label>
         </div>
     </div>
@@ -66,6 +70,7 @@
                     <th>Kategori</th>
                     <th>Sebab Mohon</th>
                     <th>Tarikh Mohon</th>
+                    <th>Jawatan</th>
                     <th>Tindakan</th>
                 </tr>
             </thead>
