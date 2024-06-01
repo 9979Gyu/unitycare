@@ -4,7 +4,6 @@
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
 @endpush
 
-
 @section('title')
     UnityCare
 @endsection
@@ -29,9 +28,7 @@
 
     <div>
         <!-- Tab for program and job -->
-
         <div>
-
             <!-- Show the tab for program and job -->
             <ul class="nav nav-tabs" id="tab" role="tablist">
                 <li class="nav-item" role="presentation">
@@ -57,7 +54,7 @@
                 <div class="tab-pane fade" id="search" role="tabpanel" aria-labelledby="search-tab">
                     <!-- Search any -->
                     <div id="search">
-                        <div class="card-container"></div>
+                        <div class="search"></div>
                     </div>
                 </div>
             </div>

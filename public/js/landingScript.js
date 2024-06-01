@@ -29,11 +29,56 @@ $(document).ready(function(){
     $('#job-tab').on('shown.bs.tab', function (event) {
         updateCardContainer();
     });
+    
+    $(".card-container").on("click", ".card", function() {
+
+        // Hide all other collapse-content except the clicked one
+        $(".collapse-content").not($(this).find(".collapse-content")).slideUp();
+
+        // Toggle the collapse-content of the clicked card
+        $(this).find(".collapse-content").slideToggle();
+        
+    });
+    
 
     function updateCardContainer(){
         $.ajax({
             type: 'GET',
-            url: "/getJobs",
+            url: "/getCountPosition",
+            success: function(data) {
+
+                $(".card-container").empty();
+
+                $.each(data.events, function(index, sector){
+
+                    // Append sector to the card-container
+                    $(".card-container").append(
+                        '<div class="card mb-2" id="' + sector.sectorid + '">' +
+                            '<div class="card-body d-flex justify-content-between">' +
+                                '<div><h4 class="card-title">' + sector.sectorname + 
+                                ' (' + sector.offercount + ')'  + '</h4></div>' +
+                            '</div>' +
+                            '<div class="collapse-content">' +
+                                '<p>Additional information about ' + sector.sectorname + '.</p>' +
+                            '</div>' +
+                        '</div>'
+                    );
+                    
+                    $(".collapse-content").css("display", "none");
+                    
+                });
+                
+            },
+            error: function (data) {
+                $('.condition-message').html(data);
+            }
+        });
+    }
+
+    function updateCardContainer2(){
+        $.ajax({
+            type: 'GET',
+            url: "/getCountPosition",
             success: function(data) {
 
                 $(".card-container").empty();

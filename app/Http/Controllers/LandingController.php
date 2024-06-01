@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Program;
 use App\Models\Job;
 use App\Models\Job_Offer;
+use App\Models\Sector;
 
 class LandingController extends Controller
 {
@@ -33,6 +34,53 @@ class LandingController extends Controller
 
         // Return events data as JSON
         return response()->json($events);
+
+    }
+
+    // Function to return the number of position in each sector
+    public function getCountPosition(){
+        $events = [];
+        $offers = OfferController::getApprovedOffers();
+        $sectors = Sector::where('status', 1)->get();
+
+        $sectorSums = [];
+
+        if(isset($offers)){
+            
+            foreach ($offers as $offer) {
+
+                // Access the user's sector attribute within the offer
+                $sectorID = $offer->sectorid;
+
+                // Count the offer by sector
+                if (isset($sectorSums[$sectorID])) {
+                    $sectorSums[$sectorID]++;
+                } 
+                else {
+                    $sectorSums[$sectorID] = 1;
+                }
+                
+            }
+
+            foreach ($sectors as $sector) {
+
+                $tempSec = $sector->sector_id;
+
+                // If the sector contains offer, save data into events variable
+                if(isset($sectorSums[$tempSec])){
+                    $events[] = [
+                        'sectorid' => $tempSec,
+                        'sectorname' => $sector->name,
+                        'offercount' => $sectorSums[$tempSec],
+                    ];
+                }
+
+            }
+
+            // Return events data as JSON
+            return response()->json(['events' => $events]);
+
+        }
 
     }
 

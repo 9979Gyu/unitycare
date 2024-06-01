@@ -463,6 +463,7 @@ class OfferController extends Controller
             'u.name as username', 
             'u.contactNo as usercontact', 
             'u.email as useremail',
+            'u.sector_id as sectorid',
             'j.name as jobname',
             'j.position as jobposition',
             'jt.name as typename',

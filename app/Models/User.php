@@ -30,7 +30,8 @@ class User extends Authenticatable
         'officeNo',
         'ICNo',
         'status',
-        'roleID'
+        'roleID',
+        'sectorID'
     ];
 
     /**
