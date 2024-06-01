@@ -1,24 +1,7 @@
 $(document).ready(function(){
 
-    // Manage event on calendar
-    const calendarEl = document.getElementById('calendar');
-    const calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'dayGridMonth',
-        locale: 'ms',
-        buttonText: {
-            today: 'Hari Ini',
-        },
-        events: {
-            url: '/getPrograms',
-            method: 'GET'
-        },
-        eventClick: function(info) {
-            // Redirect to the joinprogram page with the program ID
-            window.location.href = '/joinprogram/' + info.event.id;
-        }
-    });
-
-    calendar.render();
+    var selectedSector;
+    var selectedPosition;
 
     // Re-render when tab is shown
     $('#program-tab').on('shown.bs.tab', function (event) {
@@ -32,15 +15,38 @@ $(document).ready(function(){
     
     $(".card-container").on("click", ".card", function() {
 
-        // Hide all other collapse-content except the clicked one
-        $(".collapse-content").not($(this).find(".collapse-content")).slideUp();
+        selectedSector = $(this).attr("id");
 
-        // Toggle the collapse-content of the clicked card
-        $(this).find(".collapse-content").slideToggle();
+        // Toggle the collapse-position of the clicked card
+        $(this).find(".collapse-position").slideToggle();
+
+        // Hide all other collapse-position except the clicked one
+        $(".collapse-position").not($(this).find(".collapse-position")).slideUp();
+
+        // Call function to display position based on sector selected
+        updateCollapsePosition(selectedSector);
+
+    });
+
+    // Expand/collapse the positions within a sector
+    $(".card-container").on("click", ".collapse-position li", function(e) {
+        // Prevent the click from bubbling up to the parent card
+        e.stopPropagation();
+
+        selectedPosition = $(this).attr("id");
         
+        console.log(selectedPosition);
+
+        // Toggle the collapse-offer of the clicked card
+        $(this).find(".collapse-offer").slideToggle();
+
+        // Hide all other collapse-offer except the clicked one
+        $(".collapse-offer").not($(this).find(".collapse-offer")).slideUp();
+
+        // Call function to display offers based on position and sector selected
+        updateCollapseOffer(selectedSector, selectedPosition)
     });
     
-
     function updateCardContainer(){
         $.ajax({
             type: 'GET',
@@ -54,18 +60,16 @@ $(document).ready(function(){
                     // Append sector to the card-container
                     $(".card-container").append(
                         '<div class="card mb-2" id="' + sector.sectorid + '">' +
-                            '<div class="card-body d-flex justify-content-between">' +
+                            '<a href="#"><div class="card-body d-flex justify-content-between">' +
                                 '<div><h4 class="card-title">' + sector.sectorname + 
-                                ' (' + sector.offercount + ')'  + '</h4></div>' +
-                            '</div>' +
-                            '<div class="collapse-content">' +
-                                '<p>Additional information about ' + sector.sectorname + '.</p>' +
-                            '</div>' +
+                                ' (' + sector.offercount + ')</h4></div>' +
+                            '</div></a>' +
+                            '<ul class="collapse-position"></ul>' +
                         '</div>'
                     );
-                    
-                    $(".collapse-content").css("display", "none");
-                    
+
+                    $(".collapse-position").css("display", "none");
+
                 });
                 
             },
@@ -75,37 +79,32 @@ $(document).ready(function(){
         });
     }
 
-    function updateCardContainer2(){
+    function updateCollapsePosition(selectedSector){
         $.ajax({
             type: 'GET',
-            url: "/getCountPosition",
+            url: "/getCountOffer",
+            data: { sectorID: selectedSector },
             success: function(data) {
 
-                $(".card-container").empty();
+                var selectedCollapse = $("#" + selectedSector).find(".collapse-position");
 
-                $.each(data.events, function(index, offer){
+                selectedCollapse.empty();
 
-                    var button;
+                $.each(data.events, function(index, position){
 
-                    button = '<a class="viewAnchor btn btn-info m-2" href="/joinoffer/' + offer.offer_id + '">' +
-                        '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">' +
-                        '<path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>' +
-                        '</svg> Lihat </a>';
+                    var positionID = position.jobposition.replace(/\s+/g, '_');
 
-                    $(".card-container").append(
-                        '<p><div class="card" id="' + offer.offer_id + '">' +
-                            '<div class="card-body d-flex justify-content-between">' +
-                                '<div><h4 class="card-title">' + offer.jobposition + '</h4>' +
-                                '<div><p class="card-text">' + offer.username + '</p>' +
-                                    '<p class="card-text badge badge-primary"> RM ' + offer.min_salary + ' - RM ' + offer.max_salary + ' sebulan</p>' +
-                                    ' <p class="card-text badge badge-primary">' + offer.typename + '</p>' +
-                                    ' <p class="card-text badge badge-primary">' + offer.shiftname + '</p>' +
-                                '</div></div>' +
-                                '<div>' + button + '</div>' +
-                            '</div>' +
-                        '</div></p>'
+                    selectedCollapse.append(
+                        '<div>' + 
+                            '<a href="#"><li class="d-flex justify-content-between" id="' + positionID + '">' +
+                                '<p>' + position.jobposition + ' (' + position.offercount + ')</p>' +
+                            '</li></a>' + 
+                            '<ul class="collapse-offer"></ul>' +
+                        '</div>'
                     );
-                    
+    
+                    $(".collapse-offer").css("display", "none");
+
                 });
             },
             error: function (data) {
@@ -113,4 +112,50 @@ $(document).ready(function(){
             }
         });
     }
+    
+    function updateCollapseOffer(selectedSector, selectedPosition){
+
+        
+        $(".collapse-offer").css("display", "block");
+
+        // var selectedCollapse = $("#" + selectedPosition).find('.collapse-offer');
+        var selectedCollapse = $("#" + selectedSector).find("#" + selectedPosition).find(".collapse-offer");
+        // var selectedCollapse = $('.collapse-offer');
+
+        selectedPosition = selectedPosition.replace(/_/g, ' ');
+
+        $.ajax({
+            type: 'GET',
+            url: "/getJobs",
+            data: {
+                sectorID: selectedSector,
+                positionName: selectedPosition
+            },
+            success: function(data) {
+                selectedCollapse.empty();
+
+                $.each(data.events, function(index, offer){
+
+                    console.log(offer);
+
+                    selectedCollapse.append(
+                        '<li class="d-flex justify-content-between" id="' + offer.offer_id + '">' +
+                            '<p>' + offer.username + '</p>' +
+                            // '<div><p>' + offer.username + '</p>' +
+                            // '<p class="badge badge-primary"> RM ' + offer.min_salary + 
+                            // ' - RM ' + offer.max_salary + ' sebulan</p>' +
+                            // ' <p class="badge badge-primary">' + offer.typename + '</p>' +
+                            // ' <p class="badge badge-primary">' + offer.shiftname + '</p></div>' +
+                        '</li>'
+                    );
+                });
+
+            },
+            error: function (data) {
+                $('.condition-message').html(data);
+            }
+        });
+    }
+
+    
 });

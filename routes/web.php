@@ -121,6 +121,7 @@ Route::post('/declineapplication', [ApplicationController::class, 'declineApprov
 Route::get('/getPrograms', [LandingController::class, 'getPrograms']);
 Route::get('/getJobs', [LandingController::class, 'getJobs']);
 Route::get('/getCountPosition', [LandingController::class, 'getCountPosition']);
+Route::get('/getCountOffer', [LandingController::class, 'getCountOffer']);
 
 
 
