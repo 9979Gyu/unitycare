@@ -10,6 +10,7 @@ class Shift_Type extends Model
     use HasFactory;
 
     protected $table = 'shift_types';
+    protected $primaryKey = 'shift_type_id';
 
     protected $fillable = [
         'shift_type_id',
@@ -17,4 +18,9 @@ class Shift_Type extends Model
         'description',
         'status',
     ];
+
+    public function jobOffers()
+    {
+        return $this->hasMany(Job_Offer::class, 'shift_type_id');
+    }
 }

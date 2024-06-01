@@ -18,6 +18,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
+        'id',
         'name',
         'email',
         'password',
@@ -31,7 +32,7 @@ class User extends Authenticatable
         'ICNo',
         'status',
         'roleID',
-        'sectorID'
+        'sector_id'
     ];
 
     /**
@@ -55,5 +56,15 @@ class User extends Authenticatable
 
     public function programs(){
         return $this->hasMany(Program::class);
+    }
+
+    public function jobOffers()
+    {
+        return $this->hasMany(Job_Offer::class, 'user_id');
+    }
+
+    public function sector()
+    {
+        return $this->belongsTo(Sector::class, 'sector_id');
     }
 }

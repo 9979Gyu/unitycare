@@ -7,10 +7,33 @@ use App\Models\Program;
 use App\Models\Job;
 use App\Models\Job_Offer;
 use App\Models\Sector;
+use Illuminate\Database\Eloquent\Builder;
 use Auth;
 
-class LandingController extends Controller
-{
+class LandingController extends Controller{
+
+    public function index(){
+        // Retrieve sectors that have associated job offers
+        $sectors = Sector::whereHas('organizations.jobOffers', function ($query) {
+            $query->where('approval_status', 2);
+        })
+        ->with([
+            'organizations.jobOffers' => function ($query) {
+                $query->with([
+                    'shiftType',
+                    'jobType',
+                    'organization'
+                ]);
+            },
+            'organizations.jobOffers.organization'
+        ])
+        ->get();
+
+        // dd($sectors[0]->organizations[0]->jobOffers);
+
+        return view('landings.index', compact('sectors'));
+    }
+
     // Function to return list of programs display in landings page
     public function getPrograms(Request $request){
 

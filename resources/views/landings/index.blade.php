@@ -26,39 +26,131 @@
         </div>
     @endif
 
-    <div>
+    <div class="container mt-5">
         <!-- Tab for program and job -->
-        <div>
-            <!-- Show the tab for program and job -->
-            <ul class="nav nav-tabs" id="tab" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="program-tab" data-bs-toggle="tab" data-bs-target="#program" type="button" role="tab" aria-controls="program" aria-selected="true">Program</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="job-tab" data-bs-toggle="tab" data-bs-target="#job" type="button" role="tab" aria-controls="job" aria-selected="false">Pekerjaan</button>
-                </li>
-            </ul>
+        <ul class="nav nav-tabs" id="tab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="program-tab" data-bs-toggle="tab" data-bs-target="#program" type="button" role="tab" aria-controls="program" aria-selected="true">Program</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="job-tab" data-bs-toggle="tab" data-bs-target="#job" type="button" role="tab" aria-controls="job" aria-selected="false">Pekerjaan</button>
+            </li>
+        </ul>
 
-            <!-- content for tab -->
-            <div class="tab-content m-3" id="tabContent">
-                <div class="tab-pane fade show active" id="program" role="tabpanel" aria-labelledby="program-tab">
-                    <!-- Calendar -->
-                    <div id='calendar'></div>
-                </div>
-                <div class="tab-pane fade" id="job" role="tabpanel" aria-labelledby="job-tab">
-                    <!-- Job offer -->
-                    <div id="job">
-                        <div class="card-container"></div>
-                    </div>
-                </div>
-                <div class="tab-pane fade" id="search" role="tabpanel" aria-labelledby="search-tab">
-                    <!-- Search any -->
-                    <div id="search">
-                        <div class="search"></div>
+        <!-- Content for tab -->
+        <div class="tab-content m-3" id="tabContent">
+            <div class="tab-pane fade show active" id="program" role="tabpanel" aria-labelledby="program-tab">
+                <!-- Calendar -->
+                <div id='calendar'></div>
+            </div>
+
+            <div class="tab-pane fade" id="job" role="tabpanel" aria-labelledby="job-tab">
+                <!-- Job offer -->
+                <div id="job">
+                    <div class="card-container">
+                        <div class="accordion" id="sectorsAccordion">
+                            @foreach($sectors as $sector)
+                                @php
+                                    // Initialize the displayed positions array for each sector
+                                    $displayedPositions = [];
+                                    $sumOfPositions = $sector->organizations->flatMap->jobOffers->groupBy('job_id')->count();
+                                    
+                                    // Initialize an array to count the number of offers for each position
+                                    $jobOfferCounts = [];
+                                    
+                                    // First pass: count the number of offers for each job position
+                                    foreach($sector->organizations as $organization) {
+                                        foreach($organization->jobOffers as $offer) {
+                                            $jobId = $offer->job_id;
+                                            if (!isset($jobOfferCounts[$jobId])) {
+                                                $jobOfferCounts[$jobId] = 0;
+                                            }
+                                            $jobOfferCounts[$jobId]++;
+                                        }
+                                    }
+                                @endphp
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingSector{{ $sector->sector_id }}">
+                                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSector{{ $sector->sector_id }}" aria-expanded="true" aria-controls="collapseSector{{ $sector->sector_id }}">
+                                            {{ $sector->name }} ({{ $sumOfPositions }} Jawatan)
+                                        </button>
+                                    </h2>
+                                    <div id="collapseSector{{ $sector->sector_id }}" class="accordion-collapse collapse" aria-labelledby="headingSector{{ $sector->sector_id }}" data-bs-parent="#sectorsAccordion">
+                                        <div class="accordion-body">
+                                            @foreach($sector->organizations as $organization)
+                                                @foreach($organization->jobOffers->groupBy('job_id') as $jobId => $jobOffers)
+                                                    @php
+                                                        // Retrieve the job associated with the offer
+                                                        $job = $jobOffers->first()->job;
+                                                    @endphp
+
+                                                    <!-- Check if $job is not null -->
+                                                    @if($job)
+                                                        @if(!in_array($job->job_id, $displayedPositions))
+                                                            <!-- Add the position to the displayed positions array -->
+                                                            @php
+                                                                $displayedPositions[] = $job->job_id;
+                                                            @endphp
+
+                                                            <!-- Display the position -->
+                                                            <div class="accordion mb-2" id="positionAccordion{{ $job->job_id }}">
+                                                                <div class="accordion-item">
+                                                                    <h2 class="accordion-header" id="headingPosition{{ $job->job_id }}">
+                                                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePosition{{ $job->job_id }}" aria-expanded="false" aria-controls="collapsePosition{{ $job->job_id }}">
+                                                                            {{ $job->position }} ({{ $jobOfferCounts[$jobId] }} Tawaran)
+                                                                        </button>
+                                                                    </h2>
+                                                                    <div id="collapsePosition{{ $job->job_id }}" class="accordion-collapse collapse" aria-labelledby="headingPosition{{ $job->job_id }}" data-bs-parent="#positionAccordion{{ $job->job_id }}">
+                                                                        <div class="accordion-body" id="organizationList{{ $job->job_id }}">
+                                                                            @foreach($jobOffers as $offer)
+                                                                                <div><a class="viewAnchor text-black" href="/joinoffer/{{$offer->offer_id}}">
+                                                                                    <h5 class="card-text">{{ $offer->organization->username }}</h5></a>
+                                                                                    <span class="card-text badge badge-primary"> RM {{ $offer->min_salary }}  - RM {{ $offer->max_salary }} sebulan</span>
+                                                                                    <span class="card-text badge badge-primary"> {{ $offer->jobType->name }} </span>
+                                                                                    <span class="card-text badge badge-primary"> {{ $offer->shiftType->name }} </span>
+                                                                                </div>
+                                                                            @endforeach
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        @else
+                                                            <!-- Append to the existing position's organization list -->
+                                                            <script>
+                                                                $(document).ready(function() {
+                                                                    const list = $('#organizationList{{ $job->job_id }}');
+                                                                    @foreach($jobOffers as $offer)
+
+                                                                        const listItem = '<hr><div><a class="viewAnchor text-black" href="/joinoffer/{{$offer->offer_id}}">' +
+                                                                                        '<h5 class="card-text">{{ $offer->organization->username }}</h5></a>' +
+                                                                                        '<span class="card-text badge badge-primary"> RM {{ $offer->min_salary }}  - RM {{ $offer->max_salary }} sebulan</span>' +
+                                                                                        ' <span class="card-text badge badge-primary"> {{ $offer->jobType->name }} </span>' +
+                                                                                        ' <span class="card-text badge badge-primary"> {{ $offer->shiftType->name }} </span>' +
+                                                                                        '</div>';
+                                                                        list.append(listItem);
+
+                                                                    @endforeach
+                                                                });
+                                                            </script>
+                                                        @endif
+                                                    @endif
+                                                @endforeach
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
                     </div>
                 </div>
             </div>
 
+            <div class="tab-pane fade" id="search" role="tabpanel" aria-labelledby="search-tab">
+                <!-- Search any -->
+                <div id="search">
+                    <div class="search"></div>
+                </div>
+            </div>
         </div>
 
         <br>

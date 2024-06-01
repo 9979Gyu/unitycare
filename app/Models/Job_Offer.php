@@ -10,6 +10,7 @@ class Job_Offer extends Model
     use HasFactory;
 
     protected $table = 'job_offers';
+    protected $primaryKey = 'offer_id';
 
     protected $fillable = [
         'offer_id',
@@ -26,5 +27,25 @@ class Job_Offer extends Model
         'approval_status',
         'status',
     ];
+
+    public function job()
+    {
+        return $this->belongsTo(Job::class, 'job_id');
+    }
+
+    public function organization()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function jobType()
+    {
+        return $this->belongsTo(Job_Type::class, 'job_type_id');
+    }
+
+    public function shiftType()
+    {
+        return $this->belongsTo(Shift_Type::class, 'shift_type_id');
+    }
 
 }

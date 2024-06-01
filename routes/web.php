@@ -21,10 +21,12 @@ use App\Http\Controllers\LandingController;
 |
 */
 
-Route::get('/', function () {
-    // return view('welcome');
-    return view('/landings/index');
-});
+// Route::get('/', function () {
+//     // return view('welcome');
+//     return view('/landings/index');
+// });
+
+Route::get('/', [LandingController::class, 'index']);
 
 Route::get('/db-check', function () {
     try {

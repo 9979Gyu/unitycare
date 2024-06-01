@@ -10,6 +10,7 @@ class Job_Type extends Model
     use HasFactory;
 
     protected $table = 'job_types';
+    protected $primaryKey = 'job_type_id';
 
     protected $fillable = [
         'job_type_id',
@@ -17,4 +18,9 @@ class Job_Type extends Model
         'description',
         'status',
     ];
+
+    public function jobOffers()
+    {
+        return $this->hasMany(Job_Offer::class, 'job_type_id');
+    }
 }
