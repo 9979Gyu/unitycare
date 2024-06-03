@@ -27,6 +27,7 @@ use App\Http\Controllers\LandingController;
 // });
 
 Route::get('/', [LandingController::class, 'index']);
+Route::get('/info', [LandingController::class, 'info']);
 
 Route::get('/db-check', function () {
     try {

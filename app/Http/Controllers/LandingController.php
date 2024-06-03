@@ -12,6 +12,10 @@ use Auth;
 
 class LandingController extends Controller{
 
+    public function info(){
+        return view('landings.info');
+    }
+
     public function index(){
         
         // Check if user logged in and is B40/OKU

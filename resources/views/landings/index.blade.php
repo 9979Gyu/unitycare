@@ -39,13 +39,13 @@
 
         <!-- Content for tab -->
         <div class="tab-content m-3" id="tabContent">
+            <!-- Calendar -->
             <div class="tab-pane fade show active" id="program" role="tabpanel" aria-labelledby="program-tab">
-                <!-- Calendar -->
                 <div id='calendar'></div>
             </div>
 
+            <!-- Job offer -->
             <div class="tab-pane fade" id="job" role="tabpanel" aria-labelledby="job-tab">
-                <!-- Job offer -->
                 <div id="job">
                     <div class="card-container">
                         <div class="accordion" id="sectorsAccordion">
@@ -145,25 +145,13 @@
                 </div>
             </div>
 
+            <!-- Search position and program -->
             <div class="tab-pane fade" id="search" role="tabpanel" aria-labelledby="search-tab">
-                <!-- Search any -->
-                <div id="search">
-                    <div class="search"></div>
-                </div>
+                <div id='searchField'></div>
             </div>
         </div>
 
         <br>
-
-        <h3>Misi</h3>
-        <p>
-            Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
-        </p>
-
-        <h3>Visi</h3>
-        <p>
-            Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
-        </p>
 
         <div id="carouselImage" class="carousel slide" data-bs-ride="carousel">
 
