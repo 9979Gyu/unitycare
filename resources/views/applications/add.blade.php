@@ -28,7 +28,7 @@
             </tr>
             <tr>
                 <th scope="row">Nama</th>
-                <td colspan="3">{{ $offer->jobname }} - {{ $offer->jobposition }}</td>
+                <td colspan="3">{{ $offer->job->name }} - {{ $offer->job->position }}</td>
             </tr>
             <tr>
                 <th scope="row">Tempat</th>
@@ -36,11 +36,11 @@
             </tr>
             <tr>
                 <th scope="row">Jenis</th>
-                <td colspan="3">{{ $offer->typename }}</td>
+                <td colspan="3">{{ $offer->jobType->name }}</td>
             </tr>
             <tr>
                 <th scope="row">Syif</th>
-                <td colspan="3">{{ $offer->shiftname }}</td>
+                <td colspan="3">{{ $offer->shiftType->name }}</td>
             </tr>
             <tr>
                 <th scope="row">Purata Gaji</th>
@@ -48,7 +48,7 @@
             </tr>
             <tr>
                 <th scope="row">Penerangan</th>
-                <td colspan="3">{{ $offer->description }}</td>
+                <td colspan="3">{{ json_decode($offer->description, true)['description'] }}</td>
             </tr>
             <tr>
                 <th scope="row" rowspan="2">Pengurus</th>
@@ -57,16 +57,10 @@
                 <th>Emel</th>
             </tr>
             <tr>
-                <td>{{ $offer->username }}</td>
-                <td>+60{{ $offer->usercontact }}</td>
-                <td>{{ $offer->useremail }}</td>
+                <td>{{ $offer->organization->name }}</td>
+                <td>+60{{ $offer->organization->contactNo }}</td>
+                <td>{{ $offer->organization->email }}</td>
             </tr>
-            @if(Auth::user()->roleID == 5)
-            <tr>
-                <th scope="row" class="required">Sebab mohon</th>
-                <td colspan="3"><input type="text" class="form-control" name="desc" id="desc" value="{{ old('description') }}" required></td>
-            </tr>
-            @endif
             <tr>
                 <th scope="row">Pilihan</th>
                 <input type="number" name="offer_id" value="{{ $offer->offer_id }}" hidden>

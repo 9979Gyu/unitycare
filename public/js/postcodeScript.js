@@ -3,7 +3,7 @@ $(document).ready(function(){
         var postcode = $(this).val();
         if(postcode){
             $.ajax({
-                url: '/search',
+                url: '/searchPostcode',
                 type: 'GET',
                 data: {postcode: postcode},
                 success: function(data){

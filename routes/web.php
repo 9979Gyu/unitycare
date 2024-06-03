@@ -68,7 +68,7 @@ Route::get('/register', [UserController::class, 'register']);
 Route::post('/storeadmin', [UserController::class, 'storeAdmin'])->name('user.storeAdmin');
 
 // Postcode - search state and cities
-Route::get('/search', [PostcodeController::class, 'search']);
+Route::get('/searchPostcode', [PostcodeController::class, 'search']);
 Route::get('/getCityState', [PostcodeController::class, 'getCityState']);
 
 // Poor people
