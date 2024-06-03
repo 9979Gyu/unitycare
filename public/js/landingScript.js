@@ -65,8 +65,8 @@ $(document).ready(function(){
                 var programName = '<a href="/joinprogram/' + program.program_id + '">' + program.name + '</a>';
         
                 $('#searchResults').append(
-                    '<li class="list-group-item">' + programName + ' <br> ' + organizationName + '<br>Date: ' + 
-                        program.start_date + ' - ' + program.end_date + '</li><br>'
+                    '<li class="list-group-item">' + programName + ' <br> ' + organizationName + '<br>' + 
+                        program.start_date + ' ' + program.start_time + ' - ' + program.end_date + ' ' + program.end_time + '</li><br>'
                 );
             });
         }

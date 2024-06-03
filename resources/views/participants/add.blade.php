@@ -64,8 +64,8 @@
                 <th colspan="2">Peserta</th>
             </tr>
             <tr>
-                <td>{{ $volRemain }} / {{ $volLimit->qty_limit }}</td>
-                <td colspan="2">{{ $poorRemain }} / {{ $poorLimit->qty_limit }}</td>
+                <td>{{ $volRemain }} / {{ $volLimit->programSpecs[0]->qty_limit }}</td>
+                <td colspan="2">{{ $poorRemain }} / {{ $poorLimit->programSpecs[0]->qty_limit }}</td>
             </tr>
             <tr>
                 <th scope="row" rowspan="2">Pengurus</th>
@@ -74,9 +74,9 @@
                 <th>Emel</th>
             </tr>
             <tr>
-                <td>{{ $program->user->name }}</td>
-                <td>+60{{ $program->user->contactNo }}</td>
-                <td>{{ $program->user->email }}</td>
+                <td>{{ $program->organization->name }}</td>
+                <td>+60{{ $program->organization->contactNo }}</td>
+                <td>{{ $program->organization->email }}</td>
             </tr>
             <tr>
                 <th scope="row">Pilihan</th>

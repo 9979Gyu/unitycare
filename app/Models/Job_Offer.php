@@ -26,6 +26,10 @@ class Job_Offer extends Model
         'shift_type_id',
         'approval_status',
         'status',
+        'start_date',
+        'start_time',
+        'end_date',
+        'end_time',
     ];
 
     public function job()

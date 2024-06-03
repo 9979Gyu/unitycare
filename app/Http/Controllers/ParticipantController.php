@@ -21,7 +21,7 @@ class ParticipantController extends Controller
     public function create($id){
 
         if(Auth::check()){
-            $program = Program::with('user')
+            $program = Program::with('organization')
             ->where([
                 ['program_id', $id],
                 ['status', 1],
@@ -34,37 +34,37 @@ class ParticipantController extends Controller
             )
             ->first();
 
-            $volLimit = DB::table("programs")
-            ->join('program_specs as ps', 'ps.program_id', '=', 'programs.program_id')
-            ->where([
-                ['programs.program_id', $id],
-                ['programs.status', 1],
-                ['programs.approved_status', 2],
-                ['ps.user_type_id', 2],
+            $volLimit = Program::where([
+                ['program_id', $id],
+                ['status', 1],
+                ['approved_status', 2],
             ])
+            ->with(['programSpecs' => function ($query) {
+                $query->where('user_type_id', 2);
+            }])
+            ->first();       
+
+            $poorLimit = Program::where([
+                ['program_id', $id],
+                ['status', 1],
+                ['approved_status', 2],
+            ])
+            ->with(['programSpecs' => function ($query) {
+                $query->where('user_type_id', 3);
+            }])
             ->first();
 
-            $poorLimit = DB::table("programs")
-            ->join('program_specs as ps', 'ps.program_id', '=', 'programs.program_id')
-            ->where([
-                ['programs.program_id', $id],
-                ['programs.status', 1],
-                ['programs.approved_status', 2],
-                ['ps.user_type_id', 3],
+            $participantExist = Participant::where([
+                ['status', 1],
+                ['user_id', Auth::user()->id]
             ])
-            ->first();
-
-            $participantExist = DB::table('participants')
-            ->join('programs as p', 'p.program_id', '=', 'participants.program_id')
-            ->where([
-                ['p.program_id', $id],
-                ['participants.status', 1],
-                ['participants.user_id', Auth::user()->id]
-            ])
+            ->with(['programs' => function ($query) {
+                $query->where('program_id', $id);
+            }])
             ->count();
 
-            $volRemain = $volLimit->qty_limit - $volLimit->qty_enrolled;
-            $poorRemain = $poorLimit->qty_limit - $poorLimit->qty_enrolled;
+            $volRemain = $volLimit->programSpecs[0]->qty_limit - $volLimit->programSpecs[0]->qty_enrolled;
+            $poorRemain = $poorLimit->programSpecs[0]->qty_limit - $poorLimit->programSpecs[0]->qty_enrolled;
 
             return view('participants.add', compact('program', 'volLimit', 'poorLimit', 'volRemain', 'poorRemain', 'participantExist'));
             

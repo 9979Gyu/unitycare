@@ -81,13 +81,6 @@ class LandingController extends Controller{
         if(isset($searchQuery) && isset($searchOption)){
 
             if($searchOption == "program"){
-                // $results = Program::whereHas('organization', function ($query) use ($searchQuery) {
-                //     $query->where('name', 'like', '%' . $searchQuery . '%')
-                //           ->where('status', 1)
-                //           ->where('approved_status', 2);
-                // })
-                // ->with('organization')
-                // ->get();
                 $results = Program::where('name', 'like', '%' . $searchQuery . '%')
                           ->where('status', 1)
                           ->where('approved_status', 2)

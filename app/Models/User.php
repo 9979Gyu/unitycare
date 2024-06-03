@@ -55,7 +55,7 @@ class User extends Authenticatable
     ];
 
     public function programs(){
-        return $this->hasMany(Program::class);
+        return $this->hasMany(Program::class, 'user_id');
     }
 
     public function jobOffers()

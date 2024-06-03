@@ -23,10 +23,9 @@ class ProgramController extends Controller
             $roleNo = Auth::user()->roleID;
         }
 
-        $allPrograms = Program::where([
-            ['programs.status', 1],
-        ])
-        ->join('users', 'id', '=', 'user_id')
+        $allPrograms = Program::where('programs.status', 1)
+        ->join('users', 'programs.user_id', '=', 'users.id')
+        ->with('organization')
         ->select(
             'programs.*', 
             'users.name as username', 
@@ -39,40 +38,40 @@ class ProgramController extends Controller
             ['programs.status', 1],
             ['programs.approved_status', 2]
         ])
-            ->join('users', 'id', '=', 'user_id')
-            ->select(
-                'programs.*', 
-                'users.name as username', 
-                'users.contactNo as contact_no', 
-                'users.email as useremail'
-            )
-            ->get();
+        ->join('users', 'programs.user_id', '=', 'users.id')
+        ->select(
+            'programs.*', 
+            'users.name as username', 
+            'users.contactNo as contact_no', 
+            'users.email as useremail'
+        )
+        ->get();
 
         $pendingPrograms = Program::where([
             ['programs.status', 1],
             ['programs.approved_status', 1]
         ])
-            ->join('users', 'id', '=', 'user_id')
-            ->select(
-                'programs.*', 
-                'users.name as username', 
-                'users.contactNo as contact_no', 
-                'users.email as useremail'
-            )
-            ->get();
+        ->join('users', 'programs.user_id', '=', 'users.id')
+        ->select(
+            'programs.*', 
+            'users.name as username', 
+            'users.contactNo as contact_no', 
+            'users.email as useremail'
+        )
+        ->get();
 
         $declinedPrograms = Program::where([
             ['programs.status', 1],
             ['programs.approved_status', 0]
         ])
-            ->join('users', 'id', '=', 'user_id')
-            ->select(
-                'programs.*', 
-                'users.name as username', 
-                'users.contactNo as contact_no', 
-                'users.email as useremail'
-            )
-            ->get();
+        ->join('users', 'programs.user_id', '=', 'users.id')
+        ->select(
+            'programs.*', 
+            'users.name as username', 
+            'users.contactNo as contact_no', 
+            'users.email as useremail'
+        )
+        ->get();
 
         if($roleNo == 5){
             $programs = $approvedPrograms;
@@ -82,6 +81,7 @@ class ProgramController extends Controller
         }
 
         return $programs;
+
     }
 
     public function index()
@@ -165,7 +165,7 @@ class ProgramController extends Controller
             $program->save();
 
             $addVolunteer = new Program_Spec([
-                'program_id' => $program->id,
+                'program_id' => $program->program_id,
                 'user_type_id' => 2,
                 'qty_limit' => $request->get('volunteer'),
                 'qty_enrolled' => 0,
@@ -174,7 +174,7 @@ class ProgramController extends Controller
             $addVolunteer->save();
 
             $addPoor = new Program_Spec([
-                'program_id' => $program->id,
+                'program_id' => $program->program_id,
                 'user_type_id' => 3,
                 'qty_limit' => $request->get('poor'),
                 'qty_enrolled' => 0,
