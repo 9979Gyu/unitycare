@@ -73,6 +73,63 @@ class LandingController extends Controller{
         return view('landings.index', compact('sectors'));
     }
 
+    public function getJobsAndApplications(){
+        
+        // Check if user logged in and is B40/OKU
+        if(Auth::check() && Auth::user()->roleID == 5){
+
+            // Get logged in user's poor id
+            $poorId = Auth::user()->poor->poor_id;
+
+            // Retrieve sectors based on approved application which the user has made
+            $sectors = Sector::whereHas('organizations.jobOffers.applications', function ($query) use ($poorId) {
+                $query->where('approval_status', 2)
+                ->where('status', 1)
+                ->where('poor_id', $poorId);
+            })
+            ->with([
+                'organizations.jobOffers' => function ($query) use ($poorId) {
+                    $query->whereHas('applications', function ($query) use ($poorId) {
+                        $query->where('approval_status', 2)
+                        ->where('status', 1)
+                        ->where('poor_id', $poorId);
+                    })
+                    ->with([
+                        'shiftType',
+                        'jobType',
+                        'organization',
+                        'applications' => function ($query) use ($poorId){
+                            $query->where('approval_status', 2)
+                            ->where('status', 1)
+                            ->where('poor_id', $poorId);
+                        }
+                    ]);
+                }
+            ])
+            ->get();
+        }
+        else{
+            // Retrieve sectors that have associated job offers
+            $sectors = Sector::whereHas('organizations.jobOffers', function ($query) {
+                $query->where('approval_status', 2);
+            })
+            ->with([
+                'organizations.jobOffers' => function ($query) {
+                    $query->with([
+                        'shiftType',
+                        'jobType',
+                        'organization'
+                    ]);
+                },
+                // Ensures that the organization related to jobOffers is eagerly loaded
+                'organizations.jobOffers.organization'
+            ])
+            ->get();
+        }
+
+        return response()->json($sectors);
+    }
+
     // Function to return list of programs display in landings page
     public function getPrograms(Request $request){
 

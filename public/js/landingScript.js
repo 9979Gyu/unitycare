@@ -25,6 +25,18 @@ $(document).ready(function(){
         calendar.render();
     });
 
+    // // Add slide up and slide down animation for accordion
+    // $(document).on('click', '.accordion-button', function() {
+    //     const target = $(this).attr('data-bs-target');
+    //     const targetElement = $(target);
+
+    //     targetElement.stop(true, true).slideToggle(300, function() {
+    //         targetElement.toggleClass('show');
+    //     });
+    // });
+
+
+
     // Manage job offer
     // $('#job-tab').on('shown.bs.tab', function (event) {
     //     updateCardContainer();

@@ -1,7 +1,0 @@
-.collapse-content {
-    display: none;
-}
-
-.card .expanded .collapse-content {
-    display: block;
-}
