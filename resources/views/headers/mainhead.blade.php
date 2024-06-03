@@ -36,7 +36,7 @@
                     </li>
                 @endif
                 @if(Auth::check())
-                    @if(Auth::user()->roleID != 5)
+                    @if(Auth::user()->roleID == 1 || Auth::user()->roleID == 2)
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <b>Pengguna</b>
