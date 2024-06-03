@@ -40,8 +40,6 @@ class ApplicationController extends Controller
             ->with(['organization', 'jobType', 'shiftType', 'job'])
             ->first();
 
-            // dd($offer);
-
             $applicationExist = Application::where('status', 1)
             ->with(['jobOffer' => function ($query) {
                 $query->where([
@@ -63,8 +61,8 @@ class ApplicationController extends Controller
 
     public function store(Request $request){
     
-        $offerID = $request->get("offer_id");
-        $description = $request->get('desc');
+        $offerID = $request->get("selectedID");
+        $description = $request->get('reason');
 
         $uid = Auth::user()->id;
 
@@ -97,12 +95,13 @@ class ApplicationController extends Controller
             $result = $application->save();
 
             if($result){
-                return redirect('/viewoffer')->with('success', 'Berjaya didaftarkan');
+
+                $request->session()->flash('success', 'Berjaya didaftarkan');
+                $request->session()->flash('redirect', '/viewoffer');
+
+                return response()->json(['success' => true, 'redirect' => '/viewoffer']);
             }
         }
-
-        return redirect('/viewoffer')->withErrors(['message' => "Pendaftaran tidak berjaya"]);
-
     }
 
     public function dismiss(Request $request)
@@ -233,6 +232,12 @@ class ApplicationController extends Controller
 
     public function updateApproval(Request $request){
         $id = $request->get("selectedID");
+
+        $poorID = Application::where([
+            ['application_id', $id],
+            ['status', 1],
+        ])
+        ->value('poor_id');
         
         // Get the current date and time
         $currentDateTime = Carbon::now();
@@ -251,8 +256,26 @@ class ApplicationController extends Controller
 
             // If successfully update the program
             if($update){
-                // direct user to view program page with success messasge
-                return redirect('/viewapplication')->with('success', 'Data berjaya dikemaskini');
+
+                // Update employment status
+                $update = Poor::where('poor_id', $poorID)->update(['employment_status' => 1]);
+
+                if($update){
+                    
+                    // Update other applications status to 0 if the employment status is 1
+                    $updateOthers = Application::where([
+                        ['status', 1],
+                        ['approval_status', 1],
+                        ['poor_id', $poorID]
+                    ])
+                    ->update(['status' => 0]);
+
+                    if($updateOthers){
+                        // Direct user to view program page with success messasge
+                        return redirect('/viewapplication')->with('success', 'Data berjaya dikemaskini');
+                    }
+                    
+                }
             }
         }
 

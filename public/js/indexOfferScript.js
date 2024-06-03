@@ -374,14 +374,15 @@ $(document).ready(function() {
                 dataType: 'html',
                 url: "/deleteoffer",
                 data: { selectedID : selectedID },
-                success: function(data) {
-                    $('#deleteModal').modal('hide');
-                    $('.condition-message').html(data);
-
-                    updateCardContainer();
+                success: function(response) {
+                    $('#applyModal').modal('hide');
+                    $('.condition-message').html(response.message);
+            
+                    window.location.href = '/viewoffer';
                 },
-                error: function (data) {
-                    $('.condition-message').html(data);
+                error: function(xhr, status, error) {
+                    // Handle error
+                    console.error(xhr.responseText);
                 }
             })
         }
