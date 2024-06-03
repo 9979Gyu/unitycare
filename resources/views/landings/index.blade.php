@@ -35,6 +35,9 @@
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="job-tab" data-bs-toggle="tab" data-bs-target="#job" type="button" role="tab" aria-controls="job" aria-selected="false">Pekerjaan</button>
             </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="search-tab" data-bs-toggle="tab" data-bs-target="#search" type="button" role="tab" aria-controls="search" aria-selected="false">Carian</button>
+            </li>
         </ul>
 
         <!-- Content for tab -->
@@ -147,7 +150,42 @@
 
             <!-- Search position and program -->
             <div class="tab-pane fade" id="search" role="tabpanel" aria-labelledby="search-tab">
-                <div id='searchField'></div>
+                <!-- <div class="container t-5">
+                    <div class="search-bar">
+                        <select name="typeDropDown" id="typeDropDown">
+                            <option>Pilih Jenis</option>
+                        </select>
+
+                        <input type="text" name="keyword" id="keyword" placeholder="Pekerjaan, kata kunci atau syarikat">
+                        
+                        <button type="button" class="btn btn-primary" id="searchBtn">Cari</button>
+                    </div>
+                </div>
+                <br>
+                <div id='searchResult' class="card-container"></div> -->
+
+                <div class="container mt-4">
+                    <div class="row justify-content-center">
+                        <div class="col">
+                            <div class="input-group">
+                                <select id="searchOption" class="form-select">
+                                    <option value="program">Program</option>
+                                    <option value="job">Pekerjaan</option>
+                                </select>
+                                <input type="text" id="searchInput" class="form-control" placeholder="Cari...">
+                                <button type="button" class="btn btn-primary" id="searchBtn">Cari</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Display search results -->
+                    <div class="row mt-4 justify-content-center">
+                        <div class="col">
+                            <ul id="searchResults" class="list-group"></ul>
+                        </div>
+                    </div>
+                </div>
+
+
             </div>
         </div>
 

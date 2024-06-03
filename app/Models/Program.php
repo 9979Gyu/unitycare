@@ -9,6 +9,9 @@ class Program extends Model
 {
     use HasFactory;
 
+    protected $table = 'programs';
+    protected $primaryKey = 'program_id';
+
     protected $fillable = [
         'name',
         'start_date',
@@ -26,14 +29,16 @@ class Program extends Model
         'close_date',
     ];
 
-    public function user(){
-        return $this->belongsTo(User::class);
+    public function organization(){
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function programSpecs(){
-        return $this->hasMany(Program_Spec::class);
+        return $this->hasMany(Program_Spec::class, 'program_id');
     }
 
-
+    public function participants(){
+        return $this->hasMany(Participant::class, 'program_id');
+    }
 
 }

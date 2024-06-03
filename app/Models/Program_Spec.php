@@ -10,6 +10,7 @@ class Program_Spec extends Model
     use HasFactory;
 
     protected $table = 'program_specs';
+    protected $primaryKey = 'spec_id';
 
     protected $fillable = [
         'program_id',
@@ -19,7 +20,7 @@ class Program_Spec extends Model
     ];
 
     public function program(){
-        return $this->belongsTo(Program::class);
+        return $this->belongsTo(Program::class, 'program_id');
     }
 
 }

@@ -10,6 +10,7 @@ class Participant extends Model
     use HasFactory;
 
     protected $table = 'participants';
+    protected $primaryKey = 'participant_id';
 
     protected $fillable = [
         'program_id',
@@ -17,4 +18,8 @@ class Participant extends Model
         'user_id',
         'status',
     ];
+
+    public function program(){
+        return $this->belongsTo(Program::class, 'program_id');
+    }
 }

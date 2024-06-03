@@ -73,61 +73,40 @@ class LandingController extends Controller{
         return view('landings.index', compact('sectors'));
     }
 
-    public function getJobsAndApplications(){
-        
-        // Check if user logged in and is B40/OKU
-        if(Auth::check() && Auth::user()->roleID == 5){
+    public function search(Request $request)
+    {
+        $searchQuery = ucwords($request->get('query'));
+        $searchOption = $request->get('option');
 
-            // Get logged in user's poor id
-            $poorId = Auth::user()->poor->poor_id;
+        if(isset($searchQuery) && isset($searchOption)){
 
-            // Retrieve sectors based on approved application which the user has made
-            $sectors = Sector::whereHas('organizations.jobOffers.applications', function ($query) use ($poorId) {
-                $query->where('approval_status', 2)
-                ->where('status', 1)
-                ->where('poor_id', $poorId);
-            })
-            ->with([
-                'organizations.jobOffers' => function ($query) use ($poorId) {
-                    $query->whereHas('applications', function ($query) use ($poorId) {
-                        $query->where('approval_status', 2)
-                        ->where('status', 1)
-                        ->where('poor_id', $poorId);
-                    })
-                    ->with([
-                        'shiftType',
-                        'jobType',
-                        'organization',
-                        'applications' => function ($query) use ($poorId){
-                            $query->where('approval_status', 2)
-                            ->where('status', 1)
-                            ->where('poor_id', $poorId);
-                        }
-                    ]);
-                }
-            ])
-            ->get();
+            if($searchOption == "program"){
+                $results = Program::whereHas('organization', function ($query) use ($searchQuery) {
+                    $query->where('name', 'like', '%' . $searchQuery . '%')
+                          ->where('status', 1)
+                          ->where('approved_status', 2);
+                })
+                ->with('organization')
+                ->get();
+            }
+            else{
+                $results = Job::whereHas('jobOffers.organization', function ($query) use ($searchQuery) {
+                    $query->where('position', 'like', '%' . $searchQuery . '%')
+                          ->where('status', 1);
+                })
+                ->with(['jobOffers' => function ($query) {
+                    $query->where('approval_status', 2)
+                          ->with(['job', 'organization']);
+                }])
+                ->get();
+
+            }
+            
+
+            dd($results);
+
+            return response()->json($results);
         }
-        else{
-            // Retrieve sectors that have associated job offers
-            $sectors = Sector::whereHas('organizations.jobOffers', function ($query) {
-                $query->where('approval_status', 2);
-            })
-            ->with([
-                'organizations.jobOffers' => function ($query) {
-                    $query->with([
-                        'shiftType',
-                        'jobType',
-                        'organization'
-                    ]);
-                },
-                // Ensures that the organization related to jobOffers is eagerly loaded
-                'organizations.jobOffers.organization'
-            ])
-            ->get();
-        }
-
-        return response()->json($sectors);
     }
 
     // Function to return list of programs display in landings page

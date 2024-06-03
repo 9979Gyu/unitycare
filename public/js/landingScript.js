@@ -25,104 +25,71 @@ $(document).ready(function(){
         calendar.render();
     });
 
-    // // Add slide up and slide down animation for accordion
-    // $(document).on('click', '.accordion-button', function() {
-    //     const target = $(this).attr('data-bs-target');
-    //     const targetElement = $(target);
+    $('#searchBtn').on('click', function() {
+        const input = $("#searchInput").val().trim();
+        const selectedOption = $("#searchOption").val().toLowerCase();
 
-    //     targetElement.stop(true, true).slideToggle(300, function() {
-    //         targetElement.toggleClass('show');
-    //     });
-    // });
+        // Perform search only if query is not empty
+        if (input !== '') {
+            $.ajax({
+                url: '/search',
+                method: 'GET',
+                data: { 
+                    query: input,
+                    option: selectedOption, 
+                },
+                success: function(response) {
+                    displayResults(response, selectedOption);
+                },
+                error: function(xhr, status, error) {
+                    console.error(error);
+                }
+            });
+        } 
+        else {
+            // Clear results if query is empty
+            $('#searchResults').empty(); 
+        }
+    });
 
+    function displayResults(results, option) {
+        $('#searchResults').empty(); // Clear previous results
 
+        if(option == "program"){
+            // Display each search result
+            results.forEach(function(result) {
+                // Iterate over each job offer for the current job
+                result.job_offers.forEach(function(jobOffer) {
+                    var organizationName = jobOffer.organization.name;
+                    var jobName = '<a href="/joinoffer/' + 
+                    jobOffer.offer_id + '">' + result.name + '</a>';
 
-    // Manage job offer
-    // $('#job-tab').on('shown.bs.tab', function (event) {
-    //     updateCardContainer();
-    // });
-    
-    // $(".card-container").on("click", ".card", function() {
+                    $('#searchResults').append(
+                        '<li class="list-group-item">' + jobName + ' - ' + organizationName + '</li>' +
+                        '<li class="list-group-item">Salary: RM ' + 
+                            jobOffer.min_salary + ' - RM ' + jobOffer.max_salary + '</li><br>'
+                    );
+                });
+            });
+        }
+        else{
+            // Display each search result
+            results.forEach(function(result) {
+                // Iterate over each job offer for the current job
+                result.job_offers.forEach(function(jobOffer) {
+                    var organizationName = jobOffer.organization.name;
+                    var jobName = '<a href="/joinoffer/' + 
+                    jobOffer.offer_id + '">' + result.name + '</a>';
 
-    //     // Hide all other collapse-content except the clicked one
-    //     $(".collapse-content").not($(this).find(".collapse-content")).slideUp();
-
-    //     // Toggle the collapse-content of the clicked card
-    //     $(this).find(".collapse-content").slideToggle();
+                    $('#searchResults').append(
+                        '<li class="list-group-item">' + jobName + ' - ' + organizationName + '</li>' +
+                        '<li class="list-group-item">Salary: RM ' + 
+                            jobOffer.min_salary + ' - RM ' + jobOffer.max_salary + '</li><br>'
+                    );
+                });
+            });
+        }
         
-    // });
-    
+    }
 
-    // function updateCardContainer(){
-    //     $.ajax({
-    //         type: 'GET',
-    //         url: "/getCountPosition",
-    //         success: function(data) {
-
-    //             $(".card-container").empty();
-
-    //             $.each(data.events, function(index, sector){
-
-    //                 // Append sector to the card-container
-    //                 $(".card-container").append(
-    //                     '<div class="card mb-2" id="' + sector.sectorid + '">' +
-    //                         '<div class="card-body d-flex justify-content-between">' +
-    //                             '<div><h4 class="card-title">' + sector.sectorname + 
-    //                             ' (' + sector.offercount + ')'  + '</h4></div>' +
-    //                         '</div>' +
-    //                         '<div class="collapse-content">' +
-    //                             '<p>Additional information about ' + sector.sectorname + '.</p>' +
-    //                         '</div>' +
-    //                     '</div>'
-    //                 );
-                    
-    //                 $(".collapse-content").css("display", "none");
-                    
-    //             });
-                
-    //         },
-    //         error: function (data) {
-    //             $('.condition-message').html(data);
-    //         }
-    //     });
-    // }
-
-    // function updateCardContainer2(){
-    //     $.ajax({
-    //         type: 'GET',
-    //         url: "/getCountPosition",
-    //         success: function(data) {
-
-    //             $(".card-container").empty();
-
-    //             $.each(data.events, function(index, offer){
-
-    //                 var button;
-
-    //                 button = '<a class="viewAnchor btn btn-info m-2" href="/joinoffer/' + offer.offer_id + '">' +
-    //                     '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">' +
-    //                     '<path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>' +
-    //                     '</svg> Lihat </a>';
-
-    //                 $(".card-container").append(
-    //                     '<p><div class="card" id="' + offer.offer_id + '">' +
-    //                         '<div class="card-body d-flex justify-content-between">' +
-    //                             '<div><h4 class="card-title">' + offer.jobposition + '</h4>' +
-    //                             '<div><p class="card-text">' + offer.username + '</p>' +
-    //                                 '<p class="card-text badge badge-primary"> RM ' + offer.min_salary + ' - RM ' + offer.max_salary + ' sebulan</p>' +
-    //                                 ' <p class="card-text badge badge-primary">' + offer.typename + '</p>' +
-    //                                 ' <p class="card-text badge badge-primary">' + offer.shiftname + '</p>' +
-    //                             '</div></div>' +
-    //                             '<div>' + button + '</div>' +
-    //                         '</div>' +
-    //                     '</div></p>'
-    //                 );
-                    
-    //             });
-    //         },
-    //         error: function (data) {
-    //             $('.condition-message').html(data);
-    //         }
-    //     });
-    // }
 });
