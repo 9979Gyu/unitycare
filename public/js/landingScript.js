@@ -55,21 +55,19 @@ $(document).ready(function(){
     function displayResults(results, option) {
         $('#searchResults').empty(); // Clear previous results
 
-        if(option == "program"){
+        if(results.length === 0){
+            $('#searchResults').append('<li class="list-group-item">Tiada rekod berkenaan</li>');
+        }
+        else if(option == "program"){
             // Display each search result
-            results.forEach(function(result) {
-                // Iterate over each job offer for the current job
-                result.job_offers.forEach(function(jobOffer) {
-                    var organizationName = jobOffer.organization.name;
-                    var jobName = '<a href="/joinoffer/' + 
-                    jobOffer.offer_id + '">' + result.name + '</a>';
-
-                    $('#searchResults').append(
-                        '<li class="list-group-item">' + jobName + ' - ' + organizationName + '</li>' +
-                        '<li class="list-group-item">Salary: RM ' + 
-                            jobOffer.min_salary + ' - RM ' + jobOffer.max_salary + '</li><br>'
-                    );
-                });
+            results.forEach(function(program) {
+                var organizationName = program.organization.name;
+                var programName = '<a href="/joinprogram/' + program.program_id + '">' + program.name + '</a>';
+        
+                $('#searchResults').append(
+                    '<li class="list-group-item">' + programName + ' <br> ' + organizationName + '<br>Date: ' + 
+                        program.start_date + ' - ' + program.end_date + '</li><br>'
+                );
             });
         }
         else{
@@ -82,8 +80,7 @@ $(document).ready(function(){
                     jobOffer.offer_id + '">' + result.name + '</a>';
 
                     $('#searchResults').append(
-                        '<li class="list-group-item">' + jobName + ' - ' + organizationName + '</li>' +
-                        '<li class="list-group-item">Salary: RM ' + 
+                        '<li class="list-group-item">' + jobName + ' <br> ' + organizationName + '<br>Salary: RM ' + 
                             jobOffer.min_salary + ' - RM ' + jobOffer.max_salary + '</li><br>'
                     );
                 });
