@@ -48,4 +48,9 @@ class Job_Offer extends Model
         return $this->belongsTo(Shift_Type::class, 'shift_type_id');
     }
 
+    public function applications()
+    {
+        return $this->hasMany(Application::class, 'offer_id');
+    }
+
 }

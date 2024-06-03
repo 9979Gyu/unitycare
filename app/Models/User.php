@@ -67,4 +67,10 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Sector::class, 'sector_id');
     }
+
+    public function poor()
+    {
+        return $this->hasOne(Poor::class, 'user_id');
+    }
+
 }

@@ -10,8 +10,10 @@ class Application extends Model
     use HasFactory;
 
     protected $table = 'applications';
+    protected $primaryKey = 'application_id';
 
     protected $fillable = [
+        'application_id',
         'applied_date',
         'offer_id',
         'poor_id',
@@ -21,4 +23,14 @@ class Application extends Model
         'status',
         'description',
     ];
+
+    public function jobOffer()
+    {
+        return $this->belongsTo(Job_Offer::class, 'offer_id');
+    }
+
+    public function poor()
+    {
+        return $this->belongsTo(Poor::class, 'poor_id');
+    }
 }

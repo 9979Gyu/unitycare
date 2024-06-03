@@ -10,8 +10,10 @@ class Poor extends Model
     use HasFactory;
 
     protected $table = 'poors';
+    protected $primaryKey = 'poor_id';
 
     protected $fillable = [
+        'poor_id',
         'disability_type',
         'education_level',
         'instituition_name',
@@ -20,4 +22,9 @@ class Poor extends Model
         'user_id',
         'volunteer_id'
     ];
+
+    public function oku()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }
