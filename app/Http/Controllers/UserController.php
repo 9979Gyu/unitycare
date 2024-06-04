@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Poor;
+use App\Exports\ExportUser;
 use Facade\FlareClient\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -11,6 +12,7 @@ use Illuminate\Support\Facades\Validator;
 use DataTables;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
 
 class UserController extends Controller
 {
@@ -493,5 +495,36 @@ class UserController extends Controller
     {
         Auth::logout();
         return redirect('/login')->with('success', 'Berjaya Log Keluar');
+    }
+
+    // Function to export user info
+    public function exportUsers(Request $request){
+        
+        // Validate the request data
+        $rules = [
+            'roleID' => 'required',
+            'roleName' => 'required',
+        ];
+        
+        $validated = $request->validate($rules);
+
+        if($validated){
+            // Retrieve the validated data
+            $roleID = $request->get('roleID');
+            
+            // Is B40/OKU
+            if($roleID == 5){
+                $filename = "B40_OKU";
+            }
+            else{
+                $filename = $request->get('roleName');
+            }
+            
+
+            return Excel::download(new ExportUser($roleID), $filename . '-' . time() . '.xlsx');
+        }
+        
+        return redirect()->back()->withErrors(["message" => "Eksport Excel tidak berjaya"]);
+        
     }
 }

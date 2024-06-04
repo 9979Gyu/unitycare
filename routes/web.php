@@ -55,6 +55,8 @@ Route::get('/login', function () {
 Route::post('/auth', [UserController::class, 'verifyUser']);
 Route::post('/logout', [UserController::class, 'logout']);
 
+// Export Excel Route
+Route::post('/export-users', [UserController::class, 'exportUsers'])->name('export-users');
 
 Route::get('/create/{roleNo}', [UserController::class, 'create']);
 Route::post('/store', [UserController::class, 'store']);

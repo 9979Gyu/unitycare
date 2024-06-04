@@ -20,17 +20,22 @@
         </div>
     @endif
 
-    @if($users[0]->roleID == 5)
-    <button class="btn btn-info float-end" type="button" id="addBtn" onclick="window.location='/createspecial'" >
-        Tambah
-    </button>
-    @else
-    <button class="btn btn-info float-end" type="button" id="addBtn" onclick="window.location='/create/{{ $users[0]->roleID }}'" >
-        Tambah
-    </button>
-    @endif
+    <form method="POST" action="/export-users" id="excel">
+        @csrf
+        <input type="number" id="roleID" name="roleID" value="{{ $users[0]->roleID }}" hidden>
+        <input type="text" id="roleName" name="roleName" value="{{ $rolename }}" hidden>
+        <button class="btn btn-outline-primary" type="submit" id="excelBtn">Excel</button>
+        @if($users[0]->roleID == 5)
+        <button class="btn btn-info float-end" type="button" id="addBtn" onclick="window.location='/createspecial'" >
+            Tambah
+        </button>
+        @else
+        <button class="btn btn-info float-end" type="button" id="addBtn" onclick="window.location='/create/{{ $users[0]->roleID }}'" >
+            Tambah
+        </button>
+        @endif
+    </form>
 
-    <input type="number" id="roleID" value="{{ $users[0]->roleID }}" hidden>
     <div class="table-responsive">
         <table id="requestTable" class="table table-bordered table-striped dt-responsive" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
             <thead>
@@ -67,106 +72,6 @@
         </div>
     </div>
 
-    <script>
-    $(document).ready(function() {
-
-        var requestTable;
-
-        fetch_data();
-        function fetch_data() {
-            requestTable = $('#requestTable').DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: {
-                    url: "/getstaff",
-                    data: {
-                        rid: $("#roleID").val(),
-                    },
-                    type: 'GET',
-
-                },
-                'columnDefs': [{
-                    "targets": [0],
-                    "className": "text-center",
-                    "width": "2%"
-                }, {
-                    "targets": [1, 2, 3, 4, 5],
-                    "className": "text-center",
-                },],
-                
-                order: [
-                    [1, 'asc']
-                ],
-                columns: [{
-                    "data": null,
-                    searchable: false,
-                    "sortable": true,
-                    render: function(data, type, row, meta) {
-                        return meta.row + meta.settings._iDisplayStart + 1;
-                    }
-                }, {
-                    data: "name",
-                    name: 'name',
-                    orderable: true,
-                    searchable: true,
-                }, {
-                    data: "email",
-                    name: 'email',
-                    orderable: true,
-                    searchable: true
-                }, {
-                    data: "username",
-                    name: 'username',
-                    orderable: true,
-                    searchable: true
-                }, {
-                    data: "contactNo",
-                    name: 'contactNo',
-                    orderable: true,
-                    searchable: true,
-                },{
-                    data: 'action',
-                    name: 'action',
-                    orderable: false,
-                    searchable: false
-                }, ]
-                
-            });
-        }
-
-        // csrf token for ajax
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
-
-        var idToDelete;
-        $(document).on('click', '.deleteAnchor', function() {
-            idToDelete = $(this).attr('id');
-            console.log(idToDelete);
-        });
-
-        $('#delete').click(function() {
-            if (idToDelete) {
-                $.ajax({
-                    type: 'POST',
-                    dataType: 'html',
-                    url: "/deleteuser/" + idToDelete,
-                    success: function(data) {
-                        $('#deleteModal').modal('hide');
-                        $('.condition-message').html(data);
-
-                        requestTable.ajax.reload();
-                    },
-                    error: function (data) {
-                        $('.condition-message').html(data);
-                    }
-                })
-            }
-        });
-
-    });
-    </script>
+    <script src="{{ asset('js/userScript.js') }}"></script>
 
 @endsection

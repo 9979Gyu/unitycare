@@ -28,6 +28,7 @@ $(document).ready(function(){
                 success: function(data) {
                     $('#applyModal').modal('hide');
                     $('.condition-message').html(data);
+                    location.reload(true);
                 },
                 error: function (data) {
                     $('.condition-message').html(data);

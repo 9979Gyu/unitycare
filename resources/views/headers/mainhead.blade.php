@@ -1,15 +1,18 @@
-<div class="container-fluid flex">
-    <img src="{{ asset('images/applogo2.png') }}" alt="Gambar Aplikasi">
-    <div>
+<!-- <div class="container-fluid d-flex align-items-center ">
+    <div class="flex-shrink-0">
+        <img src="{{ asset('images/webicon-512px.png') }}" alt="Gambar Aplikasi" class="img-fluid">
+    </div>
+    <div class="flex-grow-1">
         <h1>UNITY CARE</h1>
         <span>PEMBANGUNAN MASYARAKAT</span>
     </div>
 </div>
+ -->
 <nav class="navbar navbar-expand-lg navbar-dark navCustom">
 
     <div class="container-fluid">
 
-        <a class="navbar-brand" href="/"><b>Utama</b></a>
+        <a class="navbar-brand" href="/"><b>UnityCare</b></a>
 
         <!-- for responsive, will show button when screen is down-sized -->
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
