@@ -7,7 +7,7 @@ use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 
-class ExportUser implements FromCollection, withHeadings
+class ExportUser implements FromCollection, withHeadings, ShouldAutoSize
 {
 
     // Declare varible

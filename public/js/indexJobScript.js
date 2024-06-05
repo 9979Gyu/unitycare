@@ -1,9 +1,25 @@
 $(document).ready(function() {
     
     var requestTable;
+    var selectedType = $('#type option:selected').val();
 
-    fetch_data();
-    function fetch_data() {
+    fetch_data(selectedType);
+
+    $('#type').change(function() {
+        selectedType = $('#type option:selected').val();
+        // Fetch data based on the selected position
+        fetch_data(selectedType);
+    });
+
+   
+    function fetch_data(selectedType) {
+
+        // Make AJAX request to fetch data based on the selected position
+        if ($.fn.DataTable.isDataTable('#requestTable')) {
+            // If DataTable already initialized, destroy it
+            $('#requestTable').DataTable().destroy();
+        }
+
         requestTable = $('#requestTable').DataTable({
             language: {
                 "sEmptyTable":     "Tiada data tersedia dalam jadual",
@@ -34,6 +50,7 @@ $(document).ready(function() {
                 url: "/getjob",
                 data: {
                     rid: $("#roleID").val(),
+                    selectedType: selectedType,
                 },
                 type: 'GET',
 
@@ -43,7 +60,7 @@ $(document).ready(function() {
                 "className": "text-center",
                 "width": "2%"
             }, {
-                "targets": [1, 2, 3, 4, 5],
+                "targets": [1, 2, 3, 4],
                 "className": "text-center",
             },], 
             columns: [{
@@ -58,19 +75,13 @@ $(document).ready(function() {
                 name: 'name',
                 orderable: true,
                 searchable: true,
-            },
-            {
-                data: "position",
-                name: 'position',
-                orderable: true,
-                searchable: true,
             }, {
                 data: "description",
                 name: 'description',
                 orderable: true,
                 searchable: true
             }, {
-                data: "jobOffersCount",
+                data: "job_offers_count",
                 name: 'use',
                 orderable: true,
                 searchable: true

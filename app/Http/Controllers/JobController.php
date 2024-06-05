@@ -3,10 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Job;
+use App\Models\Shift_Type;
+use App\Models\Job_Type;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use DataTables;
 use Illuminate\Support\Facades\Auth;
+use App\Exports\ExportJob;
+use Maatwebsite\Excel\Facades\Excel;
 
 class JobController extends Controller
 {
@@ -91,31 +95,61 @@ class JobController extends Controller
     public function getJobsDatatable(Request $request)
     {
         if(request()->ajax()){
-            $rid = $request->rid;
+            $rid = $request->get('rid');
+            $type = $request->get('selectedType');
 
-            $selectedJobs = DB::table('jobs')
-            ->join('job_offers as jo', 'jo.job_id', '=', 'jobs.job_id')
-            ->where([
-                ['jobs.status', 1],
-                ['jo.status', 1]
-            ])
-            ->select(
-                'jobs.job_id',
-                'jobs.name as name',
-                'jobs.description as description',
-                'jobs.position as position',
-                DB::raw('count(jo.offer_id) as jobOffersCount')
-            )
-            ->groupBy('jobs.job_id', 'jobs.name', 'jobs.description', 'jobs.position')
-            ->get();
+            // Handling for retrieve jobs based on type
+            if(isset($rid) && isset($type)){
 
-            if(isset($selectedJobs)){
-                $table = Datatables::of($selectedJobs);
+                if($type == "job"){
+                    $selectedItem = Job::select(
+                        'job_id as id',
+                        DB::raw('CONCAT(name, " - ", position) as name'),
+                        'description'
+                    )
+                    ->withCount('jobOffers')
+                    ->where('status', 1)
+                    ->groupBy('job_id', 'name', 'description', 'position')
+                    ->orderBy('name')
+                    ->get();
+
+                }
+                else if($type == "shift"){
+                    $selectedItem = Shift_Type::select(
+                        'shift_type_id as id',
+                        'name',
+                        'description',
+                    )
+                    ->withCount('jobOffers')
+                    ->where('status', 1)
+                    ->groupBy('shift_type_id', 'name', 'description')
+                    ->orderBy('name')
+                    ->get();
+                }
+                else{
+                    $selectedItem = Job_Type::select(
+                        'job_type_id as id',
+                        'name',
+                        'description',
+                    )
+                    ->withCount('jobOffers')
+                    ->where('status', 1)
+                    ->groupBy('job_type_id', 'name', 'description')
+                    ->orderBy('name')
+                    ->get();
+                }   
+
+            }
+
+
+            if(isset($selectedItem)){
+                $table = Datatables::of($selectedItem);
 
                 $table->addColumn('action', function ($row) {
                     $token = csrf_token();
                     $btn = '<div class="d-flex justify-content-center">';
-                    $btn = $btn . '<a class="deleteAnchor" href="#" id="' . $row->job_id . '"><span class="badge badge-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"> Padam </span></a></div>';
+                    // $btn = $btn . '<a href="/editprogram/' . $row->id . '"><span class="badge badge-warning"> Kemaskini </span></a></div>';
+                    $btn = $btn . '<a class="deleteAnchor" href="#" id="' . $row->id . '"><span class="badge badge-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"> Padam </span></a></div>';
                     return $btn;
                 });
     
@@ -130,4 +164,29 @@ class JobController extends Controller
         return view('jobs.index', compact('roleNo'));
     }
 
+    // Function to export program info
+    public function exportJobs(Request $request){
+        
+        // Validate the request data
+        $rules = [
+            'roleID' => 'required',
+            'type' => 'required',
+        ];
+
+        $validated = $request->validate($rules);
+
+        if($validated){
+            // Retrieve the validated data
+            $roleID = $request->get('roleID');
+            $type = $request->get('type');
+
+            return Excel::download(new ExportJob(
+                $roleID, $type), 
+                ucwords($type) . '-' . time() . '.xlsx'
+            );
+        }
+        
+        return redirect()->back()->withErrors(["message" => "Eksport Excel tidak berjaya"]);
+        
+    }
 }

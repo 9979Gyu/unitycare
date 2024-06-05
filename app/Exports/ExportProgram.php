@@ -7,7 +7,7 @@ use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 
-class ExportProgram implements FromCollection, withHeadings
+class ExportProgram implements FromCollection, withHeadings, ShouldAutoSize
 {
     // Declare varible
     private $id;

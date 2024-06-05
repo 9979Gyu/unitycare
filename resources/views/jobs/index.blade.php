@@ -26,14 +26,29 @@
 
     <br>
 
-    <input type="number" id="roleID" value="{{ $roleNo }}" hidden>
+    <form method="POST" action="/export-jobs" id="excel">
+        @csrf
+        <input type="number" name="roleID" id="roleID" value="{{ $roleNo }}" hidden>
+        <div class="row mb-3">
+            <div class="col">
+                <select name="type" name="type" id="type" class="form-control">
+                    <option value="type" selected>Jenis Pekerjaan</option>
+                    <option value="shift">Jenis Syif</option>
+                    <option value="job">Jenis Jawatan</option>
+                </select>
+            </div>
+            <div class="col">
+                <button class="btn btn-outline-primary float-end" type="submit" id="excelBtn">Excel</button>
+            </div>
+        </div>
+    </form>
+
     <div class="table-responsive">
         <table id="requestTable" class="table table-bordered table-striped dt-responsive display datatable" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
             <thead>
                 <tr style="text-align:center">
                     <th> No. </th>
                     <th>Nama</th>
-                    <th>Jawatan</th>
                     <th>Penerangan</th>
                     <th>Bilangan Pengguna</th>
                     <th>Tindakan</th>
