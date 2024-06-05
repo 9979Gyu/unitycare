@@ -12,6 +12,9 @@ use Illuminate\Support\Facades\DB;
 use DataTables;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use App\Exports\ExportOffer;
+use Maatwebsite\Excel\Facades\Excel;
+
 
 class OfferController extends Controller
 {
@@ -225,31 +228,49 @@ class OfferController extends Controller
     public function getOffersDatatable(Request $request)
     {
         if(request()->ajax()){
-            $rid = $request->rid;
+            $rid = $request->get('rid');
+            $state = $request->get('selectedState');
+            $status = $request->get('status');
 
-            $selectedOffers = Job_Offer::where([
-                ['job_offers.status', 1],
-                ['job_offers.approval_status', 1],
-            ])
-            ->join('users as u', 'u.id', '=', 'job_offers.user_id')
-            ->join('job_types as jt', 'jt.job_type_id', '=', 'job_offers.job_type_id')
-            ->join('shift_types as st', 'st.shift_type_id', '=', 'job_offers.shift_type_id')
-            ->join('jobs as j', 'j.job_id', '=', 'job_offers.job_id')
-            ->select(
-                'job_offers.*',
-                'u.name as username', 
-                'u.contactNo as usercontact', 
-                'u.email as useremail',
-                'j.name as jobname',
-                'j.position as jobposition',
-                'jt.name as typename',
-                'st.name as shiftname',
-                DB::raw("DATE(job_offers.updated_at) as updateDate"),
-                'job_offers.description->description as description',
-                'job_offers.description->reason as reason',
-            )
-            ->orderBy('job_offers.updated_at', 'desc')
-            ->get();
+            // Handling for retrieve programs based on approval state and program type
+            if(isset($rid) && isset($state) && isset($status)){
+
+                $query = Job_Offer::where([
+                    ['job_offers.status', $status],
+                ])
+                ->join('users as u', 'u.id', '=', 'job_offers.user_id')
+                ->join('job_types as jt', 'jt.job_type_id', '=', 'job_offers.job_type_id')
+                ->join('shift_types as st', 'st.shift_type_id', '=', 'job_offers.shift_type_id')
+                ->join('jobs as j', 'j.job_id', '=', 'job_offers.job_id');
+
+                if($state != 3){
+                    $query = Job_Offer::where([
+                        ['job_offers.status', $status],
+                        ['job_offers.approval_status', $state],
+                    ])
+                    ->join('users as u', 'u.id', '=', 'job_offers.user_id')
+                    ->join('job_types as jt', 'jt.job_type_id', '=', 'job_offers.job_type_id')
+                    ->join('shift_types as st', 'st.shift_type_id', '=', 'job_offers.shift_type_id')
+                    ->join('jobs as j', 'j.job_id', '=', 'job_offers.job_id');
+                }
+
+                $selectedOffers = $query
+                ->select(
+                    'job_offers.*',
+                    'u.name as username', 
+                    'u.contactNo as usercontact', 
+                    'u.email as useremail',
+                    'j.name as jobname',
+                    'j.position as jobposition',
+                    'jt.name as typename',
+                    'st.name as shiftname',
+                    DB::raw("DATE(job_offers.updated_at) as updateDate"),
+                    'job_offers.description->description as description',
+                    'job_offers.description->reason as reason',
+                )
+                ->orderBy('job_offers.updated_at', 'desc')
+                ->get();
+            }
 
             if(isset($selectedOffers)){
 
@@ -477,5 +498,37 @@ class OfferController extends Controller
 
         return $allOffers;
     }
+
+    // Function to export offer info
+    public function exportOffers(Request $request){
+        
+        // Validate the request data
+        $rules = [
+            'roleID' => 'required',
+            'statusFilter' => 'required',
+        ];
+
+        $validated = $request->validate($rules);
+
+        if($validated){
+            // Retrieve the validated data
+            $roleID = $request->get('roleID');
+            $state = $request->get('statusFilter');
+            $status = 1;
+
+            if($state == 4){
+                $status = 0;
+            }
+
+            return Excel::download(new ExportOffer(
+                $roleID, $state, $status), 
+                'Offers-' . time() . '.xlsx'
+            );
+        }
+        
+        return redirect()->back()->withErrors(["message" => "Eksport Excel tidak berjaya"]);
+        
+    }
+
 }
 

@@ -11,9 +11,11 @@ $(document).ready(function() {
     });
 
     var requestTable;
+    var selectedState = 3;
+    var status = 1;
 
     if($("#roleID").val() == 1 || $("#roleID").val() == 2){
-        fetch_data();
+        fetch_data(selectedState, status);
     }
     else{
         updateCardContainer();
@@ -245,8 +247,36 @@ $(document).ready(function() {
         });
     }
     
+    // Function to handle radio button value
+    $('#allRadio, #pendingRadio, #approveRadio, #declineRadio, #deleteRadio').change(function() {
+        status = 1;
+        if ($('#allRadio').is(':checked')) {
+            selectedState = 3;
+        }
+        else if ($('#pendingRadio').is(':checked')) {
+            selectedState = 1;
+        } 
+        else if ($('#approveRadio').is(':checked')) {
+            selectedState = 2;
+        } 
+        else if ($('#declineRadio').is(':checked')) {
+            selectedState = 0;
+        }
+        else if ($('#deleteRadio').is(':checked')) {
+            status = 0
+        }
+
+        // Fetch data based on the selected position
+        fetch_data(selectedState, status);
+    });
     
-    function fetch_data() {
+    function fetch_data(state, status) {
+        // Make AJAX request to fetch data based on the selected position
+        if ($.fn.DataTable.isDataTable('#requestTable')) {
+            // If DataTable already initialized, destroy it
+            $('#requestTable').DataTable().destroy();
+        }
+
         requestTable = $('#requestTable').DataTable({
             language: {
                 "sEmptyTable":     "Tiada data tersedia dalam jadual",
@@ -277,6 +307,8 @@ $(document).ready(function() {
                 url: "/getoffers",
                 data: {
                     rid: $("#roleID").val(),
+                    selectedState: state,
+                    status: status,
                 },
                 type: 'GET',
 

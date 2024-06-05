@@ -62,9 +62,9 @@ class ExportProgram implements FromCollection, withHeadings, ShouldAutoSize
                     'Nombor Telefon Pengurus' => $program->organization->contactNo ?? '',
                     'Tarikh Tutup Permohonan' => $program->close_date,
                     'Kategori' => ($program->type_id == 1) ? "Sukalerawan" : "Pembangunan Kemahiran" ,
+                    'Status'  => $approval,
                     'Diproses Oleh' => $program->organization->name,
                     'Diproses Pada' => $program->approved_at,
-                    'Status'  => $approval
                 ];
             });
         }
@@ -86,9 +86,9 @@ class ExportProgram implements FromCollection, withHeadings, ShouldAutoSize
             'Nombor Telefon Pengurus',
             'Tarikh Tutup Permohonan',
             'Kategori',
+            'Status',
             'Diproses Oleh',
             'Diproses Pada',
-            'Status'
         ];
     }
 }
