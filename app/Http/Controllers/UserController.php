@@ -494,7 +494,7 @@ class UserController extends Controller
     public function logout()
     {
         Auth::logout();
-        return redirect('/login')->with('success', 'Berjaya Log Keluar');
+        return redirect('/')->with('success', 'Berjaya Log Keluar');
     }
 
     // Function to export user info

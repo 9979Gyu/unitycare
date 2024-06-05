@@ -555,4 +555,25 @@ class ProgramController extends Controller
             'enrolled' => $enrolled
         ]);        
     }
+
+    // Function to export program info
+    public function exportPrograms(Request $request){
+        
+        // Validate the request data
+        $rules = [
+            'roleID' => 'required',
+        ];
+        
+        $validated = $request->validate($rules);
+
+        if($validated){
+            // Retrieve the validated data
+            $roleID = $request->get('roleID');
+        
+            return Excel::download(new ExportUser($roleID), 'Programs-' . time() . '.xlsx');
+        }
+        
+        return redirect()->back()->withErrors(["message" => "Eksport Excel tidak berjaya"]);
+        
+    }
 }

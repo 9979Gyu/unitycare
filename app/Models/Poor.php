@@ -23,8 +23,13 @@ class Poor extends Model
         'volunteer_id'
     ];
 
-    public function oku()
+    public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function disabilityType()
+    {
+        return $this->belongsTo(Disability_Type::class, 'disability_type');
     }
 }

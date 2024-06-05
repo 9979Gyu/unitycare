@@ -26,7 +26,12 @@
 
     <br>
 
-    <input type="number" id="roleID" value="{{ Auth::user()->roleID }}" hidden>
+    <form method="POST" action="/export-program" id="excel">
+        @csrf
+        <input type="number" id="roleID" value="{{ Auth::user()->roleID }}" hidden>
+        <button class="btn btn-outline-primary" type="submit" id="excelBtn">Excel</button>
+    </form>
+
     <div class="table-responsive">
         <table id="requestTable" class="table table-bordered table-striped dt-responsive" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
             <thead>

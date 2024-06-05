@@ -6,8 +6,8 @@
         <h1>UNITY CARE</h1>
         <span>PEMBANGUNAN MASYARAKAT</span>
     </div>
-</div>
- -->
+</div> -->
+
 <nav class="navbar navbar-expand-lg navbar-dark navCustom">
 
     <div class="container-fluid">
@@ -24,6 +24,7 @@
                 <li class="nav-item">
                     <a class="nav-link" aria-current="page" href="/info"><b>Info</b></a>
                 </li>
+                <!-- Not logged in -->
                 @if(!Auth::check())
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -37,8 +38,10 @@
                             <li><a class="dropdown-item" href="/createspecial"><b>B40/OKU</b></a></li>
                         </ul>
                     </li>
-                @endif
-                @if(Auth::check())
+
+                <!-- Logged in -->
+                @else
+                    <!-- Is Admin or Staff -->
                     @if(Auth::user()->roleID == 1 || Auth::user()->roleID == 2)
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -46,40 +49,44 @@
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                                 @if(Auth::user()->roleID == 1)
-                                <li><a class="dropdown-item" href="/view/2"><b>Pekerja</b></a></li>
-                                <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="/view/2"><b>Pekerja</b></a></li>
+                                    <li><hr class="dropdown-divider"></li>
                                 @endif
                                 @if(Auth::user()->roleID == 1 || Auth::user()->roleID == 2)
-                                <li><a class="dropdown-item" href="/view/3"><b>Syarikat</b></a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="/view/4"><b>Sukarelawan</b></a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="/view/5"><b>B40/OKU</b></a></li>
+                                    <li><a class="dropdown-item" href="/view/3"><b>Syarikat</b></a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="/view/4"><b>Sukarelawan</b></a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="/view/5"><b>B40/OKU</b></a></li>
                                 @endif
                                 @if(Auth::user()->roleID == 4)
-                                <li><a class="dropdown-item" href="/createspecial"><b>B40/OKU</b></a></li>
+                                    <li><a class="dropdown-item" href="/createspecial"><b>B40/OKU</b></a></li>
                                 @endif
                             </ul>
                         </li>
                     @endif
 
+                    <!-- Is not volunteer -->
                     @if(Auth::user()->roleID != 4)
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <b>Pekerjaan</b>
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <!-- Is admin and staff -->
                                 @if(Auth::user()->roleID <= 2)
-                                <li><a class="dropdown-item" href="/viewjob"><b>Jenis Pekerjaan</b></a></li>
-                                <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="/viewjob"><b>Jenis Pekerjaan</b></a></li>
+                                    <li><hr class="dropdown-divider"></li>
                                 @endif
-                                <li><a class="dropdown-item" href="/viewoffer"><b>Tawaran</b></a></li>
 
+                                <li><a class="dropdown-item" href="/viewoffer"><b>Lihat</b></a></li>
+
+                                <!-- Is enterprise -->
                                 @if(Auth::user()->roleID == 3)
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="/createoffer"><b>Tambah</b></a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="/viewapplication"><b>Permohonan</b></a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="/createoffer"><b>Tambah</b></a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="/viewapplication"><b>Permohonan</b></a></li>
                                 @endif
                             </ul>
                         </li>
@@ -91,9 +98,10 @@
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <li><a class="dropdown-item" href="/viewprogram"><b>Lihat</b></a></li>
+                            <!-- Is not B40 / OKU -->
                             @if(Auth::user()->roleID != 5)
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="/createprogram/{{ Auth::user()->roleID }}"><b>Tambah</b></a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="/createprogram/{{ Auth::user()->roleID }}"><b>Tambah</b></a></li>
                             @endif
                         </ul>
                     </li>
@@ -129,11 +137,6 @@
                     </ul>
                 </li>
             </ul>
-            
-            <!-- <form class="d-flex" role="search">
-                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-light" type="submit">Search</button>
-            </form> -->
         </div>
     </div>
 </nav>

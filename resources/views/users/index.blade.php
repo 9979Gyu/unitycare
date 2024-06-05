@@ -26,11 +26,11 @@
         <input type="text" id="roleName" name="roleName" value="{{ $rolename }}" hidden>
         <button class="btn btn-outline-primary" type="submit" id="excelBtn">Excel</button>
         @if($users[0]->roleID == 5)
-        <button class="btn btn-info float-end" type="button" id="addBtn" onclick="window.location='/createspecial'" >
+        <button class="btn btn-outline-info float-end" type="button" id="addBtn" onclick="window.location='/createspecial'" >
             Tambah
         </button>
         @else
-        <button class="btn btn-info float-end" type="button" id="addBtn" onclick="window.location='/create/{{ $users[0]->roleID }}'" >
+        <button class="btn btn-outline-info float-end" type="button" id="addBtn" onclick="window.location='/create/{{ $users[0]->roleID }}'" >
             Tambah
         </button>
         @endif
