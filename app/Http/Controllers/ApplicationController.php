@@ -41,15 +41,15 @@ class ApplicationController extends Controller
             ->first();
 
             $applicationExist = Application::where('status', 1)
-            ->with(['jobOffer' => function ($query) {
+            ->whereHas('jobOffer', function ($query) use ($id) {
                 $query->where([
-                    'offer_id', $id,
-                    'approval_status', 2,
+                    ['offer_id', $id],
+                    ['approval_status', 2],
                 ]);
-            }])
-            ->with(['poor' => function ($query) {
+            })
+            ->whereHas('poor', function ($query) {
                 $query->where('user_id', Auth::user()->id);
-            }])
+            })
             ->count();
     
             return view('applications.add', compact('offer', 'applicationExist'));
@@ -61,47 +61,56 @@ class ApplicationController extends Controller
 
     public function store(Request $request){
     
-        $offerID = $request->get("selectedID");
-        $description = $request->get('reason');
+        $rules= [
+            "offerId" => "required",
+            "reason" => "required"
+        ];
 
-        $uid = Auth::user()->id;
+        $validated = $request->validate($rules);
 
-        // Get the current date
-        $currentDateTime = date('Y-m-d H:i:s.u');
+        if($validated){
+            $offerID = $request->get("offerId");
+            $description = $request->get('reason');
+            $uid = Auth::user()->id;
+            $roleNo = Auth::user()->roleID;
+            
+            // Get the current date
+            $currentDateTime = date('Y-m-d H:i:s.u');
 
-        $poorID = Poor::where([
-            ['user_id', $uid],
-            ['status', 1]
-        ])
-        ->value("poor_id");
-
-        if(isset($description)){
-            $desc = [
-                "description" => $description,
-                "reason" => "",
-            ];
-        }
-
-        if(isset($offerID) && isset($poorID)){
-            $application = new Application([
-                'applied_date' => $currentDateTime,
-                'offer_id' => $offerID,
-                'poor_id' => $poorID,
-                'status' => 1,
-                'approval_status' => 1,
-                'description' => json_encode($desc),
-            ]);
-
-            $result = $application->save();
-
-            if($result){
-
-                $request->session()->flash('success', 'Berjaya didaftarkan');
-                $request->session()->flash('redirect', '/viewoffer');
-
-                return response()->json(['success' => true, 'redirect' => '/viewoffer']);
+            $poorID = Poor::where([
+                ['user_id', $uid],
+                ['status', 1]
+            ])
+            ->value("poor_id");
+    
+            if(isset($description)){
+                $desc = [
+                    "description" => $description,
+                    "reason" => "",
+                ];
             }
+    
+            if(isset($offerID) && isset($poorID)){
+                $application = new Application([
+                    'applied_date' => $currentDateTime,
+                    'offer_id' => $offerID,
+                    'poor_id' => $poorID,
+                    'status' => 1,
+                    'approval_status' => 1,
+                    'description' => json_encode($desc),
+                ]);
+    
+                $result = $application->save();
+    
+                if($result){
+                    return view('offers.index', compact('roleNo', 'uid'));
+                }
+            }
+            
         }
+
+        return redirect()->back()->withErrors(["message" => "Data tidak berjaya disimpan"]);
+        
     }
 
     public function dismiss(Request $request)

@@ -61,7 +61,6 @@
         </tr>
         <tr>
             <th scope="row">Pilihan</th>
-            <input type="number" name="offerId" id="offerId" value="{{ $offer->offer_id }}" hidden>
             <td colspan="3">
             @if($offer->user_id != Auth::user()->id && $applicationExist == 0)
                 @if(Auth::user()->roleID == 5)
@@ -74,27 +73,31 @@
     </table>
 
     <!-- Modal -->
-    <div class="modal fade" id="applyModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="applyModalLabel">Mohon Pekerjaan</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Adakah anda pasti untuk memohon perkerjaan ini? </p>
-                    <div>
-                        <label for="reason" class="required">Sebab mohon</label>
-                        <input type="text" name="reason" class="form-control" id="reason" required>
-                    </div>    
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" id="submit">Mohon</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+    <form method="POST" action="/storeapplication" id="applyForm">
+        @csrf
+        <div class="modal fade" id="applyModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="applyModalLabel">Mohon Pekerjaan</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Adakah anda pasti untuk memohon perkerjaan ini? </p>
+                        <div>
+                            <label for="reason" class="required">Sebab mohon</label>
+                            <input type="text" name="reason" class="form-control" id="reason" required>
+                            <input type="number" name="offerId" id="offerId" value="{{ $offer->offer_id }}" hidden>
+                        </div>    
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-danger" id="submit">Mohon</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    </form>
 
     <script src="{{ asset('js/processApplicationScript.js') }}"></script>
 
