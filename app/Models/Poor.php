@@ -32,4 +32,9 @@ class Poor extends Model
     {
         return $this->belongsTo(Disability_Type::class, 'disability_type');
     }
+
+    public function educationLevel()
+    {
+        return $this->belongsTo(Education_Level::class, 'education_level');
+    }
 }

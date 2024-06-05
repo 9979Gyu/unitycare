@@ -120,7 +120,7 @@
                         
                         @if(Auth::check())
                             
-                            <li><a class="dropdown-item" href="/createstaff"><b>Profile</b></a></li>
+                            <li><a class="dropdown-item" href="/viewprofile"><b>Profil</b></a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><form class="dropdown-item" method="POST" action="/logout">
                                 @csrf

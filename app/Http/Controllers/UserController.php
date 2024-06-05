@@ -351,15 +351,15 @@ class UserController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
+        $id = $request->get('uid');
+
         //
         $rules = [
             'name' => 'required',
-            'ICNo' => 'required|unique:users,ICNo,' . $id,
             'email' => 'required|unique:users,email,'. $id,
             'username' => 'required|unique:users,username,'. $id,
             'contactNo' => 'required|unique:users,contactNo,'. $id,
@@ -367,12 +367,13 @@ class UserController extends Controller
             'state' => 'required',
             'city' => 'required',
             'postalCode' => 'required',
-            'roleID' => 'required|in:2,4'
+            'roleID' => 'required|in:1,2,3,4,5'
         ];
 
         $validated = $request->validate($rules);
 
         if($validated){
+
             DB::table('users')
                 ->where('id', $id)
                 ->update([
@@ -390,7 +391,13 @@ class UserController extends Controller
                     'roleID' => $request->get('roleID'),
                 ]);
 
-            return redirect('/view/' . $request->get('roleID'))->with('success', 'Data berjaya dikemaskini');
+            if($id == Auth::user()->id){
+                return redirect('/viewprofile')->with('success', 'Data berjaya dikemaskini');
+            }
+            else{
+                return redirect('/view/' . $request->get('roleID'))->with('success', 'Data berjaya dikemaskini');
+            }
+
         }
         else{
             $validator = Validator::make($request->all(), $rules);
@@ -525,6 +532,36 @@ class UserController extends Controller
         }
         
         return redirect()->back()->withErrors(["message" => "Eksport Excel tidak berjaya"]);
+        
+    }
+
+    public function indexProfile(){
+        
+        if(Auth::check()){
+            $id = Auth::user()->id;
+            $roleID = Auth::user()->roleID;
+
+            // Is B40 / OKU
+            if($roleID == 5){
+                $user = User::where([
+                    ['status', 1],
+                    ['id', $id],
+                ])
+                ->with(["poor", "poor.disabilityType", "poor.educationLevel"])
+                ->first();
+            }
+            else{
+                $user = User::where([
+                    ['status', 1],
+                    ['id', $id],
+                ])
+                ->first();
+            }
+
+            return view('users.profile', compact('user'));
+        }
+        
+        return redirect('/')->withErrors(['message' => 'Anda tidak dibenarkan untuk melayari halaman ini']);
         
     }
 }

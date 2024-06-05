@@ -61,7 +61,7 @@ Route::post('/store', [UserController::class, 'store']);
 Route::get('/view/{roleNo}', [UserController::class, 'index']);
 Route::get('/getstaff', [UserController::class, 'getUsersDatatable'])->name('user.getAllDatatable');
 Route::get('/edituser/{id}', [UserController::class, 'edit']);
-Route::post('/updateuser/{id}', [UserController::class, 'update']);
+Route::post('/updateuser', [UserController::class, 'update']);
 Route::post('/deleteuser/{id}', [UserController::class, 'destroy']);
 
 Route::get('/register', [UserController::class, 'register']);
@@ -74,6 +74,7 @@ Route::get('/getCityState', [PostcodeController::class, 'getCityState']);
 // Poor people
 Route::get('/createspecial', [UserController::class, 'createPoorPeople']);
 Route::post('/checkUser', [UserController::class, 'checkUser']);
+Route::get('/viewprofile', [UserController::class, 'indexProfile']);
 
 // Activity / Program
 Route::get('/viewprogram', [ProgramController::class, 'index']);

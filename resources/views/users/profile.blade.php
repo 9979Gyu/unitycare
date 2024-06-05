@@ -1,6 +1,6 @@
 @extends('layouts.app')
 @section('title')
-    UnityCare-Edit
+    UnityCare-Profil
 @endsection
 
 @section('content')
@@ -21,7 +21,9 @@
         </div>
     @endif
 
-    <form action="/updateuser" method="post" class="container">
+    <br>
+
+    <form action="/updateuser" method="post" class="container" id="profileForm">
         @csrf
         <div class="mb-3">
             <h5>Maklumat Peribadi</h5>
@@ -29,7 +31,7 @@
         <div class="row mb-3">
             <label for="name" class="col-sm-2 col-form-label required">Nama</label>
             <div class="col-sm-10">
-                <input type="text" name="name" class="form-control touppercase" id="name" value="{{ $user->name }}" required>
+                <input type="text" name="name" class="form-control" id="name" value="{{ $user->name }}" required>
             </div>
         </div>
 
@@ -48,14 +50,14 @@
 
             <label for="officeNo" class="col-sm-2 col-form-label">Nombor Telefon Pejabat</label>
             <div class="col-sm-4">
-                <input type="text" value="{{ $user->officeNo }}" name="officeNo" class="form-control" id="officeNo">
+                <input type="number" value="{{ $user->officeNo }}" name="officeNo" class="form-control" id="officeNo">
             </div>
         </div>
 
         <div class="row mb-3">
             <label for="address" class="col-sm-2 col-form-label required">Alamat</label>
             <div class="col-sm-10">
-                <input type="text" value="{{ $user->address }}" name="address" class="form-control touppercase" id="address" required>
+                <input type="text" value="{{ $user->address }}" name="address" class="form-control" id="address" required>
             </div>
         </div>
 
@@ -63,18 +65,17 @@
         <div class="row mb-3">
             <label for="postalCode" class="col-sm-2 col-form-label required">Poskod</label>
             <div class="col-sm-4">
-                <input type="number" value="{{ $user->postalCode }}" name="postalCode" class="form-control" id="postalCode" required>
+                <input type="number" name="postalCode" class="form-control" id="postalCode" value="{{ $user->postalCode }}" required>
             </div>
             <label for="state" class="col-sm-2 col-form-label required">Negeri</label>
             <div class="col-sm-4">
                 <select name="state" id="state" class="form-select">
-                    <option selected>{{ $user->state }}</option>
+                    <option selected>{{ $user->state  }}</option>
                 </select>
             </div>
         </div>
 
         <div class="row mb-3">
-            
             <label for="city" class="col-sm-2 col-form-label required">Bandar</label>
             <div class="col-sm-10">
                 <select name="city" id="city" class="form-select">
@@ -82,6 +83,30 @@
                 </select>
             </div>
         </div>
+
+        @if($user->roleID == 5)
+            <div class="row mb-3">
+                <label for="eduLevel" class="col-sm-2 col-form-label required">Peringkat Pendidikan</label>
+                <div class="col-sm-4">
+                    <select name="eduLevel" id="eduLevel" class="form-select">
+                        <option selected>{{ $user->poor->educationLevel->name }}</option>
+                    </select>
+                </div>
+                <label for="eduName" class="col-sm-2 col-form-label required">Nama Institusi</label>
+                <div class="col-sm-4">
+                    <input type="text" value="{{ $user->poor->instituition_name }}" name="eduName" class="form-control" id="eduName" required>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label for="disType" class="col-sm-2 col-form-label required">Kategori</label>
+                <div class="col-sm-10">
+                    <select name="disType" id="disType" class="form-select">
+                        <option selected>{{ $user->poor->disabilityType->name }}</option>
+                    </select>
+                </div>
+            </div>
+        @endif
 
         <br>
 
@@ -98,17 +123,24 @@
         <div class="row mb-3">
             <label for="email" class="col-sm-2 col-form-label required">Emel</label>
             <div class="col-sm-10">
-                <input type="email" value="{{ $user->email }}" name="email" class="form-control touppercase" id="email" pattern="[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$">
+                <input type="email" value="{{ $user->email }}" name="email" class="form-control" id="email" pattern="[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$">
             </div>
         </div>
 
-        <input type="number" name="roleID" value="{{ $user->roleID }}" hidden>
-        <input type="number" name="uid" value="{{ $user->id }}" hidden>
+        <div class="row mb-3" hidden>
+            <label for="password" class="col-sm-2 col-form-label required">Kata Laluan</label>
+            <div class="col-sm-10">
+                <input type="password" value="{{ $user->password }}" name="password" class="form-control" id="password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Must contain at least one  number and one uppercase and lowercase letter, and at least 8 or more characters">
+                <input type="number" name="roleID" value="{{ $user->roleID }}" hidden>
+                <input type="number" name="uid" value="{{ $user->id }}" hidden>
+            </div>
+        </div>
 
         <div class="row">
             <div class="col-sm-10 offset-sm-2">
-                <button type="submit" class="btn btn-primary">Hantar</button>
-                <button type="button" onclick="window.location='/view/{{$user->roleID}}'" class="btn btn-danger">Tutup</button>
+                <button type="submit" class="btn btn-primary" id="submitBtn">Hantar</button>
+                <button type="button" class="btn btn-primary" id="editBtn">Kemaskini</button>
+                <button type="button" onclick="window.location='/'" class="btn btn-danger">Tutup</button>
             </div>
         </div>
 
@@ -116,33 +148,6 @@
 
     <br>
 
-    <script type="text/javascript">
-        $(document).ready(function(){
-            $("#postalCode").on('change', function(){
-                var postcode = $(this).val();
-                if(postcode){
-                    $.ajax({
-                        url: '/search',
-                        type: 'GET',
-                        data: {postcode: postcode},
-                        success: function(data){
-                            $('#state').empty();
-                            $("#city").empty();
-                            data.forEach(function(item){
-                                $("#state").append('<option>' + item.state + '</option>');
-                                $("#city").append('<option>' + item.city + '</option>');
-                            });
-                        }
-                    });
-                }
-                else{
-                    $('#state').empty();
-                    $("#city").empty();
-                    $("#state").append('<option selected>Pilih Negeri</option>');
-                    $("#city").append('<option selected>Pilih Bandar</option>');
-                }
-            });
-        });
-    </script>
-
+    <script src="{{ asset('js/postcodeScript.js') }}"></script>
+    <script src="{{ asset('js/profileScript.js') }}"></script>
 @endsection
