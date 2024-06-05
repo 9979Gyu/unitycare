@@ -10,6 +10,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use DataTables;
 use Illuminate\Support\Facades\Auth;
+use App\Exports\ExportProgram;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ProgramController extends Controller
 {
@@ -451,23 +453,36 @@ class ProgramController extends Controller
     public function getProgramsDatatable(Request $request)
     {
         if(request()->ajax()){
-            $rid = $request->rid;
+            $rid = $request->get('rid');
+            $state = $request->get('selectedState');
+            $type = $request->get('selectedType');
+            $status = $request->get('status');
 
-            $selectedPrograms = DB::table('programs')
-            ->join('users', 'users.id', '=', 'programs.user_id')
-            ->where([
-                ['programs.status', 1],
-                ['programs.approved_status', 1]
-            ])
-            ->select(
-                'programs.*',
-                'programs.description->desc as description',
-                'users.name as username',
-                'users.email as useremail',
-                'users.contactNo as usercontact'
-            )
-            ->orderBy("programs.updated_at", "desc")
-            ->get();
+            // Handling for retrieve programs based on approval state and program type
+            if(isset($rid) && isset($state) && isset($type) && isset($status)){
+
+                $query = Program::where('status', $status)->with('organization');
+
+                if($state != 3) {
+                    $query->where('approved_status', $state);
+                }
+
+                if($type != 3) {
+                    $query->where('type_id', $type);
+                }
+
+                $selectedPrograms = $query->orderBy('updated_at', 'desc')->get();
+
+                // Transform the data but keep it as a collection of objects
+                $selectedPrograms->transform(function ($program) {
+                    $program->description = json_decode($program->description, true)['desc'] ?? '';
+                    $program->username = $program->organization->name ?? '';
+                    $program->useremail = $program->organization->email ?? '';
+                    $program->usercontact = $program->organization->contactNo ?? '';
+                    return $program;
+                });
+
+            }
 
             if(isset($selectedPrograms)){
 
@@ -476,6 +491,7 @@ class ProgramController extends Controller
                 $table->addColumn('action', function ($row) {
                     $token = csrf_token();
                     $btn = '<div class="d-flex justify-content-center">';
+
                     if(Auth::user()->roleID == 1 || Auth::user()->roleID == 2){
                         if($row->approved_status == 1){
                             // User created the program and the program is pending approval
@@ -511,6 +527,10 @@ class ProgramController extends Controller
                         elseif($row->approved_status == 2){
                             $btn = $btn . '<a href="/joinprogram/' . $row->program_id . '"><span class="badge badge-success"> Mohon </span></a></div>';
                         }
+                    }
+
+                    if($row->status == 0){
+                        $btn = " ";
                     }
 
                     return $btn;
@@ -562,15 +582,27 @@ class ProgramController extends Controller
         // Validate the request data
         $rules = [
             'roleID' => 'required',
+            'type' => 'required',
+            'statusFilter' => 'required',
         ];
-        
+
         $validated = $request->validate($rules);
 
         if($validated){
             // Retrieve the validated data
             $roleID = $request->get('roleID');
-        
-            return Excel::download(new ExportUser($roleID), 'Programs-' . time() . '.xlsx');
+            $state = $request->get('statusFilter');
+            $type = $request->get('type');
+            $status = 1;
+
+            if($state == 4){
+                $status = 0;
+            }
+            
+            return Excel::download(new ExportProgram(
+                $roleID, $state, $type, $status), 
+                'Programs-' . time() . '.xlsx'
+            );
         }
         
         return redirect()->back()->withErrors(["message" => "Eksport Excel tidak berjaya"]);

@@ -24,7 +24,7 @@
         @csrf
         <input type="number" id="roleID" name="roleID" value="{{ $users[0]->roleID }}" hidden>
         <input type="text" id="roleName" name="roleName" value="{{ $rolename }}" hidden>
-        <button class="btn btn-outline-primary" type="submit" id="excelBtn">Excel</button>
+        <button class="btn btn-outline-primary float-end ml-2" type="submit" id="excelBtn">Excel</button>
         @if($users[0]->roleID == 5)
         <button class="btn btn-outline-info float-end" type="button" id="addBtn" onclick="window.location='/createspecial'" >
             Tambah

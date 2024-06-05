@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Poor;
-use App\Exports\ExportUser;
 use Facade\FlareClient\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -12,6 +11,7 @@ use Illuminate\Support\Facades\Validator;
 use DataTables;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use App\Exports\ExportUser;
 use Maatwebsite\Excel\Facades\Excel;
 
 class UserController extends Controller

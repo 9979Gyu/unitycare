@@ -26,10 +26,46 @@
 
     <br>
 
-    <form method="POST" action="/export-program" id="excel">
+    <form method="POST" action="/export-programs" id="excel">
         @csrf
-        <input type="number" id="roleID" value="{{ Auth::user()->roleID }}" hidden>
-        <button class="btn btn-outline-primary" type="submit" id="excelBtn">Excel</button>
+        <input type="number" name="roleID" id="roleID" value="{{ Auth::user()->roleID }}" hidden>
+        <div class="row mb-3">
+            <div class="col">
+                <select name="type" name="type" id="type" class="form-control">
+                    <option value="3" selected>Semua Programs</option>
+                    <option value="1">Sukarelawan</option>
+                    <option value="2">Pembangunan Kemahiran</option>
+                </select>
+            </div>
+            <div class="col">
+                <button class="btn btn-outline-primary float-end" type="submit" id="excelBtn">Excel</button>
+            </div>
+        </div>
+
+        <div class="pb-2">
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="statusFilter" id="allRadio" value="3" checked>
+                <label class="form-check-label" for="all">Aktif</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="statusFilter" id="pendingRadio" value="1">
+                <label class="form-check-label" for="pending">Belum selesai</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="statusFilter" id="approveRadio" value="2">
+                <label class="form-check-label" for="approve">Diterima</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="statusFilter" id="declineRadio" value="0">
+                <label class="form-check-label" for="decline">Ditolak</label>
+            </div>
+            @if(Auth::user()->roleID == 1)
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="statusFilter" id="deleteRadio" value="4">
+                    <label class="form-check-label" for="decline">Dipadam</label>
+                </div>
+            @endif
+        </div>
     </form>
 
     <div class="table-responsive">

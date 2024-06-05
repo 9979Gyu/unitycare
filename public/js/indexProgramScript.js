@@ -6,9 +6,50 @@ $(document).ready(function() {
     $("#more").hide();
 
     var requestTable;
+    var selectedState = 3;
+    var selectedType = $('#type option:selected').val();
+    var status = 1;
+    
+    fetch_data(selectedState, selectedType, status);
 
-    fetch_data();
-    function fetch_data() {
+    $('#type').change(function() {
+        selectedType = $('#type option:selected').val();
+        // Fetch data based on the selected position
+        fetch_data(selectedState, selectedType, status);
+    });
+
+    $('#allRadio, #pendingRadio, #approveRadio, #declineRadio, #deleteRadio').change(function() {
+        status = 1;
+        if ($('#allRadio').is(':checked')) {
+            selectedState = 3;
+        }
+        else if ($('#pendingRadio').is(':checked')) {
+            selectedState = 1;
+        } 
+        else if ($('#approveRadio').is(':checked')) {
+            selectedState = 2;
+        } 
+        else if ($('#declineRadio').is(':checked')) {
+            selectedState = 0;
+        }
+        else if ($('#deleteRadio').is(':checked')) {
+            status = 0
+        }
+        
+        // Fetch data based on the selected position
+        fetch_data(selectedState, selectedType, status);
+    });
+
+    function fetch_data(selectedState, selectedType, status) {
+        
+        console.log(selectedType);
+
+        // Make AJAX request to fetch data based on the selected position
+        if ($.fn.DataTable.isDataTable('#requestTable')) {
+            // If DataTable already initialized, destroy it
+            $('#requestTable').DataTable().destroy();
+        }
+
         requestTable = $('#requestTable').DataTable({
             language: {
                 "sEmptyTable":     "Tiada data tersedia dalam jadual",
@@ -39,6 +80,9 @@ $(document).ready(function() {
                 url: "/getprogram",
                 data: {
                     rid: $("#roleID").val(),
+                    selectedState: selectedState, 
+                    selectedType: selectedType,
+                    status: status
                 },
                 type: 'GET',
 
@@ -119,6 +163,7 @@ $(document).ready(function() {
         }
     });
 
+    // Function to remove program
     var selectedID;
     $(document).on('click', '.deleteAnchor', function() {
         selectedID = $(this).attr('id');
@@ -144,6 +189,7 @@ $(document).ready(function() {
         }
     });
 
+    // Function to approve program
     $(document).on('click', '.approveAnchor', function() {
         selectedID = $(this).attr('id');
 
@@ -199,6 +245,7 @@ $(document).ready(function() {
         });
     });
 
+    // Function to decline program
     $(document).on('click', '.declineAnchor', function() {
         selectedID = $(this).attr('id');
     });
