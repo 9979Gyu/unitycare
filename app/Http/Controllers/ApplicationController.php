@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\DB;
 use DataTables;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use App\Exports\ExportApplication;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ApplicationController extends Controller
 {
@@ -336,5 +338,42 @@ class ApplicationController extends Controller
         // direct user to view program page with error messasge
         return redirect()->back()->withErrors(['message' => "Data tidak berjaya dikemaskini"]);
 
+    }
+
+    // Function to export offer info
+    public function exportApplications(Request $request){
+        
+        // Validate the request data
+        $rules = [
+            'roleID' => 'required',
+            'statusFilter' => 'required',
+            'position' => 'required',
+            'job' => 'required',
+        ];
+
+        $validated = $request->validate($rules);
+
+        if($validated){
+            // Retrieve the validated data
+            $roleID = $request->get('roleID');
+            $state = $request->get('statusFilter');
+            $status = 1;
+            $selectedPosition = $request->get("position");
+            $userID = Auth::user()->id;
+
+            if($state == 4){
+                $status = 0;
+            }
+
+            $filename = Job::where('job_id', $selectedPosition)->value("position");
+
+            return Excel::download(new ExportApplication(
+                $roleID, $state, $status, $selectedPosition, $userID), 
+                'Permohonan Kerja (' . $filename . ') - ' . time() . '.xlsx'
+            );
+        }
+        
+        return redirect()->back()->withErrors(["message" => "Eksport Excel tidak berjaya"]);
+        
     }
 }

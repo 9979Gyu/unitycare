@@ -26,39 +26,54 @@
 
     <br>
 
-    <input type="number" id="roleID" value="{{ $roleNo }}" hidden>
-    <div class="row mb-3">
-        <div class="col-sm-6">
-            <select name="job" id="job" class="form-control select2">
-                <option value="0" selected>Pilih Perkerjaan</option>
-            </select>
+    <form method="POST" action="/export-applications" class="container" id="excel">
+        @csrf
+        <input type="number" name="roleID" id="roleID" value="{{ $roleNo }}" hidden>
+        <div class="row mb-3">
+            <div class="col-sm-6">
+                <select name="job" id="job" class="form-control select2">
+                    <option value="0" selected>Pilih Perkerjaan</option>
+                </select>
+            </div>
+
+            <div class="col-sm-6">
+                <select name="position" id="position" class="form-control select2">
+                    <option value="0" selected>Pilih Jawatan</option>
+                </select>
+            </div>
         </div>
 
-        <div class="col-sm-6">
-            <select name="position" id="position" class="form-control select2">
-                <option value="0" selected>Pilih Jawatan</option>
-            </select>
+        <div class="row mb-3">
+            <div class="col">
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="statusFilter" id="allRadio" value="3" checked>
+                    <label class="form-check-label" for="all">Aktif</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="statusFilter" id="pendingRadio" value="1">
+                    <label class="form-check-label" for="pending">Belum selesai</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="statusFilter" id="approveRadio" value="2">
+                    <label class="form-check-label" for="approve">Diterima</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="statusFilter" id="declineRadio" value="0">
+                    <label class="form-check-label" for="decline">Ditolak</label>
+                </div>
+                @if(Auth::user()->roleID == 1)
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="statusFilter" id="deleteRadio" value="4">
+                        <label class="form-check-label" for="decline">Dipadam</label>
+                    </div>
+                @endif
+            </div>
+            <div class="col">
+                <button class="btn btn-outline-primary float-end" type="submit" id="excelBtn">Excel</button>
+            </div>
         </div>
-    </div>
+    </form>
 
-    <div class="pb-2">
-        <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="statusFilter" id="allRadio" value="3" checked>
-            <label class="form-check-label" for="all">Semua</label>
-        </div>
-        <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="statusFilter" id="pendingRadio" value="1">
-            <label class="form-check-label" for="pending">Belum selesai</label>
-        </div>
-        <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="statusFilter" id="approveRadio" value="2">
-            <label class="form-check-label" for="approve">Diterima</label>
-        </div>
-        <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="statusFilter" id="declineRadio" value="0">
-            <label class="form-check-label" for="decline">Ditolak</label>
-        </div>
-    </div>
 
     <div class="table-responsive">
         <table id="requestTable" class="table table-bordered table-striped dt-responsive" style="border-collapse: collapse; border-spacing: 0; width: 100%;">

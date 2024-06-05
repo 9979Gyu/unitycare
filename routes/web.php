@@ -55,6 +55,7 @@ Route::post('/export-users', [UserController::class, 'exportUsers'])->name('expo
 Route::post('/export-programs', [ProgramController::class, 'exportPrograms']);
 Route::post('/export-jobs', [JobController::class, 'exportJobs']);
 Route::post('/export-offers', [OfferController::class, 'exportOffers']);
+Route::post('/export-applications', [ApplicationController::class, 'exportApplications']);
 
 Route::get('/create/{roleNo}', [UserController::class, 'create']);
 Route::post('/store', [UserController::class, 'store']);
