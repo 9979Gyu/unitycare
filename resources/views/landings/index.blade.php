@@ -112,6 +112,7 @@
                                                                                     <span class="card-text badge badge-primary"> {{ $offer->jobType->name }} </span>
                                                                                     <span class="card-text badge badge-primary"> {{ $offer->shiftType->name }} </span>
                                                                                 </div>
+                                                                                <br>
                                                                             @endforeach
                                                                         </div>
                                                                     </div>
@@ -150,20 +151,6 @@
 
             <!-- Search position and program -->
             <div class="tab-pane fade" id="search" role="tabpanel" aria-labelledby="search-tab">
-                <!-- <div class="container t-5">
-                    <div class="search-bar">
-                        <select name="typeDropDown" id="typeDropDown">
-                            <option>Pilih Jenis</option>
-                        </select>
-
-                        <input type="text" name="keyword" id="keyword" placeholder="Pekerjaan, kata kunci atau syarikat">
-                        
-                        <button type="button" class="btn btn-primary" id="searchBtn">Cari</button>
-                    </div>
-                </div>
-                <br>
-                <div id='searchResult' class="card-container"></div> -->
-
                 <div class="container mt-4">
                     <div class="row justify-content-center">
                         <div class="col">
