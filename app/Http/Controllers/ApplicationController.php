@@ -42,10 +42,12 @@ class ApplicationController extends Controller
             ->with(['organization', 'jobType', 'shiftType', 'job'])
             ->first();
 
-            $applicationExist = Application::where('status', 1)
+            $applicationExist = Application::where([
+                ['status', 1],
+                ['approval_status', 2],
+            ])
             ->whereHas('jobOffer', function ($query) use ($id) {
                 $query->where([
-                    ['offer_id', $id],
                     ['approval_status', 2],
                 ]);
             })
@@ -53,6 +55,8 @@ class ApplicationController extends Controller
                 $query->where('user_id', Auth::user()->id);
             })
             ->count();
+
+            // dd($applicationExist);
     
             return view('applications.add', compact('offer', 'applicationExist'));
         }
@@ -277,7 +281,8 @@ class ApplicationController extends Controller
                     $updateOthers = Application::where([
                         ['status', 1],
                         ['approval_status', 1],
-                        ['poor_id', $poorID]
+                        ['poor_id', $poorID],
+                        ['application', '<>', $id]
                     ])
                     ->update(['status' => 0]);
 
