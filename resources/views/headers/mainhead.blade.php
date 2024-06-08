@@ -122,10 +122,12 @@
                             
                             <li><a class="dropdown-item" href="/viewprofile"><b>Profil</b></a></li>
                             <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/login-reset"><b>Tukar Kata Laluan</b></a></li>
+                            <li><hr class="dropdown-divider"></li>
                             <li><form class="dropdown-item" method="POST" action="/logout">
                                 @csrf
                                 <button type="submit" style="background: none!important; border: none; cursor: pointer;">
-                                    <b>Logout</b>
+                                    <b>Log Keluar</b>
                                 </button>
                             </form></li>
                         @else

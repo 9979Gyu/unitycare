@@ -9,7 +9,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class PerubahanKataLaluan extends Mailable
+class NotifyPasswordChange extends Mailable
 {
     use Queueable, SerializesModels;
     public $mailData;
@@ -61,6 +61,6 @@ class PerubahanKataLaluan extends Mailable
      */
     public function build()
     {
-        return $this->view('emails.notify');
+        return $this->subject('Makluman Mengenai Pertukaran Kata Laluan')->view('emails.notify');
     }
 }

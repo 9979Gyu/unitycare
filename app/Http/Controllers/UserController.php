@@ -16,7 +16,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\WelcomeEmail;
 use App\Mail\ForgotPasswordEmail;
-use App\Mail\PerubahanKataLaluan;
+use App\Mail\NotifyPasswordChange;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 
@@ -645,7 +645,26 @@ class UserController extends Controller
         
     }
 
+    public function resetPassword(){
 
+        $username = Auth::user()->username;
+
+        $user = User::where([
+            ['username', $username],
+            ['status', 1],
+        ])
+        ->first();
+
+        if($user){
+            $user->remember_token = Str::random(32);
+            $user->save();
+
+            return redirect('/set-password?token=' . $user->remember_token);
+        }
+
+        return redirect('/login')->with(['error' => "Nama pengguna tidak wujud"], 400);
+        
+    }
 
     public function indexChangePassword(Request $request){
         $token = $request->query('token');
@@ -665,10 +684,19 @@ class UserController extends Controller
 
     public function changePassword(Request $request){
         
-        $rules = [
-            'password' => "required",
-            'password2' => "required"
-        ];
+        if(Auth::check()){
+            $rules = [
+                'old-password' => "required",
+                'password' => "required",
+                'password2' => "required"
+            ];
+        }
+        else{
+            $rules = [
+                'password' => "required",
+                'password2' => "required"
+            ];
+        }
 
         $validated = $request->validate($rules);
 
@@ -678,6 +706,14 @@ class UserController extends Controller
             $password2 = trim($request->get('password2'));
             $username = $request->get('username');
             $token = $request->get('token');
+
+            if(Auth::check()){
+                $oldPwd = trim($request->get('old-password'));
+
+                if (!Hash::check($oldPwd, Auth::user()->password)) {
+                    return redirect('/set-password?token=' . $token)->withErrors(['message' => 'Pertukaran kata laluan tidak berjaya']);
+                }
+            }
 
             if($password == $password2){
 
@@ -701,6 +737,8 @@ class UserController extends Controller
                     ]);
 
                     $this->notifyChangePassword($user);
+
+                    Auth::logout();
         
                     return redirect('/login')->with(['success' => "Pertukaran kata laluan berjaya"]);
                 }
@@ -751,7 +789,7 @@ class UserController extends Controller
         // Create the final formatted date-time string
         $formattedDateTime = str_replace([$now->format('l'), $now->format('F')], [$dayOfWeek, $month], $formattedDateTime);
 
-        Mail::to($user->email)->send(new PerubahanKataLaluan([
+        Mail::to($user->email)->send(new NotifyPasswordChange([
             'name' => $user->username,
             'datetime' => $formattedDateTime
         ]));

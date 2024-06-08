@@ -61,6 +61,6 @@ class ForgotPasswordEmail extends Mailable
      */
     public function build()
     {
-        return $this->view('emails.reset');
+        return $this->subject('Pertukaran Kata Laluan')->view('emails.reset');
     }
 }

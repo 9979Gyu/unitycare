@@ -68,6 +68,7 @@ Route::post('/deleteuser/{id}', [UserController::class, 'destroy']);
 Route::get('/set-password', [UserController::class, 'indexChangePassword']);
 Route::post('/change-password', [UserController::class, 'changePassword']);
 Route::post('/reset', [UserController::class, 'changePasswordEmail']);
+Route::get('/login-reset', [UserController::class, 'resetPassword']);
 
 Route::get('/register', [UserController::class, 'register']);
 Route::post('/storeadmin', [UserController::class, 'storeAdmin'])->name('user.storeAdmin');
