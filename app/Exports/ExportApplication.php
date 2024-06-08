@@ -15,23 +15,31 @@ class ExportApplication implements FromCollection, WithHeadings, ShouldAutoSize
     private $status;
     private $selectedPosition;
     private $userID;
+    private $startDate;
+    private $endDate;
     /**
     * @return \Illuminate\Support\Collection
     */
-    public function __construct($id, $state, $status, $selectedPosition, $userID)
+    public function __construct($id, $state, $status, $selectedPosition, $userID, $startDate, $endDate)
     {
         $this->id = $id;
         $this->state = $state;
         $this->status = $status; 
         $this->selectedPosition = $selectedPosition;
         $this->userID = $userID;
+        $this->startDate = $startDate;
+        $this->endDate = $endDate;
     }
 
     public function collection()
     {
         if(isset($this->selectedPosition)){
 
-            $query = Application::where('applications.status', $this->status);
+            $query = Application::where([
+                ['applications.status', $this->status],
+                ['applied_date', '>=', $this->startDate],
+                ['applied_date', '<=', $this->endDate],
+            ]);
 
             if ($this->state != 3) {
                 $query->where('applications.approval_status', $this->state);

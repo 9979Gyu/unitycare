@@ -506,6 +506,7 @@ class OfferController extends Controller
         $rules = [
             'roleID' => 'required',
             'statusFilter' => 'required',
+            
         ];
 
         $validated = $request->validate($rules);

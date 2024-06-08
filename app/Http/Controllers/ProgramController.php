@@ -584,6 +584,8 @@ class ProgramController extends Controller
             'roleID' => 'required',
             'type' => 'required',
             'statusFilter' => 'required',
+            'startDate' => 'required',
+            'endDate' => 'required',
         ];
 
         $validated = $request->validate($rules);
@@ -594,13 +596,15 @@ class ProgramController extends Controller
             $state = $request->get('statusFilter');
             $type = $request->get('type');
             $status = 1;
+            $startDate = $request->get('startDate');
+            $endDate = $request->get('endDate');
 
             if($state == 4){
                 $status = 0;
             }
             
             return Excel::download(new ExportProgram(
-                $roleID, $state, $type, $status), 
+                $roleID, $state, $type, $status, $startDate, $endDate), 
                 'Programs-' . time() . '.xlsx'
             );
         }

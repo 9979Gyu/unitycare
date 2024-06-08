@@ -349,6 +349,8 @@ class ApplicationController extends Controller
             'statusFilter' => 'required',
             'position' => 'required',
             'job' => 'required',
+            'startDate' => 'required',
+            'endDate' => 'required',
         ];
 
         $validated = $request->validate($rules);
@@ -360,6 +362,8 @@ class ApplicationController extends Controller
             $status = 1;
             $selectedPosition = $request->get("position");
             $userID = Auth::user()->id;
+            $startDate = $request->get('startDate');
+            $endDate = $request->get('endDate');
 
             if($state == 4){
                 $status = 0;
@@ -368,7 +372,7 @@ class ApplicationController extends Controller
             $filename = Job::where('job_id', $selectedPosition)->value("position");
 
             return Excel::download(new ExportApplication(
-                $roleID, $state, $status, $selectedPosition, $userID), 
+                $roleID, $state, $status, $selectedPosition, $userID, $startDate, $endDate), 
                 'Permohonan Kerja (' . $filename . ') - ' . time() . '.xlsx'
             );
         }

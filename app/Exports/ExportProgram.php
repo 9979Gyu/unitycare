@@ -14,21 +14,30 @@ class ExportProgram implements FromCollection, withHeadings, ShouldAutoSize
     private $state;
     private $type;
     private $status;
+    private $startDate;
+    private $endDate;
 
     /**
     * @return \Illuminate\Support\Collection
     */
-    public function __construct($id, $state, $type, $status)
+    public function __construct($id, $state, $type, $status, $startDate, $endDate)
     {
         $this->id = $id;
         $this->state = $state;
         $this->type = $type;
         $this->status = $status;
+        $this->startDate = $startDate;
+        $this->endDate = $endDate;
     }
 
     public function collection()
     {
-        $query = Program::where('status', $this->status)->with('organization');
+        $query = Program::where([
+            ['status', $this->status],
+            ['start_date', '>=', $this->startDate],
+            ['start_date', '<=', $this->endDate],
+        ])
+        ->with('organization');
 
         if($this->state != 3) {
             $query->where('approved_status', $this->state);

@@ -29,6 +29,7 @@
     <form method="POST" action="/export-programs" id="excel">
         @csrf
         <input type="number" name="roleID" id="roleID" value="{{ Auth::user()->roleID }}" hidden>
+        <input type="text" id="actionName" name="actionName" value="/export-programs" hidden>
         <div class="row mb-3">
             <div class="col">
                 <select name="type" name="type" id="type" class="form-control">
@@ -38,7 +39,7 @@
                 </select>
             </div>
             <div class="col">
-                <button class="btn btn-outline-primary float-end" type="submit" id="excelBtn">Excel</button>
+                <button class="btn btn-outline-primary float-end" type="button" id="excelBtn">Excel</button>
             </div>
         </div>
 
@@ -66,6 +67,32 @@
                 </div>
             @endif
         </div>
+
+        <div class="modal fade" id="dateModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="dateModalLabel">Excel</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">        
+                        <div class="form-group">
+                            <label for="startDate required">Dari</label>
+                            <input type="date" class="form-control" id="startDate" name="startDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="endDate required">Hingga</label>
+                            <input type="date" class="form-control" id="endDate" name="endDate" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-danger" id="applyDates">Eksport</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </form>
 
     <div class="table-responsive">
@@ -162,7 +189,11 @@
         </div>
     </div>
 
+    <!-- Include the date modal
+    @include('exports.datemodal') -->
+
     <script src="{{ asset('js/indexProgramScript.js') }}"></script>
+    <script src="{{ asset('js/modalScript.js') }}"></script>
 
 
 @endsection
