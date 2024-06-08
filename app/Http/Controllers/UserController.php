@@ -15,6 +15,7 @@ use App\Exports\ExportUser;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\WelcomeEmail;
+use App\Mail\ForgotPasswordEmail;
 use Illuminate\Support\Str;
 
 class UserController extends Controller
@@ -203,11 +204,13 @@ class UserController extends Controller
             else
                 $ic = $request->get('ICNo');
 
+            $username = Str::lower(trim($request->get('username')));
+
             $user = new User([
                 'name' => $request->get('name'),
                 'email' => $request->get('email'),
-                'password' => Hash::make($request->get('password')),
-                'username' => $request->get('username'),
+                'password' => Hash::make(trim($request->get('password'))),
+                'username' => $username,
                 'contactNo' => $request->get('contactNo'),
                 'address' => $request->get('address'),
                 'state' => $request->get('state'),
@@ -301,7 +304,7 @@ class UserController extends Controller
             $user = new User([
                 'name' => $request->get('fname') . ' ' . $request->get('lname'),
                 'email' => $request->get('email'),
-                'password' => Hash::make($request->get('password')),
+                'password' => Hash::make(trim($request->get('password'))),
                 'username' => $request->get('username'),
                 'contactNo' => $request->get('contactNo'),
                 'address' => $request->get('address'),
@@ -582,7 +585,6 @@ class UserController extends Controller
         return redirect('/')->withErrors(['message' => 'Anda tidak dibenarkan untuk melayari halaman ini']);
         
     }
-
         
     public function validateEmail($user){
         Mail::to($user->email)->send(new WelcomeEmail([
@@ -613,4 +615,97 @@ class UserController extends Controller
         return redirect('/login')->with(['error' => "Emel pengesahan tidak berjaya"], 400);
 
     }
+
+    public function changePasswordEmail(Request $request){
+
+        $username = $request->get('reset-username');
+
+        $user = User::where([
+            ['username', $username],
+            ['status', 1],
+        ])
+        ->first();
+
+        if($user){
+            $user->remember_token = Str::random(32);
+            $user->save();
+
+            Mail::to($user->email)->send(new ForgotPasswordEmail([
+                'name' => $user->username,
+                'remember_token' => $user->remember_token
+            ]));
+
+            return redirect('/login')->with(['success' => 'Sila semak emel untuk tukar kata laluan']);
+        }
+
+        return redirect('/login')->with(['error' => "Nama pengguna tidak wujud"], 400);
+        
+    }
+
+
+
+    public function indexChangePassword(Request $request){
+        $token = $request->query('token');
+
+        $username = User::where([
+            ['remember_token', $token],
+        ])
+        ->value("username");
+
+        if($username){
+            return view("auths.forgot", compact('username', 'token'));
+        }
+
+        return redirect('/login')->with(['error' => "Pertukaran kata laluan tidak berjaya"], 400);
+
+    }
+
+    public function changePassword(Request $request){
+        
+        $rules = [
+            'password' => "required",
+            'password2' => "required"
+        ];
+
+        $validated = $request->validate($rules);
+
+        if($validated){
+
+            $password = trim($request->get('password'));
+            $password2 = trim($request->get('password2'));
+            $username = $request->get('username');
+            $token = $request->get('token');
+
+            if($password == $password2){
+
+                $user = User::where([
+                    ['username', $username],
+                    ['remember_token', $token]
+                ])
+                ->first();
+
+                if($user){
+                    $user->password = Hash::make($password);
+                    $user->remember_token = null;
+                    $user->status = 1;
+                    
+                    $user->save();
+        
+                    return redirect('/login')->with(['success' => "Pertukaran kata laluan berjaya"]);
+                }
+     
+            }
+        }
+
+        return redirect('/set-password?token=' . $token)->withErrors(['message' => 'Pertukaran kata laluan tidak berjaya']);
+
+    }
+
+    public function notifyChangePassword($user){
+        Mail::to($user->email)->send(new ForgotPasswordEmail([
+            'name' => $user->username,
+            'datetime' => 
+        ]));
+    }
+
 }

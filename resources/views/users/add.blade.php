@@ -91,7 +91,7 @@
         <div class="row mb-3">
             <label for="username" class="col-sm-2 col-form-label required">Nama Pengguna</label>
             <div class="col-sm-10">
-                <input type="text" value="{{ old('username') }}" name="username" class="form-control" id="username" pattern=".{3,}" maxlength="25" title="Three or more characters">
+                <input type="text" value="{{ old('username') }}" name="username" class="form-control lowercase" id="username" pattern=".{3,}" maxlength="25" title="Three or more characters">
             </div>
         </div>
 

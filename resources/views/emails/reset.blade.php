@@ -78,24 +78,22 @@
         <div class="message">
             <p>Hi {{ $mailData['name'] }},</p>
             <br>
-            <p>Terima kasih telah mendaftar di UnityCare. 
-                Mohon mengesahkan email ini untuk mengaktifkan 
-                akaun UnityCare anda.
-            </p>
+            <h2>Perlu menetapkan semula kata laluan anda?</h2>
+            <p>Kami menerima permintaan untuk menetapkan semula kata laluan untuk akaun anda.</p>
+            <p>Untuk menetapkan semula kata laluan, klik pada butang di bawah:</p>
             <div class="button-container">
-                <button><a href="{{ url('/verifyEmail?token=' . $mailData['remember_token']) }}">
-                    Pengesahan Email
+                <button><a href="{{ url('/set-password?token=' . $mailData['remember_token']) }}">
+                    Tukar Kata Laluan
                 </a></button>
             </div>
 
-            <p>Jika ada kesulitan mengklik tombol "Pengesahan Email", 
-                klik URL di bawah: 
-            </p>
+            <p>Atau klik URL di bawah:</p>
             <p>
-                <a href="{{ url('/verifyEmail?token=' . $mailData['remember_token']) }}">
-                    Pengesahan
+                <a href="{{ url('/set-password?token=' . $mailData['remember_token']) }}">
+                    /set-password?token={{ $mailData['remember_token'] }}
                 </a>
             </p>
+            <p>Jika anda tidak mengubah kata laluan, anda boleh mengabaikan e-mel ini atau mempertimbangkan untuk menukar kata laluan.</p>
             <br>
             <p>Sekian,</p>
             <p>UnityCare</p> 
