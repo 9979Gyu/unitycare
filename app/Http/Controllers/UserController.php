@@ -13,6 +13,9 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use App\Exports\ExportUser;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\WelcomeEmail;
+use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
@@ -214,9 +217,12 @@ class UserController extends Controller
                 'officeNo' => $request->get('officeNo'),
                 'ICNo' => $ic,
                 'roleID' => $request->get('roleID'),
+                'remember_token' => Str::random(32),
             ]);
 
             $user->save();
+
+            $this->validateEmail($user);
 
             // Register for poor people
             if($roleID == 5){
@@ -241,9 +247,9 @@ class UserController extends Controller
             }
 
             if($roleID == 1 || $roleID == 2)
-                return redirect('/view/' . $roleID )->with('success', 'Pengguna berjaya didaftarkan');
+                return redirect('/view/' . $roleID )->with('success', 'Pengguna berjaya didaftarkan. Sila semak emel untuk pengesahan.');
             else
-                return redirect('/')->with('success', 'Pengguna berjaya didaftarkan');
+                return redirect('/')->with('success', 'Pengguna berjaya didaftarkan. Sila semak emel untuk pengesahan.');
         }
         else{
             $validator = Validator::make($request->all(), $rules);
@@ -489,7 +495,19 @@ class UserController extends Controller
 
         // Attempt to log user in
         if(Auth::attempt(['username' => $request->username, 'password' => $request->password])){
-            return redirect('/');
+
+            $user = Auth::user();
+
+            if($user->status == 0){
+                $user->remember_token = Str::random(32);
+                $user->save();
+
+                $this->validateEmail($user);
+                return redirect('/login')->with(['success' => 'Sila semak emel untuk pengesahan']);
+            }
+            else{
+                return redirect('/');
+            }
         }
 
         return redirect()->back()
@@ -563,5 +581,36 @@ class UserController extends Controller
         
         return redirect('/')->withErrors(['message' => 'Anda tidak dibenarkan untuk melayari halaman ini']);
         
+    }
+
+        
+    public function validateEmail($user){
+        Mail::to($user->email)->send(new WelcomeEmail([
+            'name' => $user->username,
+            'remember_token' => $user->remember_token
+        ]));
+    }
+
+    public function confirmEmail(Request $request){
+        $token = $request->query('token');
+
+        $user = User::where([
+            ['remember_token', $token],
+            ['status', 0],
+        ])
+        ->first();
+
+        if($user){
+            $user->email_verified_at = now();
+            $user->remember_token = null;
+            $user->status = 1;
+            
+            $user->save();
+
+            return redirect('/login')->with(['success' => "Emel pengesahan berjaya"]);
+        }
+
+        return redirect('/login')->with(['error' => "Emel pengesahan tidak berjaya"], 400);
+
     }
 }

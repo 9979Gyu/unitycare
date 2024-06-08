@@ -20,7 +20,7 @@
         </div>
     @endif
 
-    <table class="table table-hover">
+    <table class="table table-hover table-responsive">
         <tr>
             <th colspan="4" class="text-center">Maklumat Pekerjaan</th>
         </tr>

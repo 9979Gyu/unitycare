@@ -59,6 +59,7 @@ Route::post('/export-applications', [ApplicationController::class, 'exportApplic
 
 Route::get('/create/{roleNo}', [UserController::class, 'create']);
 Route::post('/store', [UserController::class, 'store']);
+Route::get('/verifyEmail', [UserController::class, 'confirmEmail']);
 Route::get('/view/{roleNo}', [UserController::class, 'index']);
 Route::get('/getstaff', [UserController::class, 'getUsersDatatable'])->name('user.getAllDatatable');
 Route::get('/edituser/{id}', [UserController::class, 'edit']);

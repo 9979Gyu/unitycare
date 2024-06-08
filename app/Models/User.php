@@ -32,7 +32,9 @@ class User extends Authenticatable
         'ICNo',
         'status',
         'roleID',
-        'sector_id'
+        'sector_id',
+        'remember_token',
+        'email_verified_at'
     ];
 
     /**
