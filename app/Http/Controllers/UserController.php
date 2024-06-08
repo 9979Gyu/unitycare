@@ -16,7 +16,9 @@ use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\WelcomeEmail;
 use App\Mail\ForgotPasswordEmail;
+use App\Mail\PerubahanKataLaluan;
 use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class UserController extends Controller
 {
@@ -603,7 +605,8 @@ class UserController extends Controller
         ->first();
 
         if($user){
-            $user->email_verified_at = now();
+            $now = Carbon::now();
+            $user->email_verified_at = $now;
             $user->remember_token = null;
             $user->status = 1;
             
@@ -690,6 +693,14 @@ class UserController extends Controller
                     $user->status = 1;
                     
                     $user->save();
+
+                    DB::table('password_resets')->insert([
+                        'email' => $user->email, 
+                        'token' => $token,
+                        'created_at' => now()
+                    ]);
+
+                    $this->notifyChangePassword($user);
         
                     return redirect('/login')->with(['success' => "Pertukaran kata laluan berjaya"]);
                 }
@@ -702,10 +713,49 @@ class UserController extends Controller
     }
 
     public function notifyChangePassword($user){
-        Mail::to($user->email)->send(new ForgotPasswordEmail([
+
+        $now = Carbon::now();
+
+        // Translation arrays
+        $days = [
+            'Sunday' => 'Ahad',
+            'Monday' => 'Isnin',
+            'Tuesday' => 'Selasa',
+            'Wednesday' => 'Rabu',
+            'Thursday' => 'Khamis',
+            'Friday' => 'Jumaat',
+            'Saturday' => 'Sabtu',
+        ];
+
+        $months = [
+            'January' => 'Jan',
+            'February' => 'Feb',
+            'March' => 'Mac',
+            'April' => 'Apr',
+            'May' => 'Mei',
+            'June' => 'Jun',
+            'July' => 'Jul',
+            'August' => 'Ogo',
+            'September' => 'Sep',
+            'October' => 'Okt',
+            'November' => 'Nov',
+            'December' => 'Dis',
+        ];
+
+        $formattedDateTime = $now->format('l, j F Y H:i:s');
+
+        // Replace English day and month names with Malay equivalents
+        $dayOfWeek = $days[$now->format('l')];
+        $month = $months[$now->format('F')];
+
+        // Create the final formatted date-time string
+        $formattedDateTime = str_replace([$now->format('l'), $now->format('F')], [$dayOfWeek, $month], $formattedDateTime);
+
+        Mail::to($user->email)->send(new PerubahanKataLaluan([
             'name' => $user->username,
-            'datetime' => 
+            'datetime' => $formattedDateTime
         ]));
+
     }
 
 }
