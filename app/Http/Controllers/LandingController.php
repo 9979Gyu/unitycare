@@ -76,9 +76,10 @@ class LandingController extends Controller{
     public function search(Request $request)
     {
         $searchQuery = ucwords($request->get('query'));
-        $searchOption = $request->get('option');
 
-        if(isset($searchQuery) && isset($searchOption)){
+        if(isset($searchQuery)){
+
+            
 
             if($searchOption == "program"){
                 $results = Program::where('name', 'like', '%' . $searchQuery . '%')

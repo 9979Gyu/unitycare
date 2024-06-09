@@ -27,7 +27,6 @@ $(document).ready(function(){
 
     $('#searchBtn').on('click', function() {
         const input = $("#searchInput").val().trim();
-        const selectedOption = $("#searchOption").val().toLowerCase();
 
         // Perform search only if query is not empty
         if (input !== '') {
@@ -36,10 +35,9 @@ $(document).ready(function(){
                 method: 'GET',
                 data: { 
                     query: input,
-                    option: selectedOption, 
                 },
                 success: function(response) {
-                    displayResults(response, selectedOption);
+                    displayResults(response);
                 },
                 error: function(xhr, status, error) {
                     console.error(error);
@@ -52,7 +50,7 @@ $(document).ready(function(){
         }
     });
 
-    function displayResults(results, option) {
+    function displayResults(results) {
         $('#searchResults').empty(); // Clear previous results
 
         if(results.length === 0){

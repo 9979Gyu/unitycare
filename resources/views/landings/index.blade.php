@@ -155,10 +155,10 @@
                     <div class="row justify-content-center">
                         <div class="col">
                             <div class="input-group">
-                                <select id="searchOption" class="form-select">
+                                <!-- <select id="searchOption" class="form-select">
                                     <option value="program">Program</option>
                                     <option value="job">Pekerjaan</option>
-                                </select>
+                                </select> -->
                                 <input type="text" id="searchInput" class="form-control" placeholder="Cari...">
                                 <button type="button" class="btn btn-primary" id="searchBtn">Cari</button>
                             </div>

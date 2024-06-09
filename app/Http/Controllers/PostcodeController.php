@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Program;
+use App\Models\Job_Offer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\DB;
 
 class PostcodeController extends Controller
 {
@@ -31,24 +34,38 @@ class PostcodeController extends Controller
         return response()->json($result);
     }
 
-    public function getCityState(){
-        $data = File::get(database_path('postcode.json'));
-        $decodedData = json_decode($data, true);
+    public function getCityState(Request $request){
+        $type = $request->get('type');
 
-        $citiesstates = [];
+        if($type == "program"){
+            $citiesstates = Program::where([
+                ['status', 1],
+                ['approved_status', 2],
+            ])
+            ->select('venue')
+            ->distinct()
+            ->get();
+        }
+        elseif($type == "offer"){
+            // Retrieve distinct cities
+            $cities = Job_Offer::where([
+                ['status', 1],
+                ['approval_status', 2],
+            ])
+            ->select('city as location')->distinct();
 
-        foreach ($decodedData['state'] as $state) {
-            // Get the name of the state
-            $citiesstates[] = $state['name'];
+            // Retrieve distinct states
+            $states = Job_Offer::where([
+                ['status', 1],
+                ['approval_status', 2],
+            ])
+            ->select('state as location')->distinct();
 
-            // Get the names of cities within each state
-            foreach ($state['city'] as $city) {
-                $citiesstates[] = $city['name'];
-            }
+            // Combine the results
+            $citiesstates = $cities->union($states)->orderBy('location', 'asc')->get();
+            
         }
 
-        $uniqueItem = array_unique($citiesstates);
-
-        return $uniqueItem;
+        return $citiesstates;
     }
 }

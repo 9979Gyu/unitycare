@@ -10,6 +10,10 @@ $(document).ready(function() {
         allowClear: true,
     });
 
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+
     var requestTable;
     var selectedState = 3;
     var status = 1;
@@ -36,14 +40,13 @@ $(document).ready(function() {
         $.ajax({
             type: 'GET',
             url: "/getCityState",
+            data:  { type : "offer" },
             success: function(data) {
                 
                 $("#citystate").empty();
-                // Loop through the unique state and city names array
-                for(var item in data){
-                    // Append each item as an option
-                    $("#citystate").append('<option>' + data[item] + '</option>');
-                }
+                data.forEach(function(item){
+                    $("#citystate").append('<option>' + item.location + '</option>');
+                });
             },
             error: function (data) {
                 $('.condition-message').html(data);
@@ -73,6 +76,8 @@ $(document).ready(function() {
                     if (keyword) {
                         matchKeyword = offer.jobname.toLowerCase().includes(keyword) ||
                                        offer.jobposition.toLowerCase().includes(keyword) ||
+                                       offer.shiftname.toLowerCase().includes(keyword) ||
+                                       offer.typename.toLowerCase().includes(keyword) ||
                                        offer.username.toLowerCase().includes(keyword);
                     }
         
