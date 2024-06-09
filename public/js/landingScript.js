@@ -37,7 +37,8 @@ $(document).ready(function(){
                     query: input,
                 },
                 success: function(response) {
-                    displayResults(response);
+                    console.log(response.option);
+                    displayResults(response.results, response.option);
                 },
                 error: function(xhr, status, error) {
                     console.error(error);
@@ -50,38 +51,55 @@ $(document).ready(function(){
         }
     });
 
-    function displayResults(results) {
+    function displayResults(results, option) {
         $('#searchResults').empty(); // Clear previous results
 
         if(results.length === 0){
             $('#searchResults').append('<li class="list-group-item">Tiada rekod berkenaan</li>');
         }
-        else if(option == "program"){
+        if(option == "programs"){
             // Display each search result
             results.forEach(function(program) {
                 var organizationName = program.organization.name;
                 var programName = '<a href="/joinprogram/' + program.program_id + '">' + program.name + '</a>';
         
+                // Format start and end dates
+                var startDate = new Date(program.start_date);
+                var endDate = new Date(program.end_date);
+
+                // Format start and end times
+                var startTime = program.start_time;
+                var endTime = program.end_time;
+
+                // Define the day names array
+                var days = ['Ahad', 'Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu'];
+
+                // Get the day name using the day number of the week
+                var dayName = days[startDate.getDay()];
+                var endDayName = days[endDate.getDay()];
+
+                // Format the date as "Day, dd-mm-yyyy"
+                var formattedStartDate = dayName + ', ' + ('0' + startDate.getDate()).slice(-2) + '-' + ('0' + (startDate.getMonth() + 1)).slice(-2) + '-' + startDate.getFullYear();
+                var formattedEndDate = endDayName + ', ' + ('0' + endDate.getDate()).slice(-2) + '-' + ('0' + (endDate.getMonth() + 1)).slice(-2) + '-' + endDate.getFullYear();
+
                 $('#searchResults').append(
                     '<li class="list-group-item">' + programName + ' <br> ' + organizationName + '<br>' + 
-                        program.start_date + ' ' + program.start_time + ' - ' + program.end_date + ' ' + program.end_time + '</li><br>'
+                        formattedStartDate + ' ' + program.start_time + ' - ' + formattedEndDate + ' ' + program.end_time + '</li><br>'
                 );
             });
         }
-        else{
+        if(option == "offers"){
             // Display each search result
             results.forEach(function(result) {
-                // Iterate over each job offer for the current job
-                result.job_offers.forEach(function(jobOffer) {
-                    var organizationName = jobOffer.organization.name;
-                    var jobName = '<a href="/joinoffer/' + 
-                    jobOffer.offer_id + '">' + result.name + '</a>';
+                console.log(result);
+                var organizationName = result.organization.name;
+                var jobName = '<a href="/joinoffer/' + 
+                result.offer_id + '">' + result.job.position + '</a>';
 
-                    $('#searchResults').append(
-                        '<li class="list-group-item">' + jobName + ' <br> ' + organizationName + '<br>Salary: RM ' + 
-                            jobOffer.min_salary + ' - RM ' + jobOffer.max_salary + '</li><br>'
-                    );
-                });
+                $('#searchResults').append(
+                    '<li class="list-group-item">' + jobName + ' <br> ' + organizationName + '<br>Salary: RM ' + 
+                        result.min_salary + ' - RM ' + result.max_salary + '</li><br>'
+                );
             });
         }
         

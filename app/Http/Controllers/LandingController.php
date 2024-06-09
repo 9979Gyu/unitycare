@@ -7,8 +7,11 @@ use App\Models\Program;
 use App\Models\Job;
 use App\Models\Job_Offer;
 use App\Models\Sector;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Auth;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class LandingController extends Controller{
 
@@ -75,33 +78,69 @@ class LandingController extends Controller{
 
     public function search(Request $request)
     {
-        $searchQuery = ucwords($request->get('query'));
+        $searchQuery = $request->get('query');
 
         if(isset($searchQuery)){
 
-            
+            $programs = Program::where([
+                ['status', 1],
+                ['approved_status', 2],
+                ['name', 'like', '%' . $searchQuery . '%']
+            ])
+            ->orWhere([
+                ['status', 1],
+                ['approved_status', 2],
+                ['venue', 'like', '%' . $searchQuery . '%']
+            ])
+            ->orWhere([
+                ['status', 1],
+                ['approved_status', 2],
+                ['start_date', 'like', '%' . $searchQuery . '%']
+            ])
+            ->with(['organization'])
+            ->get();
 
-            if($searchOption == "program"){
-                $results = Program::where('name', 'like', '%' . $searchQuery . '%')
-                          ->where('status', 1)
-                          ->where('approved_status', 2)
-                          ->with('organization')
-                          ->get();
-            }
-            else{
-                $results = Job::whereHas('jobOffers.organization', function ($query) use ($searchQuery) {
-                    $query->where('position', 'like', '%' . $searchQuery . '%')
-                          ->where('status', 1);
-                })
-                ->with(['jobOffers' => function ($query) {
-                    $query->where('approval_status', 2)
-                          ->with(['job', 'organization']);
-                }])
-                ->get();
+            $offers = Job_Offer::with(['job', 'organization', 'jobType', 'shiftType'])
+            ->where('status', 1)
+            ->where(function (Builder $query) use ($searchQuery) {
+                $query->where(function (Builder $query) use ($searchQuery) {
+                    $query->whereHas('job', function (Builder $query) use ($searchQuery) {
+                            $query->where('name', 'like', '%' . $searchQuery . '%')
+                                ->orWhere('position', 'like', '%' . $searchQuery . '%');
+                        })
+                        ->orWhereHas('organization', function (Builder $query) use ($searchQuery) {
+                            $query->where('name', 'like', '%' . $searchQuery . '%');
+                        })
+                        ->orWhereHas('jobType', function (Builder $query) use ($searchQuery) {
+                            $query->where('name', 'like', '%' . $searchQuery . '%');
+                        })
+                        ->orWhereHas('shiftType', function (Builder $query) use ($searchQuery) {
+                            $query->where('name', 'like', '%' . $searchQuery . '%');
+                        })
+                        ->orWhere('state', 'like', '%' . $searchQuery . '%')
+                        ->orWhere('city', 'like', '%' . $searchQuery . '%')
+                        ->orWhere('min_salary', '>=', $searchQuery);
+                });
+            })
+            ->where('approval_status', 2)
+            ->get();
 
+            // dd(count($offers));
+
+
+            if(count($programs) > 0){
+                $results = $programs;
+                $option = "programs";
+            }
+            elseif(count($offers) > 0){
+                $results = $offers;
+                $option = "offers";
             }
             
-            return response()->json($results);
+            return response()->json([
+                'results' => $results,
+                'option' => $option,
+            ]);
         }
     }
 

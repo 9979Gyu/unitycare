@@ -10,10 +10,6 @@ $(document).ready(function() {
         allowClear: true,
     });
 
-    $(function () {
-        $('[data-toggle="tooltip"]').tooltip();
-    });
-
     var requestTable;
     var selectedState = 3;
     var status = 1;
