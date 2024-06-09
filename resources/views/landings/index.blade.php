@@ -154,6 +154,13 @@
                 <div class="container mt-4">
                     <div class="row justify-content-center">
                         <div class="col">
+                            <div class="tooltip-container m-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle-fill" viewBox="0 0 16 16" data-bs-toggle="tooltip" 
+                                    title="Nama Program atau Pekerjaan (Contoh: Kerjaya)
+                                    Tarikh Mula (Contoh: 24-06-2023)">  
+                                    <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2"/>
+                                </svg>
+                            </div>
                             <div class="input-group">
                                 <input type="text" id="searchInput" class="form-control" placeholder="Cari...">
                                 <button type="button" class="btn btn-primary" id="searchBtn">Cari</button>

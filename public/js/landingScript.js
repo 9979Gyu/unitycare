@@ -1,4 +1,13 @@
 $(document).ready(function(){
+    // Initialize Bootstrap tooltip
+    $('[data-bs-toggle="tooltip"]').tooltip();
+
+    var toolTipContent = '<ul><li>Nama Program atau Pekerjaan (Contoh: Kerjaya)</li>' +
+        '<li>Tarikh Mula (Contoh: 24-06-2023)</li>' +
+        '</ul>';
+
+    // Set tooltip content for the info circle icon
+    $(".bi-info-circle-fill").attr('title', toolTipContent);
 
     // Manage event on calendar
     const calendarEl = document.getElementById('calendar');
