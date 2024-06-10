@@ -62,7 +62,7 @@
         <tr>
             <th scope="row">Pilihan</th>
             <td colspan="3">
-            @if($offer->user_id != Auth::user()->id && $applicationExist == 0)
+            @if($offer->user_id != Auth::user()->id && $applicationExist == 0 && $alreadyApply == 0)
                 @if(Auth::user()->roleID == 5)
                     <button type="button" class="btn btn-success" name="apply" id="apply" value="mohon"><b>Mohon</b></button>
                 @endif

@@ -506,7 +506,8 @@ class OfferController extends Controller
         $rules = [
             'roleID' => 'required',
             'statusFilter' => 'required',
-            
+            'startDate' => 'required',
+            'endDate' => 'required',
         ];
 
         $validated = $request->validate($rules);
@@ -516,13 +517,15 @@ class OfferController extends Controller
             $roleID = $request->get('roleID');
             $state = $request->get('statusFilter');
             $status = 1;
+            $startDate = $request->get('startDate');
+            $endDate = $request->get('endDate');
 
             if($state == 4){
                 $status = 0;
             }
 
             return Excel::download(new ExportOffer(
-                $roleID, $state, $status), 
+                $roleID, $state, $status, $startDate, $endDate), 
                 'Offers-' . time() . '.xlsx'
             );
         }

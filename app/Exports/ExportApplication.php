@@ -37,8 +37,7 @@ class ExportApplication implements FromCollection, WithHeadings, ShouldAutoSize
 
             $query = Application::where([
                 ['applications.status', $this->status],
-                ['applied_date', '>=', $this->startDate],
-                ['applied_date', '<=', $this->endDate],
+                
             ]);
 
             if ($this->state != 3) {

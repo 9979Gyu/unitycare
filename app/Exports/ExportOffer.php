@@ -17,20 +17,28 @@ class ExportOffer implements FromCollection, WithHeadings, ShouldAutoSize
     private $id;
     private $state;
     private $status;
+    private $startDate;
+    private $endDate;
 
     /**
     * @return \Illuminate\Support\Collection
     */
-    public function __construct($id, $state, $status){
+    public function __construct($id, $state, $status, $startDate, $endDate){
         $this->id = $id;
         $this->state = $state;
         $this->status = $status;
+        $this->startDate = $startDate;
+        $this->endDate = $endDate;
     }
 
     public function collection()
     {
         if(isset($this->id) && isset($this->state) && isset($this->status)){
-            $query = Job_Offer::where('job_offers.status', $this->status);
+            $query = Job_Offer::where([
+                ['job_offers.status', $this->status],
+                ['job_offers.created_at', '>=', $this->startDate],
+                ['job_offers.created_at', '<=', $this->endDate],
+            ]);
 
             if ($this->state != 3) {
                 $query->where('job_offers.approval_status', $this->state);

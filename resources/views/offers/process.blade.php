@@ -26,7 +26,66 @@
 
     <br>
 
-    
+    <form method="POST" action="/export-offers" class="container" id="excel">
+        @csrf
+        <input type="number" name="roleID" id="roleID" value="{{ $roleNo }}" hidden>
+        <div class="row mb-3">
+            <div class="col">
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="statusFilter" id="allRadio" value="3" checked>
+                    <label class="form-check-label" for="all">Aktif</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="statusFilter" id="pendingRadio" value="1">
+                    <label class="form-check-label" for="pending">Belum selesai</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="statusFilter" id="approveRadio" value="2">
+                    <label class="form-check-label" for="approve">Diterima</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="statusFilter" id="declineRadio" value="0">
+                    <label class="form-check-label" for="decline">Ditolak</label>
+                </div>
+                @if(Auth::user()->roleID == 1)
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="statusFilter" id="deleteRadio" value="4">
+                        <label class="form-check-label" for="decline">Dipadam</label>
+                    </div>
+                @endif
+            </div>
+            <div class="col">
+                <button class="btn btn-outline-primary float-end" type="button" id="excelBtn">Excel</button>
+            </div>
+        </div>
+
+        <div class="modal fade" id="dateModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="dateModalLabel">Excel</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">        
+                        <div class="form-group">
+                            <label for="startDate required">Dari</label>
+                            <input type="date" class="form-control" id="startDate" name="startDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="endDate required">Hingga</label>
+                            <input type="date" class="form-control" id="endDate" name="endDate" required>
+                        </div>
+                        
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-danger" id="applyDates">Eksport</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </form>
 
     <div class="table-responsive">
         <table id="requestTable" class="table table-bordered table-striped dt-responsive" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
@@ -124,6 +183,7 @@
     </div>
 
     <script src="{{ asset('js/indexOfferScript.js') }}"></script>
+    <script src="{{ asset('js/modalScript.js') }}"></script>
 
 
 @endsection

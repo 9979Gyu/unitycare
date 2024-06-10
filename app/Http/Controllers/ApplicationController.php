@@ -12,7 +12,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use DataTables;
 use Illuminate\Support\Facades\Auth;
-use Carbon\Carbon;
 use App\Exports\ExportApplication;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -42,6 +41,22 @@ class ApplicationController extends Controller
             ->with(['organization', 'jobType', 'shiftType', 'job'])
             ->first();
 
+            $alreadyApply = Job_Offer::where([
+                ['status', 1],
+                ['approval_status', 2],
+                ['offer_id', $id],
+            ])
+            ->whereHas('applications', function($query){
+                $query->where([
+                    ['status', 1],
+                    ['approval_status', '>=', 1],
+                ])
+                ->whereHas('poor', function ($query) {
+                    $query->where('user_id', Auth::user()->id);
+                });
+            })
+            ->count();
+
             $applicationExist = Application::where([
                 ['status', 1],
                 ['approval_status', 2],
@@ -58,7 +73,7 @@ class ApplicationController extends Controller
 
             // dd($applicationExist);
     
-            return view('applications.add', compact('offer', 'applicationExist'));
+            return view('applications.add', compact('offer', 'applicationExist', 'alreadyApply'));
         }
 
         return redirect('/login')->withErrors(['message' => 'Anda tidak dibenarkan untuk melayari halaman ini']);
@@ -81,7 +96,7 @@ class ApplicationController extends Controller
             $roleNo = Auth::user()->roleID;
             
             // Get the current date
-            $currentDateTime = date('Y-m-d H:i:s.u');
+            $currentDateTime = date('Y-m-d H:i:s');
 
             $poorID = Poor::where([
                 ['user_id', $uid],
@@ -97,6 +112,7 @@ class ApplicationController extends Controller
             }
     
             if(isset($offerID) && isset($poorID)){
+
                 $application = new Application([
                     'applied_date' => $currentDateTime,
                     'offer_id' => $offerID,
@@ -131,14 +147,15 @@ class ApplicationController extends Controller
             ])
             ->update([
                 'status' => 0,
-            ]);    
+            ]);
     
-            if($result)
-                return redirect()->back()->with('success', 'Berjaya dipadam');
+            if($result){
+                return redirect('/viewoffer')->with(["success" => "Data berjaya dipadam"]);
+            }
     
         }
 
-        return redirect()->back()->withErrors(["message" => "Tidak berjaya dipadam"]);
+        return redirect('/viewoffer')->withErrors(["message" => "Tidak berjaya dipadam"]);
     }
 
     // Function to get list of application
@@ -255,7 +272,7 @@ class ApplicationController extends Controller
         ->value('poor_id');
         
         // Get the current date and time
-        $currentDateTime = Carbon::now();
+        $currentDateTime = date('Y-m-d H:i:s');
 
         if(isset($id) && isset($currentDateTime)){
             // Update the program details
@@ -282,7 +299,7 @@ class ApplicationController extends Controller
                         ['status', 1],
                         ['approval_status', 1],
                         ['poor_id', $poorID],
-                        ['application', '<>', $id]
+                        ['application_id', '<>', $id]
                     ])
                     ->update(['status' => 0]);
 
@@ -303,7 +320,7 @@ class ApplicationController extends Controller
     public function declineApproval(Request $request){
 
         // Get the current date and time
-        $currentDateTime = Carbon::now();
+        $currentDateTime = date('Y-m-d H:i:s');
 
         $id = $request->get("selectedID");
 
