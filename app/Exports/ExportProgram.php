@@ -6,6 +6,8 @@ use App\Models\Program;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
+use Carbon\Carbon;
+
 
 class ExportProgram implements FromCollection, withHeadings, ShouldAutoSize
 {
@@ -28,6 +30,25 @@ class ExportProgram implements FromCollection, withHeadings, ShouldAutoSize
         $this->status = $status;
         $this->startDate = $startDate;
         $this->endDate = $endDate;
+    }
+
+    public function parseDate($olddate){
+        try {
+            // Parse the date with the specified format
+            $date = Carbon::createFromFormat('Y-m-d', $olddate);
+
+            // Set the locale to Malay
+            $date->locale('ms');
+
+            // Format the date to 'dddd, D MMMM YYYY' (without time since it's not provided)
+            $formattedDate = $date->isoFormat('dddd, D MMMM YYYY');
+
+            return $formattedDate;
+
+        } 
+        catch (Exception $e) {
+            return $date;
+        }
     }
 
     public function collection()
@@ -60,6 +81,11 @@ class ExportProgram implements FromCollection, withHeadings, ShouldAutoSize
                 else{
                     $approval = "Telah Diluluskan";
                 }
+
+                $program->start_date = $this->parseDate($program->start_date);
+                $program->end_date = $this->parseDate($program->end_date);
+                $program->close_date = $this->parseDate($program->close_date);
+                
                 return[
                     'Nama' => $program->name,
                     'Lokasi' => $program->venue,

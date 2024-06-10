@@ -12,6 +12,7 @@ use DataTables;
 use Illuminate\Support\Facades\Auth;
 use App\Exports\ExportProgram;
 use Maatwebsite\Excel\Facades\Excel;
+use Carbon\Carbon;
 
 class ProgramController extends Controller
 {
@@ -448,6 +449,25 @@ class ProgramController extends Controller
             return redirect()->back()->withErrors(["message" => "Tidak berjaya dipadam"]);
         }
     }
+
+    public function parseDate($olddate){
+        try {
+            // Parse the date with the specified format
+            $date = Carbon::createFromFormat('Y-m-d', $olddate);
+
+            // Set the locale to Malay
+            $date->locale('ms');
+
+            // Format the date to 'dddd, D MMMM YYYY' (without time since it's not provided)
+            $formattedDate = $date->isoFormat('dddd, D MMMM YYYY');
+
+            return $formattedDate;
+
+        } 
+        catch (Exception $e) {
+            return $date;
+        }
+    }
     
     // Function to get list of programs
     public function getProgramsDatatable(Request $request)
@@ -479,6 +499,16 @@ class ProgramController extends Controller
                     $program->username = $program->organization->name ?? '';
                     $program->useremail = $program->organization->email ?? '';
                     $program->usercontact = $program->organization->contactNo ?? '';
+
+                    $startDate = $program->start_date;
+                    $program->start_date = $this->parseDate($startDate);
+
+                    $endDate = $program->end_date;
+                    $program->end_date = $this->parseDate($endDate);
+
+                    $closeDate = $program->close_date;
+                    $program->close_date = $this->parseDate($closeDate);
+
                     return $program;
                 });
 
