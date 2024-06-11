@@ -64,6 +64,10 @@ class OfferController extends Controller
             'description' => 'required',
             'salaryStart' => 'required',
             'salaryEnd' => 'required',
+            'start_date' => 'required',
+            'end_date' => 'required',
+            'start_time' => 'required',
+            'end_time' => 'required',
         ];
 
         $validated = $request->validate($rules);
@@ -88,6 +92,10 @@ class OfferController extends Controller
                 'max_salary' => $request->get('salaryEnd'),
                 'user_id' => Auth::user()->id,
                 'approval_status' => 1,
+                'start_date' => $request->get('start_date'),
+                'start_time' => $request->get('start_time'),
+                'end_date' => $request->get('end_date'),
+                'end_time' => $request->get('end_time'),
             ]);
 
             $result = $job_offer->save();

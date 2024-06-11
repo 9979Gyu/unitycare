@@ -11,3 +11,21 @@ function todayDate(){
 
     return currentDate;
 }
+
+function parseDate(date){
+             
+    // Format dates
+    var newDate = new Date(date);
+
+    // Define the day names array
+    var days = ['Ahad', 'Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu'];
+
+    // Get the day name using the day number of the week
+    var dayName = days[newDate.getDay()];
+
+    // Format the date as "Day, dd-mm-yyyy"
+    var formattedDate = dayName + ', ' + ('0' + newDate.getDate()).slice(-2) + '-' + ('0' + (newDate.getMonth() + 1)).slice(-2) + '-' + newDate.getFullYear();
+
+    return formattedDate;
+
+}

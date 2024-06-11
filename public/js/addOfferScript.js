@@ -11,8 +11,9 @@ $(document).ready(function(){
 
             data.forEach(function(item){
                 $("#job").append('<option value="' + item.job_id + '">' + item.name + '</option>');
-                $('#job').trigger("change");
             });
+
+            $('#job').trigger("change");
         }
     });
 
@@ -38,5 +39,18 @@ $(document).ready(function(){
             $("#position").append('<option selected>Pilih Jawatan</option>');
         }
     });
+
+    $("#jobType").change(function(){
+        var selectedValue = $(this).val();
+
+        if(selectedValue == 1){
+            $("#start").hide();
+            $("#end").hide();
+        }
+        else{
+            $("#start").show();
+            $("#end").show();
+        }
+    })
     
 });

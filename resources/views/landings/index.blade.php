@@ -169,8 +169,8 @@
                     </div>
                     <!-- Display search results -->
                     <div class="row mt-4 justify-content-center">
-                        <div class="col">
-                            <ul id="searchResults" class="list-group"></ul>
+                        <div class="accordion" id="searchResults">
+                            <!-- Display the program and offer result -->
                         </div>
                     </div>
                 </div>

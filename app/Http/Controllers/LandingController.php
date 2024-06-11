@@ -82,64 +82,116 @@ class LandingController extends Controller{
 
         if(isset($searchQuery)){
 
-            $programs = Program::where([
-                ['status', 1],
-                ['approved_status', 2],
-                ['name', 'like', '%' . $searchQuery . '%']
+            $programQuery = DB::table('programs')
+                ->join('users', 'users.id', '=', 'programs.user_id')
+                ->where([
+                    ['programs.status', 1],
+                    ['programs.approved_status', 2],
+                ])
+                ->select(
+                    'programs.*',
+                    'users.name as username'
+                );
+
+            $programNameQuery = $programQuery->clone()
+                ->where('programs.name', 'like', '%' . $searchQuery . '%')
+                ->get();
+
+            $programVenueQuery = $programQuery->clone()
+                ->where('programs.venue', 'like', '%' . $searchQuery . '%')
+                ->get();
+
+            $programStartQuery = $programQuery->clone()
+                ->where('programs.start_date', 'like', '%' . $searchQuery . '%')
+                ->get();
+
+            $programUserQuery = $programQuery->clone()
+                ->where([
+                    ['users.status', 1],
+                    ['users.name', 'like', '%' . $searchQuery . '%']
+                ])
+                ->get();
+
+            // Convert the result into array and merge the results into $programs
+            $programs = array_merge($programNameQuery->toArray(), $programVenueQuery->toArray());
+            $programs = array_merge($programs, $programStartQuery->toArray());
+            $programs = array_merge($programs, $programUserQuery->toArray());
+
+            
+            $uniqueOffers = [];
+            $offers = [];
+
+            $query = DB::table('job_offers')
+            ->join('jobs', 'jobs.job_id', '=', 'job_offers.job_id')
+            ->join('shift_types', 'shift_types.shift_type_id', '=', 'job_offers.shift_type_id')
+            ->join('job_types', 'job_types.job_type_id', '=', 'job_offers.job_type_id')
+            ->join('users', 'users.id', '=', 'job_offers.user_id')
+            ->where([
+                ['job_offers.status', 1],
+                ['job_offers.approval_status', 2],
             ])
-            ->orWhere([
-                ['status', 1],
-                ['approved_status', 2],
-                ['venue', 'like', '%' . $searchQuery . '%']
-            ])
-            ->orWhere([
-                ['status', 1],
-                ['approved_status', 2],
-                ['start_date', 'like', '%' . $searchQuery . '%']
-            ])
-            ->with(['organization'])
+            ->select(
+                'job_offers.offer_id',
+                'job_offers.min_salary',
+                'job_offers.max_salary',
+                'jobs.name as jobname',
+                'jobs.position as jobposition',
+                'shift_types.name as shiftname',
+                'job_types.name as typename',
+                'users.name as username'
+            );
+            
+            $nameResults = $query->clone()
+            ->where('jobs.name', 'like', '%' . $searchQuery . '%')
             ->get();
 
-            $offers = Job_Offer::with(['job', 'organization', 'jobType', 'shiftType'])
-            ->where('status', 1)
-            ->where(function (Builder $query) use ($searchQuery) {
-                $query->where(function (Builder $query) use ($searchQuery) {
-                    $query->whereHas('job', function (Builder $query) use ($searchQuery) {
-                            $query->where('name', 'like', '%' . $searchQuery . '%')
-                                ->orWhere('position', 'like', '%' . $searchQuery . '%');
-                        })
-                        ->orWhereHas('organization', function (Builder $query) use ($searchQuery) {
-                            $query->where('name', 'like', '%' . $searchQuery . '%');
-                        })
-                        ->orWhereHas('jobType', function (Builder $query) use ($searchQuery) {
-                            $query->where('name', 'like', '%' . $searchQuery . '%');
-                        })
-                        ->orWhereHas('shiftType', function (Builder $query) use ($searchQuery) {
-                            $query->where('name', 'like', '%' . $searchQuery . '%');
-                        })
-                        ->orWhere('state', 'like', '%' . $searchQuery . '%')
-                        ->orWhere('city', 'like', '%' . $searchQuery . '%')
-                        ->orWhere('min_salary', '>=', $searchQuery);
-                });
-            })
-            ->where('approval_status', 2)
+            $positionResults = $query->clone()
+            ->where('jobs.position', 'like', '%' . $searchQuery . '%')
             ->get();
 
-            // dd(count($offers));
+            $stateResults = $query->clone()
+            ->where('job_offers.state', 'like', '%' . $searchQuery . '%')
+            ->get();
 
+            $cityResults = $query->clone()
+            ->where('job_offers.city', 'like', '%' . $searchQuery . '%')
+            ->get();
 
-            if(count($programs) > 0){
-                $results = $programs;
-                $option = "programs";
+            $typeResults = $query->clone()
+            ->where('job_types.name', 'like', '%' . $searchQuery . '%')
+            ->get();
+
+            $shiftResults = $query->clone()
+            ->where('shift_types.name', 'like', '%' . $searchQuery . '%')
+            ->get();
+
+            $userResults = $query->clone()
+            ->where('users.name', 'like', '%' . $searchQuery . '%')
+            ->get();
+
+            if(is_numeric($searchQuery)){
+                $salaryResults = $query->clone()
+                ->where('job_offers.min_salary', '>=' , $searchQuery)
+                ->get();
+
+                $offers = array_merge($offers, $salaryResults->toArray());
             }
-            elseif(count($offers) > 0){
-                $results = $offers;
-                $option = "offers";
-            }
+
+            $offers = array_merge($offers, $nameResults->toArray());
+            $offers = array_merge($offers, $positionResults->toArray());
+            $offers = array_merge($offers, $stateResults->toArray());
+            $offers = array_merge($offers, $cityResults->toArray());
+            $offers = array_merge($offers, $typeResults->toArray());
+            $offers = array_merge($offers, $shiftResults->toArray());
+            $offers = array_merge($offers, $userResults->toArray());
+            
+            // Get the distinct record only
+            $uniquePrograms = collect($programs)->unique('program_id')->values()->all();
+            $uniqueOffers = collect($offers)->unique('offer_id')->values()->all();
             
             return response()->json([
-                'results' => $results,
-                'option' => $option,
+                'programs' => $uniquePrograms,
+                'offers' => $uniqueOffers,
             ]);
         }
     }

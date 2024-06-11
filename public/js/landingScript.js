@@ -46,8 +46,7 @@ $(document).ready(function(){
                     query: input,
                 },
                 success: function(response) {
-                    console.log(response.option);
-                    displayResults(response.results, response.option);
+                    displayResults(response.programs, response.offers);
                 },
                 error: function(xhr, status, error) {
                     console.error(error);
@@ -60,58 +59,90 @@ $(document).ready(function(){
         }
     });
 
-    function displayResults(results, option) {
-        $('#searchResults').empty(); // Clear previous results
-
-        if(results.length === 0){
+    function displayResults(programs, offers) {
+        // Clear previous results
+        $('#searchResults').empty(); 
+    
+        // No record exists
+        if(programs.length === 0 && offers.length === 0){
             $('#searchResults').append('<li class="list-group-item">Tiada rekod berkenaan</li>');
-        }
-        if(option == "programs"){
-            // Display each search result
-            results.forEach(function(program) {
-                var organizationName = program.organization.name;
-                var programName = '<a href="/joinprogram/' + program.program_id + '">' + program.name + '</a>';
-        
-                // Format start and end dates
-                var startDate = new Date(program.start_date);
-                var endDate = new Date(program.end_date);
-
-                // Format start and end times
-                var startTime = program.start_time;
-                var endTime = program.end_time;
-
-                // Define the day names array
-                var days = ['Ahad', 'Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu'];
-
-                // Get the day name using the day number of the week
-                var dayName = days[startDate.getDay()];
-                var endDayName = days[endDate.getDay()];
-
-                // Format the date as "Day, dd-mm-yyyy"
-                var formattedStartDate = dayName + ', ' + ('0' + startDate.getDate()).slice(-2) + '-' + ('0' + (startDate.getMonth() + 1)).slice(-2) + '-' + startDate.getFullYear();
-                var formattedEndDate = endDayName + ', ' + ('0' + endDate.getDate()).slice(-2) + '-' + ('0' + (endDate.getMonth() + 1)).slice(-2) + '-' + endDate.getFullYear();
-
+        } 
+        else {
+            if(programs.length > 0){
                 $('#searchResults').append(
-                    '<li class="list-group-item">' + programName + ' <br> ' + organizationName + '<br>' + 
-                        formattedStartDate + ' ' + program.start_time + ' - ' + formattedEndDate + ' ' + program.end_time + '</li><br>'
+                    '<div class="accordion-item">'+
+                        '<h2 class="accordion-header" id="headingPrograms">'+
+                            '<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePrograms" aria-expanded="true" aria-controls="collapsePrograms">' +
+                                'Programs' +
+                            '</button>' +
+                        '</h2>' +
+                        '<div id="collapsePrograms" class="accordion-collapse collapse show" aria-labelledby="headingPrograms" data-bs-parent="#searchResults">' +
+                            '<div class="accordion-body">' +
+                                '<ul class="list-group" id="programsList"></ul>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>'
                 );
-            });
-        }
-        if(option == "offers"){
-            // Display each search result
-            results.forEach(function(result) {
-                console.log(result);
-                var organizationName = result.organization.name;
-                var jobName = '<a href="/joinoffer/' + 
-                result.offer_id + '">' + result.job.position + '</a>';
-
+    
+                // Display each program
+                programs.forEach(function(program) {
+                    var organizationName = program.username;
+                    var programName = '<a href="/joinprogram/' + program.program_id + '">' + program.name + '</a>';
+    
+                    $('#programsList').append(
+                        '<li class="list-group-item">' + programName + ' <br> ' + organizationName + '<br>' + 
+                            parseDate(program.start_date) + ' ' + program.start_time + ' - ' + parseDate(program.end_date) + ' ' + program.end_time + 
+                        '</li>'
+                    );
+                });
+            }
+            
+            if(offers.length > 0){
                 $('#searchResults').append(
-                    '<li class="list-group-item">' + jobName + ' <br> ' + organizationName + '<br>Salary: RM ' + 
-                        result.min_salary + ' - RM ' + result.max_salary + '</li><br>'
+                    '<div class="accordion-item">'+
+                        '<h2 class="accordion-header" id="headingOffers">'+
+                            '<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOffers" aria-expanded="true" aria-controls="collapseOffers">' +
+                                'Pekerjaan' +
+                            '</button>' +
+                        '</h2>' +
+                        '<div id="collapseOffers" class="accordion-collapse collapse show" aria-labelledby="headingOffers" data-bs-parent="#searchResults">' +
+                            '<div class="accordion-body">' +
+                                '<ul class="list-group" id="offersList"></ul>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>'
                 );
-            });
+    
+                // Display each offer
+                offers.forEach(function(offer) {
+                    var organizationName = offer.username;
+                    var jobName = '<a href="/joinoffer/' + offer.offer_id + '">' + offer.jobposition + '</a>';
+    
+                    $('#offersList').append(
+                        '<li class="list-group-item">' + jobName + ' <br> ' + organizationName + '<br>Salary: RM ' + 
+                            offer.min_salary + ' - RM ' + offer.max_salary + '</li><br>'
+                    );
+                });
+            }
         }
-        
+    }
+    
+    function parseDate(date){
+             
+        // Format dates
+        var newDate = new Date(date);
+    
+        // Define the day names array
+        var days = ['Ahad', 'Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu'];
+    
+        // Get the day name using the day number of the week
+        var dayName = days[newDate.getDay()];
+    
+        // Format the date as "Day, dd-mm-yyyy"
+        var formattedDate = dayName + ', ' + ('0' + newDate.getDate()).slice(-2) + '-' + ('0' + (newDate.getMonth() + 1)).slice(-2) + '-' + newDate.getFullYear();
+    
+        return formattedDate;
+    
     }
 
 });

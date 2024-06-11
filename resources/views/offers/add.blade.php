@@ -77,6 +77,32 @@
 
         <br>
 
+        <div class="row mb-3" id="start">
+            <label for="start_date" class="col-sm-2 col-form-label required">Tarikh Bermula</label>
+            <div class="col-sm-4">
+                <input type="date" value="{{ old('start_date') }}" name="start_date" class="form-control" id="start_date">
+            </div>
+
+            <label for="start_time" class="col-sm-2 col-form-label required">Masa Bermula</label>
+            <div class="col-sm-4">
+                <input type="time" value="{{ old('start_time') }}" name="start_time" class="form-control" id="start_time">
+            </div>
+        </div>
+
+        <div class="row mb-3" id="end">
+            <label for="end_date" class="col-sm-2 col-form-label required">Tarikh Tamat</label>
+            <div class="col-sm-4">
+                <input type="date" value="{{ old('end_date') }}" name="end_date" class="form-control" id="end_date">
+            </div>
+
+            <label for="end_time" class="col-sm-2 col-form-label required">Masa Tamat</label>
+            <div class="col-sm-4">
+                <input type="time" value="{{ old('end_time') }}" name="end_time" class="form-control" id="end_time">
+            </div>
+        </div>
+
+        <br>
+
         <!-- Working Location -->
         <div class="row mb-3">
             <label for="postalCode" class="col-sm-2 col-form-label required">Poskod</label>
