@@ -127,6 +127,8 @@ Route::get('/getapplications', [ApplicationController::class, 'getApplicationsDa
 Route::get('/viewapplication', [ApplicationController::class, 'index']);
 Route::post('/approveapplication', [ApplicationController::class, 'updateApproval']);
 Route::post('/declineapplication', [ApplicationController::class, 'declineApproval']);
+Route::post('/confirmapplication', [ApplicationController::class, 'confirmOffer']);
+Route::post('/rejectapplication', [ApplicationController::class, 'rejectOffer']);
 
 Route::get('/getPrograms', [LandingController::class, 'getPrograms']);
 Route::get('/search', [LandingController::class, 'search']);

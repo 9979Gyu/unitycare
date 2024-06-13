@@ -22,6 +22,7 @@ class Application extends Model
         'approval_status',
         'status',
         'description',
+        'is_selected',
     ];
 
     public function jobOffer()

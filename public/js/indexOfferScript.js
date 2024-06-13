@@ -121,13 +121,13 @@ $(document).ready(function() {
                                 $(".card-container").append(
                                     '<p><div class="card" id="' + offer.offer_id + '">' +
                                         '<div class="card-body d-flex justify-content-between">' +
-                                            '<div><h4 class="card-title">' + offer.jobposition + '</h4>' +
+                                            '<div><p class="card-text text-success"><b> Permohonan Diterima. Sila Membuat Keputusan </b></p>' +
+                                            '<h4 class="card-title">' + offer.jobposition + '</h4>' +
                                             '<div><p class="card-text">' + offer.username + '<br>' + offer.city + ', ' + offer.state + '</p>' +
                                                 '<p class="card-text badge badge-primary"> RM ' + minsal + ' - RM ' + maxsal + ' sebulan</p>' +
                                                 ' <p class="card-text badge badge-primary">' + offer.typename + '</p>' +
                                                 ' <p class="card-text badge badge-primary">' + offer.shiftname + '</p>' +
                                                 '<p class="card-text">' + offer.description + '</p>' +
-                                                '<p class="card-text text-success"><b> Permohonan Diterima </b></p>' +
                                             '</div></div>' +
                                             '<div>' + button + '</div>' +
                                         '</div>' +
@@ -138,13 +138,13 @@ $(document).ready(function() {
                                 $(".card-container").append(
                                     '<p><div class="card" id="' + offer.offer_id + '">' +
                                         '<div class="card-body d-flex justify-content-between">' +
-                                            '<div><h4 class="card-title">' + offer.jobposition + '</h4>' +
+                                            '<div><p class="card-text text-danger"><b> Permohonan Ditolak ' + enrolledOffer.reason + ' </b></p>' +
+                                            '<h4 class="card-title">' + offer.jobposition + '</h4>' +
                                             '<div><p class="card-text">' + offer.username + '<br>' + offer.city + ', ' + offer.state + '</p>' +
                                                 '<p class="card-text badge badge-primary"> RM ' + minsal + ' - RM ' + maxsal + ' sebulan</p>' +
                                                 ' <p class="card-text badge badge-primary">' + offer.typename + '</p>' +
                                                 ' <p class="card-text badge badge-primary">' + offer.shiftname + '</p>' +
                                                 '<p class="card-text">' + offer.description + '</p>' +
-                                                '<p class="card-text text-danger"><b> Permohonan Ditolak ' + enrolledOffer.reason + ' </b></p>' +
                                             '</div></div>' +
                                             '<div>' + button + '</div>' +
                                         '</div>' +
@@ -223,13 +223,13 @@ $(document).ready(function() {
                             $(".card-container").append(
                                 '<p><div class="card" id="' + offer.offer_id + '">' +
                                     '<div class="card-body d-flex justify-content-between">' +
-                                        '<div><h4 class="card-title">' + offer.jobposition + '</h4>' +
+                                        '<div><p class="card-text"> <b>Ditolak: ' + offer.reason + '</b></p>' +
+                                        '<h4 class="card-title">' + offer.jobposition + '</h4>' +
                                         '<div><p class="card-text">' + offer.username + '<br>' + offer.city + ', ' + offer.state + '</p>' +
                                             '<p class="card-text badge badge-primary"> RM ' + minsal + ' - RM ' + maxsal + ' sebulan</p>' +
                                             ' <p class="card-text badge badge-primary">' + offer.typename + '</p>' +
                                             ' <p class="card-text badge badge-primary">' + offer.shiftname + '</p>' +
                                             '<p class="card-text">' + offer.description + '</p>' +
-                                            '<p class="card-text"> <b>Ditolak: ' + offer.reason + '</b></p>' +
                                             '<p class="card-text text-secondary"> kemaskini ' + offer.updateDate + '</p>' +
                                         '</div></div>' +
                                         '<div>' + button + 

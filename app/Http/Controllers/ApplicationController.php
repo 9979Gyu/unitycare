@@ -60,6 +60,22 @@ class ApplicationController extends Controller
             $applicationExist = Application::where([
                 ['status', 1],
                 ['approval_status', 2],
+                ['is_selected', 1],
+            ])
+            ->whereHas('jobOffer', function ($query) use ($id) {
+                $query->where([
+                    ['approval_status', 2],
+                ]);
+            })
+            ->whereHas('poor', function ($query) {
+                $query->where('user_id', Auth::user()->id);
+            })
+            ->count();
+
+            $selectedApplication = Application::where([
+                ['status', 1],
+                ['approval_status', 2],
+                ['is_selected', 2],
             ])
             ->whereHas('jobOffer', function ($query) use ($id) {
                 $query->where([
@@ -73,7 +89,7 @@ class ApplicationController extends Controller
 
             // dd($applicationExist);
     
-            return view('applications.add', compact('offer', 'applicationExist', 'alreadyApply'));
+            return view('applications.add', compact('offer', 'applicationExist', 'alreadyApply', 'selectedApplication'));
         }
 
         return redirect('/login')->withErrors(['message' => 'Anda tidak dibenarkan untuk melayari halaman ini']);
@@ -120,6 +136,7 @@ class ApplicationController extends Controller
                     'status' => 1,
                     'approval_status' => 1,
                     'description' => json_encode($desc),
+                    'is_selected' => 1,
                 ]);
     
                 $result = $application->save();
@@ -286,30 +303,8 @@ class ApplicationController extends Controller
                 'approved_at' => $currentDateTime,
             ]);
 
-            // If successfully update the program
-            if($update){
-
-                // Update employment status
-                $update = Poor::where('poor_id', $poorID)->update(['employment_status' => 1]);
-
-                if($update){
-                    
-                    // Update other applications status to 0 if the employment status is 1
-                    $updateOthers = Application::where([
-                        ['status', 1],
-                        ['approval_status', 1],
-                        ['poor_id', $poorID],
-                        ['application_id', '<>', $id]
-                    ])
-                    ->update(['status' => 0]);
-
-                    if($updateOthers){
-                        // Direct user to view program page with success messasge
-                        return redirect('/viewapplication')->with('success', 'Data berjaya dikemaskini');
-                    }
-                    
-                }
-            }
+            // Direct user to view program page with success messasge
+            return redirect('/viewapplication')->with('success', 'Data berjaya dikemaskini');
         }
 
         // direct user to view program page with error messasge
@@ -360,6 +355,78 @@ class ApplicationController extends Controller
         // direct user to view program page with error messasge
         return redirect()->back()->withErrors(['message' => "Data tidak berjaya dikemaskini"]);
 
+    }
+
+    // Function to update user confirm for job offer
+    public function confirmOffer(Request $request){
+
+        $id = $request->get('selectedID');
+
+        // Update user selection
+        $update = Application::where([
+            ['application_id', $id],
+            ['approval_status', 2],
+            ['status', 1]
+        ])
+        ->update([
+            ['is_selected' => 2],
+        ]);
+
+        // If successfully update the status, decline other offer
+        if($update){
+
+            // Update employment status
+            $update = Poor::where('poor_id', $poorID)->update(['employment_status' => 1]);
+
+            if($update){
+                
+                // Update other applications status to 0 if the employment status is 1
+                $updateOthers = Application::where([
+                    ['status', 1],
+                    ['approval_status', 1],
+                    ['poor_id', $poorID],
+                    ['application_id', '<>', $id]
+                ])
+                ->update([
+                    ['status' => 0],
+                    ['is_selected' => 0]
+                ]);
+
+                if($updateOthers){
+                    // Direct user to view program page with success messasge
+                    return redirect('/viewapplication')->with('success', 'Data berjaya dikemaskini');
+                }
+                
+            }
+        }
+
+        // direct user to view program page with error messasge
+        return redirect()->back()->withErrors(['message' => "Data tidak berjaya dikemaskini"]);
+    }
+
+    // Function to update user reject for job offer
+    public function rejectOffer(Request $request){
+
+        $id = $request->get('selectedID');
+
+        // Update user selection
+        $update = Application::where([
+            ['application_id', $id],
+            ['approval_status', 2],
+            ['status', 1]
+        ])
+        ->update([
+            ['is_selected' => 0],
+        ]);
+
+        // If successfully update the status, decline other offer
+        if($update){
+            // Direct user to view program page with success messasge
+            return redirect('/viewapplication')->with('success', 'Data berjaya dikemaskini');
+        }
+
+        // direct user to view program page with error messasge
+        return redirect()->back()->withErrors(['message' => "Data tidak berjaya dikemaskini"]);
     }
 
     // Function to export offer info

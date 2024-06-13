@@ -212,6 +212,7 @@ class LandingController extends Controller{
                     $events[] = [
                         'title' => $program->name, 
                         'start' => $program->start_date,
+                        'end' => $program->end_date,
                         'id' => $program->program_id,
                     ];
                 }

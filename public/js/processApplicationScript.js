@@ -13,6 +13,14 @@ $(document).ready(function(){
         $('#applyModal').modal('show');
     });
 
+    $('#approve').click(function() {
+        selectedID = $("#offerId").val();
+        $('#approveModal').modal('show');
+    });
 
+    $('#decline').click(function() {
+        selectedID = $("#offerId").val();
+        $('#declineModal').modal('show');
+    });
     
 });

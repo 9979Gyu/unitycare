@@ -59,6 +59,7 @@ $(document).ready(function(){
         }
     });
 
+    // Function to display result of programs and job offers based on the user input keyword
     function displayResults(programs, offers) {
         // Clear previous results
         $('#searchResults').empty(); 
