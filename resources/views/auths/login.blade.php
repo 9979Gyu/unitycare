@@ -34,7 +34,7 @@
                             @csrf
                             <div class="form-group">
                                 <label for="username" class="required">Nama Pengguna</label>
-                                <input type="text" value="{{ old('username') }}" name="username" class="form-control lowercase" id="username" required>
+                                <input type="text" value="{{ old('username') }}" name="username" class="form-control" id="username" required>
                             </div>
                             <div class="form-group position-relative">
                                 <label for="password" class="required">Kata Laluan</label>

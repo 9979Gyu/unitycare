@@ -75,6 +75,7 @@ class UserController extends Controller
         else{
             return redirect('/login')->withErrors(['message' => 'Anda perlu log masuk untuk mendaftarkan orang kurang upaya.']);
         }
+
     }
 
     // Function to search poor or enterprise from external databases
@@ -111,62 +112,65 @@ class UserController extends Controller
 
             if($result){
 
-                $password = Str::random(8);
+                $rules = [
+                    'ic' => 'required|unique:users,ICNo',
+                ];
 
-                $user = new User([
-                    'name' => $result->name,
-                    'email' => $result->email,
-                    'contactNo' => $result->contactNo,
-                    'address' => $result->address,
-                    'state' => $result->state,
-                    'city' => $result->city,
-                    'postalCode' => $result->postcode,
-                    'status' => 0,
-                    'officeNo' => $result->officeNo,
-                    'ICNo' => $number,
-                    'roleID' => $roleID,
-                    'remember_token' => Str::random(32),
-                    'username' => $result->name,
-                    'password' => Hash::make($password),
-                ]);
+                $validated = $request->validate($rules);
 
-                if($roleID == 3){
-                    $user->sector_id = $result->sectorID;
-                }
+                if($validated){
+                    $password = Str::random(8);
 
-                $user->save();
-                $user->password = $password;
-
-                $this->validateEmail($user);
-
-                 // Register for poor people
-                if($roleID == 5){
-                    // Get the poor people details by given ic
-                    $poor = DB::connection('mysqlSecondConnection')
-                    ->table('users')
-                    ->where('users.ICNo', $ic)
-                    ->first();
-
-                    // save to poor table in db
-                    $poor = new Poor([
-                        'disability_type' => $result->disabilityType,
-                        'instituition_name' => $result->instituitionName,
-                        'employment_status' => $result->employmentStatus,
-                        'status' => 1,
-                        'user_id' => $user->id,
-                        'education_level' => $result->educationLevelID,
-                        'volunteer_id' => Auth::user()->id,
+                    $user = new User([
+                        'name' => $result->name,
+                        'email' => $result->email,
+                        'contactNo' => $result->contactNo,
+                        'address' => $result->address,
+                        'state' => $result->state,
+                        'city' => $result->city,
+                        'postalCode' => $result->postcode,
+                        'status' => 0,
+                        'ICNo' => $number,
+                        'roleID' => $roleID,
+                        'remember_token' => Str::random(32),
+                        'username' => $result->name,
+                        'password' => Hash::make($password),
                     ]);
 
-                    $poor->save();
-                }
+                    if($roleID == 3){
+                        $user->sector_id = $result->sectorID;
+                        $user->officeNo = $result->officeNo;
+                    }
 
-                return redirect('/')->with(["success" => "Pengguna berjaya didaftarkan. Sila semak emel untuk pengesahan."]);
+                    $user->save();
+                    $user->password = $password;
+
+                    $this->validateEmail($user);
+
+                    // Register for poor people
+                    if($roleID == 5){
+                        // save to poor table in db
+                        $poor = new Poor([
+                            'disability_type' => $result->disabilityType,
+                            'instituition_name' => $result->instituitionName,
+                            'employment_status' => $result->employmentStatus,
+                            'status' => 1,
+                            'user_id' => $user->id,
+                            'education_level' => $result->educationLevelID,
+                            'volunteer_id' => Auth::user()->id,
+                        ]);
+
+                        $poor->save();
+                    }
+
+                    return redirect('/')->with(["success" => "Pengguna berjaya didaftarkan. Sila semak emel untuk pengesahan."]);
+                }
+                
             }
         }
 
-        if($type=="poor"){
-            return redirect('/createspecial')->withErrors(["message" => "Anda tidak dibenarkan untuk melayari halaman ini"]);
+        if($roleID == 5){
+            return redirect('/createspecial')->withErrors(["message" => "Nombor pengenalan telah diguna"]);
         }
         else{
             return redirect('/')->withErrors(["message" => "Pendaftaran tidak berjaya"]);
@@ -216,36 +220,6 @@ class UserController extends Controller
                 'roleID' => 'required|in:1,2,4,5',
             ];
         }
-        // else if($roleID == 5){
-        //     $rules = [
-        //         'name' => 'required',
-        //         'ICNo' => 'required|unique:users,ICNo',
-        //         'email' => 'required|unique:users,email',
-        //         'username' => 'required|unique:users,username',
-        //         'contactNo' => 'required|unique:users,contactNo',
-        //         'address' => 'required',
-        //         'state' => 'required',
-        //         'city' => 'required',
-        //         'postalCode' => 'required',
-        //         'roleID' => 'required|in:1,2,4,5',
-        //         'disType' => 'required|integer|between:1,7'
-        //     ];
-        // }
-        // else if($roleID == 3){
-        //     // store as enterprise
-        //     $rules = [
-        //         'name' => 'required',
-        //         'regNo' => 'required|unique:users,ICNo',
-        //         'email' => 'required|unique:users,email',
-        //         'username' => 'required|unique:users,username',
-        //         'contactNo' => 'required|unique:users,contactNo',
-        //         'address' => 'required',
-        //         'state' => 'required',
-        //         'city' => 'required',
-        //         'postalCode' => 'required',
-        //         'roleID' => 'required|in:3',
-        //     ];
-        // }
 
         $validated = $request->validate($rules);
 
@@ -253,15 +227,15 @@ class UserController extends Controller
 
             $username = Str::lower(trim($request->get('username')));
             $email = Str::lower(trim($request->get('email')));
-            $password = Str::random(32);
+            $password = Str::random(8);
             $ic = $request->get('ICNo');
             $user = new User([
-                'name' => trim($request->get('name')),
+                'name' => ucwords(trim($request->get('name'))),
                 'email' => $email,
                 'password' => Hash::make($password),
                 'username' => $username,
                 'contactNo' => $request->get('contactNo'),
-                'address' => trim($request->get('address')),
+                'address' => ucwords(trim($request->get('address'))),
                 'state' => $request->get('state'),
                 'city' => $request->get('city'),
                 'postalCode' => $request->get('postalCode'),
@@ -271,72 +245,12 @@ class UserController extends Controller
                 'roleID' => $request->get('roleID'),
                 'remember_token' => Str::random(32),
             ]);
-           
-            // if($roleID == 3){
-            //     $ic = $request->get('regNo');
-
-            //     $user = User::where([
-            //         ['ic', $ic],
-            //         ['email', $request->get('email')],
-            //         ['contactNo', $request->get('contactNo')],
-            //         ['status', 1],
-            //     ])
-            //     ->first();
-
-            //     $user->username = $username;
-            //     $user->password = Hash::make(trim($request->get('password')));
-            //     $user->status = 0;
-            //     $user->roleID = $request->get('roleID');
-            //     $user->remember_token = Str::random(32);
-            // }
-            // else if($roleID == 5){
-            //     $ic = $request->get('ICNo');
-
-            //     $user = User::where([
-            //         ['ic', $ic],
-            //         ['email', $request->get('email')],
-            //         ['contactNo', $request->get('contactNo')],
-            //         ['status', 1],
-            //     ])
-            //     ->first();
-
-            //     $user->username = $username;
-            //     $user->password = Hash::make(trim($request->get('password')));
-            //     $user->status = 0;
-            //     $user->roleID = $request->get('roleID');
-            //     $user->remember_token = Str::random(32);
-            // }
-            // else{
-                
-            // }
 
             $user->save();
 
             $user->password = $password;
 
             $this->validateEmail($user);
-
-            // // Register for poor people
-            // if($roleID == 5){
-            //     // Get the poor people details by given ic
-            //     $poor = DB::connection('mysqlSecondConnection')
-            //     ->table('users')
-            //     ->where('users.ICNo', $ic)
-            //     ->first();
-
-            //     // save to poor table in db
-            //     $poor = new Poor([
-            //         'disability_type' => $request->get('disType'),
-            //         'instituition_name' => $poor->instituitionName,
-            //         'employment_status' => $poor->employmentStatus,
-            //         'status' => 1,
-            //         'user_id' => $user->id,
-            //         'education_level' => $poor->educationLevelID,
-            //         'volunteer_id' => Auth::user()->id,
-            //     ]);
-
-            //     $poor->save();
-            // }
 
             if($roleID == 1 || $roleID == 2)
                 return redirect('/view/' . $roleID )->with('success', 'Pengguna berjaya didaftarkan. Sila semak emel untuk pengesahan.');
@@ -575,6 +489,8 @@ class UserController extends Controller
             if($user->status == 0){
                 $user->remember_token = Str::random(32);
                 $user->save();
+
+                $user->password = "(Kata laluan terkini akaun anda)";
 
                 $this->validateEmail($user);
                 return redirect('/login')->with(['success' => 'Sila semak emel untuk pengesahan']);

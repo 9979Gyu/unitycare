@@ -42,7 +42,7 @@
                 <!-- Logged in -->
                 @else
                     <!-- Is Admin or Staff -->
-                    @if(Auth::user()->roleID == 1 || Auth::user()->roleID == 2)
+                    @if(Auth::user()->roleID == 1 || Auth::user()->roleID == 2 || Auth::user()->roleID == 4)
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <b>Pengguna</b>

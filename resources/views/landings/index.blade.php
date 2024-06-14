@@ -51,6 +51,9 @@
             <div class="tab-pane fade" id="job" role="tabpanel" aria-labelledby="job-tab">
                 <div id="job">
                     <div class="card-container">
+                        @if(count($sectors) == 0)
+                            Tiada rekod berkenaan
+                        @endif
                         <div class="accordion" id="sectorsAccordion">
                             @foreach($sectors as $sector)
                                 @php
