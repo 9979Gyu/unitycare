@@ -30,6 +30,8 @@ class Job_Offer extends Model
         'start_time',
         'end_date',
         'end_time',
+        'quantity',
+        'quantity_enrolled'
     ];
 
     public function job()

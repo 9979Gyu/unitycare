@@ -61,6 +61,31 @@
             </div>
         </div>
 
+        <!-- Working Location -->
+        <div class="row mb-3">
+            <label for="postalCode" class="col-sm-2 col-form-label required">Poskod</label>
+            <div class="col-sm-4">
+                <input type="number" name="postalCode" class="form-control" id="postalCode" required>
+            </div>
+            <label for="state" class="col-sm-2 col-form-label required">Negeri</label>
+            <div class="col-sm-4">
+                <select name="state" id="state" class="form-select">
+                    <option selected>Pilih Negeri</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="row mb-3">            
+            <label for="city" class="col-sm-2 col-form-label required">Bandar</label>
+            <div class="col-sm-10">
+                <select name="city" id="city" class="form-select">
+                    <option selected>Pilih Bandar</option>
+                </select>
+            </div>
+        </div>
+
+        <br>
+
         <div class="row mb-3">
             <label for="start_date" class="col-sm-2 col-form-label required">Tarikh Bermula</label>
             <div class="col-sm-4">
@@ -97,7 +122,7 @@
             <div class="col-sm-4">
                 <input type="number" name="volunteer" value="0" min="0" class="form-control touppercase" id="volunteer" value="{{ old('volunteer') }}" required>
             </div>
-            <label for="poor" class="col-sm-2 col-form-label required">Bilangan Orang Perlu Bantuan</label>
+            <label for="poor" class="col-sm-2 col-form-label required">Bilangan B40/OKU</label>
             <div class="col-sm-4">
                 <input type="number" name="poor" value="0" min="0" class="form-control touppercase" id="poor" value="{{ old('poor') }}" required>
             </div>
@@ -110,8 +135,6 @@
             </div>
         </div>
 
-        <br>
-
         <div class="row">
             <div class="col-sm-10 offset-sm-2">
                 <button type="submit" class="btn btn-primary">Hantar</button>
@@ -121,6 +144,9 @@
 
     </form>
 
+    <br>
+
+    <script src="{{ asset('js/postcodeScript.js') }}"></script>
     <script>
         $(document).ready(function(){
             today = new Date();

@@ -70,3 +70,7 @@ body{
     height: auto;
 }
 
+#map { 
+    height: 180px;
+}
+

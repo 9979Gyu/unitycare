@@ -192,39 +192,6 @@ $(document).ready(function() {
     // Function to approve program
     $(document).on('click', '.approveAnchor', function() {
         selectedID = $(this).attr('id');
-
-        // Get details of selected program based on given id
-        $.ajax({
-            url: '/getProgramById',
-            type: 'GET',
-            data: { pid: selectedID },
-            success: function(data){
-                $('.modal-body').empty();
-                $('.modal-body').append(
-                    '<p>Adakah anda pasti untuk meluluskan <b>' + data.program.name + '</b> ? </p>' + 
-                    '<p>Tempat: ' + data.program.venue + 
-                    '<br>Bermula: ' + data.program.start_date + ' ' + data.program.start_time +
-                    '<br>Tamat: ' + data.program.end_date + ' ' + data.program.end_time +
-                    '<br>Tarikh Tutup Pendaftaran: ' + data.program.close_date +
-                    '<br>Pengurus: ' + data.program.username +
-                    '</p>'
-                );
-                data.forEach(function(item){
-                    // volunteer
-                    if(item.participants.user_type_id == 2){
-                        $('.modal-body').append(
-                            '<p>Bilangan Sukarelawan: ' + data.participants.qty_limit + '</p>' 
-                        );
-                    }
-                    // poor people
-                    else if(item.participants.user_type_id == 3){
-                        $('.modal-body').append(
-                            '<p>Bilangan Peserta: ' + data.participants.qty_limit + '</p>' 
-                        );
-                    }
-                });
-            }
-        });
     });
 
     $('#approve').click(function() {

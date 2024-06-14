@@ -189,9 +189,6 @@
         </div>
     </div>
 
-    <!-- Include the date modal
-    @include('exports.datemodal') -->
-
     <script src="{{ asset('js/indexProgramScript.js') }}"></script>
     <script src="{{ asset('js/modalScript.js') }}"></script>
 

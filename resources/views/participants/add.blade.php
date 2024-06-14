@@ -41,7 +41,7 @@
                 </tr>
                 <tr>
                     <th scope="row">Tempat</th>
-                    <td colspan="3">{{ $program->venue }}</td>
+                    <td colspan="3" id="address">{{ $program->venue }}, {{ $program->postal_code }}, {{ $program->state }}, {{ $program->city }}</td>
                 </tr>
                 <tr>
                     <th scope="row">Mula</th>
@@ -100,8 +100,20 @@
                     <button type="button" class="btn btn-secondary" onclick="window.location='/viewprogram'"><b>Tutup</b></button>
                     </td>
                 </tr>
+                <tr>
+                    <th>Map</th>
+                    <td colspan="3">
+                        <div id="map"></div>
+                    </td>
+                </tr>
             </table>
         </div>
     </form>
+
+    <!-- Leaflet initialization script -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+    <script src="{{ asset('js/mapScript.js') }}"></script>
 
 @endsection

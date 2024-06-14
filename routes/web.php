@@ -56,6 +56,7 @@ Route::post('/export-programs', [ProgramController::class, 'exportPrograms']);
 Route::post('/export-jobs', [JobController::class, 'exportJobs']);
 Route::post('/export-offers', [OfferController::class, 'exportOffers']);
 Route::post('/export-applications', [ApplicationController::class, 'exportApplications']);
+Route::post('/export-participants', [ParticipantController::class, 'exportParticipants']);
 
 Route::get('/create', [UserController::class, 'create']);
 Route::post('/store', [UserController::class, 'store']);
@@ -97,6 +98,8 @@ Route::get('/getUpdatedPrograms', [ProgramController::class, 'getUpdatedPrograms
 Route::get('/joinprogram/{id}', [ParticipantController::class, 'create']);
 Route::post('/dismissprogram', [ParticipantController::class, 'dismiss']);
 Route::post('/storeparticipant', [ParticipantController::class, 'store']);
+Route::get('/indexparticipant', [ParticipantController::class, 'index']);
+Route::get('/getparticipants', [ParticipantController::class, 'getParticipantsDatatable']);
 
 // Jobs
 Route::get('/createjob', [JobController::class, 'create']);

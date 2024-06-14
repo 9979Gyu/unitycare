@@ -27,6 +27,9 @@ class Program extends Model
         'approved_status',
         'status',
         'close_date',
+        'state',
+        'city',
+        'postal_code'
     ];
 
     public function organization(){

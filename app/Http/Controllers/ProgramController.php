@@ -133,6 +133,9 @@ class ProgramController extends Controller
             'end_date' => 'required',
             'end_time' => 'required',
             'close_date' => 'required',
+            'state' => 'required',
+            'city' => 'required',
+            'postalCode' => 'required',
             'description' => 'required',
             'address' => 'required',
             'volunteer' => 'required',
@@ -163,6 +166,9 @@ class ProgramController extends Controller
                 'user_id' => Auth::user()->id,
                 'status' => 1,
                 'approved_status' => 1,
+                'state' => $request->get('state'),
+                'city' => $request->get('city'),
+                'postal_code' => $request->get('postalCode'),
             ]);
 
             $program->save();
@@ -258,6 +264,9 @@ class ProgramController extends Controller
             'end_date' => 'required',
             'end_time' => 'required',
             'close_date' => 'required',
+            'state' => 'required',
+            'city' => 'required',
+            'postalCode' => 'required',
             'description' => 'required',
             'address' => 'required',
             'volunteer' => 'required',
@@ -287,6 +296,9 @@ class ProgramController extends Controller
                     'user_id' => Auth::user()->id,
                     'status' => 1,
                     'approved_status' => 1,
+                    'state' => $request->get('state'),
+                    'city' => $request->get('city'),
+                    'postal_code' => $request->get('postalCode'),
                 ]);
 
             if($result){

@@ -102,6 +102,8 @@
                             @if(Auth::user()->roleID != 5)
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="/createprogram/{{ Auth::user()->roleID }}"><b>Tambah</b></a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="/indexparticipant"><b>Peserta</b></a></li>
                             @endif
                         </ul>
                     </li>

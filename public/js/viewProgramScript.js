@@ -68,8 +68,12 @@ $(document).ready(function() {
             url: "/getUpdatedPrograms",
             data: { selectedID : selectedID },
             success: function(data) {
-                
+                                
                 $(".card-container").empty();
+
+                if (data.allPrograms.length == 0) {
+                    $(".card-container").append("<div class='m-2'>Tiada rekod berkenaan</div>");
+                }
 
                 // Check the status of the checkboxes
                 var volChecked = $('#voluntaryCheckBox').is(':checked');
@@ -120,6 +124,7 @@ $(document).ready(function() {
                                         '<div><h5 class="card-title">' + program.name + '</h5>' +
                                             '<p class="card-text">' + program.venue + '</p>' +
                                             '<p class="card-text">' + program.description + '</p>' +
+                                            '<p class="card-text text-secondary">kemaskini ' + parseDate(program.updated_at) + '</p>' +
                                         '</div>' +
                                         '<div>' + button + '</div>' +
                                     '</div>' +
