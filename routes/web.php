@@ -57,7 +57,7 @@ Route::post('/export-jobs', [JobController::class, 'exportJobs']);
 Route::post('/export-offers', [OfferController::class, 'exportOffers']);
 Route::post('/export-applications', [ApplicationController::class, 'exportApplications']);
 
-Route::get('/create/{roleNo}', [UserController::class, 'create']);
+Route::get('/create', [UserController::class, 'create']);
 Route::post('/store', [UserController::class, 'store']);
 Route::get('/verifyEmail', [UserController::class, 'confirmEmail']);
 Route::get('/view/{roleNo}', [UserController::class, 'index']);
@@ -71,7 +71,6 @@ Route::post('/reset', [UserController::class, 'changePasswordEmail']);
 Route::get('/login-reset', [UserController::class, 'resetPassword']);
 
 Route::get('/register', [UserController::class, 'register']);
-Route::post('/storeadmin', [UserController::class, 'storeAdmin'])->name('user.storeAdmin');
 
 // Postcode - search state and cities
 Route::get('/searchPostcode', [PostcodeController::class, 'search']);

@@ -40,7 +40,7 @@ class UserController extends Controller
                     ->where('roleID', $users[0]->roleID)
                     ->value("name");
 
-                return view('users.index', compact('users', 'rolename'));
+                return view('users.index', compact('users', 'rolename', 'roleNo'));
             }
 
         }
@@ -53,13 +53,37 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create($roleNo)
+    public function create(Request $request)
     {
-        // Show add enterprise page
-        if($roleNo == 3)
-            return view('users.enterprise.add', compact('roleNo')); 
-        else
-            return view('users.add', compact('roleNo'));  
+        $role = $request->query('user');
+        
+        switch ($role) {
+            case 'myadmin':
+                $roleNo = 1; 
+                break;
+            case 'Pekerja':
+                $roleNo = 2; 
+                break;
+            case 'Syarikat':
+                $roleNo = 3;
+                return view('users.enterprise.add', compact('roleNo'));
+            case 'Sukarelawan':
+                $roleNo = 4; 
+                break;
+            case 'B40 / OKU':
+                $roleNo = 5; 
+                break;
+            default:
+                $roleNo = 0;
+                break;
+        };
+
+        if($roleNo == 0){
+            return redirect('/login')->withErrors(['message' => 'Tindakan tidak dibenarkan']);
+        }
+
+        // Default view if role is not matched
+        return view('users.add', compact('roleNo'));
     }
 
     public function createPoorPeople(){
@@ -84,7 +108,6 @@ class UserController extends Controller
         $result = 0;
 
         $roleID = $request->get('roleID');
-
 
         if($roleID == 5){
             $number = $request->get('ic');
@@ -112,9 +135,16 @@ class UserController extends Controller
 
             if($result){
 
-                $rules = [
-                    'ic' => 'required|unique:users,ICNo',
-                ];
+                if($roleID == 5){
+                    $rules = [
+                        'ic' => 'required|unique:users,ICNo',
+                    ];
+                }
+                else{
+                    $rules = [
+                        'ssmRegNo' => 'required|unique:users,ICNo',
+                    ];
+                }
 
                 $validated = $request->validate($rules);
 
@@ -139,7 +169,7 @@ class UserController extends Controller
 
                     if($roleID == 3){
                         $user->sector_id = $result->sectorID;
-                        $user->officeNo = $result->officeNo;
+                        $user->officeNo = $result->officeNo ? $result->officeNo : null;
                     }
 
                     $user->save();
@@ -252,10 +282,7 @@ class UserController extends Controller
 
             $this->validateEmail($user);
 
-            if($roleID == 1 || $roleID == 2)
-                return redirect('/view/' . $roleID )->with('success', 'Pengguna berjaya didaftarkan. Sila semak emel untuk pengesahan.');
-            else
-                return redirect('/')->with('success', 'Pengguna berjaya didaftarkan. Sila semak emel untuk pengesahan.');
+            return redirect('/')->with('success', 'Pengguna berjaya didaftarkan. Sila semak emel untuk pengesahan.');
         }
         else{
             $validator = Validator::make($request->all(), $rules);
@@ -269,61 +296,6 @@ class UserController extends Controller
             }
         }
 
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function storeAdmin(Request $request)
-    {
-
-        $rules = [
-            'fname' => 'required',
-            'lname' => 'required',
-            'email' => 'required|unique:users,email',
-            'password' => 'required',
-            'username' => 'required|unique:users,username',
-            'contactNo' => 'required|unique:users,contactNo',
-            'address' => 'required',
-            'state' => 'required',
-            'city' => 'required',
-            'postalCode' => 'required',
-            'roleID' => 'required|in:1'
-        ];
-
-        $validator = Validator::make($request->all(), $rules);
-
-        if ($validator->fails()) {
-            $errors = $validator->errors();
-
-            foreach ($errors->all() as $message) {
-                return redirect('/viewstaff')->with('error', $message);
-            }
-        }
-        else{
-            $user = new User([
-                'name' => $request->get('fname') . ' ' . $request->get('lname'),
-                'email' => $request->get('email'),
-                'password' => Hash::make(trim($request->get('password'))),
-                'username' => $request->get('username'),
-                'contactNo' => $request->get('contactNo'),
-                'address' => $request->get('address'),
-                'state' => $request->get('state'),
-                'city' => $request->get('city'),
-                'postalCode' => $request->get('postalCode'),
-                'status' => 1,
-                'officeNo' => $request->get('officeNo'),
-                'ICNo' => $request->get('ICNo'),
-                'roleID' => $request->get('roleID'),
-            ]);
-
-            $user->save();
-
-            return redirect('/login')->with('success', 'Login with your account');
-        }
     }
 
     /**
@@ -429,42 +401,45 @@ class UserController extends Controller
         }
     }
 
-    public function getUsersDatatable(Request $request)
-    {
+    public function getUsersDatatable(Request $request){
 
-        if(request()->ajax()){
+        if ($request->ajax()) {
             $rid = $request->rid;
 
             $selectedUsers = DB::table('users')
-            ->where([
-                ['users.status', 1],
-                ['users.roleID', $rid],
-            ])
-            ->orderBy('users.username', 'asc')
-            ->get();
+                ->where([
+                    ['users.status', 1],
+                    ['users.roleID', $rid],
+                ])
+                ->orderBy('users.username', 'asc')
+                ->get();
 
-            if(isset($selectedUsers)){
-
-                $table = Datatables::of($selectedUsers);
-
-                $table->addColumn('action', function ($row) {
-                    $token = csrf_token();
-                    $btn = '<div class="d-flex justify-content-center">';
-
-                    if(Auth::user()->id == $row->id)
-                        $btn = $btn . '<a href="/edituser/' . $row->id . '"><span class="badge badge-warning"> Kemaskini </span></a></div>';
-                    else
-                        $btn = $btn . '<a class="deleteAnchor" href="#" id="' . $row->id . '"><span class="badge badge-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"> Padam </span></a></div>';
-
-                    return $btn;
-                });
-
-                $table->rawColumns(['action']);
-                return $table->make(true);
+            if ($selectedUsers->isEmpty()) {
+                // No users found
+                return response()->json(['message' => 'No users found'], 500);
             }
-            
+
+            $table = Datatables::of($selectedUsers);
+
+            $table->addColumn('action', function ($row) {
+                $token = csrf_token();
+                $btn = '<div class="d-flex justify-content-center">';
+
+                if (Auth::user()->id == $row->id) {
+                    $btn .= '<a href="/edituser/' . $row->id . '"><span class="badge badge-warning"> Kemaskini </span></a>';
+                } else {
+                    $btn .= '<a class="deleteAnchor" href="#" id="' . $row->id . '"><span class="badge badge-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"> Padam </span></a>';
+                }
+                $btn .= '</div>';
+
+                return $btn;
+            });
+
+            $table->rawColumns(['action']);
+            return $table->make(true);
         }
     }
+
 
     /**
      * Store a newly created resource in storage.
