@@ -135,6 +135,13 @@
                 <textarea value="{{ old('description') }}" name="description" class="form-control" id="description" placeholder="Kemahiran diperlukan, Peringkat pendidikan" required></textarea>
             </div>
         </div>
+
+        <div class="row mb-3">
+            <label for="quantity" class="col-sm-2 col-form-label required">Penerangan Penuh Pekerjaan</label>
+            <div class="col-sm-10">
+                <input type="number" value="{{ old('quantity') }}" min="1" name="quantity" class="form-control" id="quantity" required>
+            </div>
+        </div>
         
         <br>
 

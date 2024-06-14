@@ -79,7 +79,7 @@ Route::get('/getCityState', [PostcodeController::class, 'getCityState']);
 
 // Poor people
 Route::get('/createspecial', [UserController::class, 'createPoorPeople']);
-Route::post('/checkUser', [UserController::class, 'checkUser']);
+Route::post('/check-user', [UserController::class, 'checkUser']);
 Route::get('/viewprofile', [UserController::class, 'indexProfile']);
 
 // Activity / Program

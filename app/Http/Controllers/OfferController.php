@@ -365,8 +365,6 @@ class OfferController extends Controller
         )
         ->get();
 
-        
-
         return response()->json([
             'allOffers' => $allOffers,
             'enrolledOffers' => $enrolledOffers

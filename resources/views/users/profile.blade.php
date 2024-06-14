@@ -123,16 +123,9 @@
         <div class="row mb-3">
             <label for="email" class="col-sm-2 col-form-label required">Emel</label>
             <div class="col-sm-10">
-                <input type="email" value="{{ $user->email }}" name="email" class="form-control" id="email" pattern="[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$">
-            </div>
-        </div>
-
-        <div class="row mb-3" hidden>
-            <label for="password" class="col-sm-2 col-form-label required">Kata Laluan</label>
-            <div class="col-sm-10">
-                <input type="password" value="{{ $user->password }}" name="password" class="form-control" id="password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Must contain at least one  number and one uppercase and lowercase letter, and at least 8 or more characters">
-                <input type="number" name="roleID" value="{{ $user->roleID }}" hidden>
-                <input type="number" name="uid" value="{{ $user->id }}" hidden>
+                <input type="email" value="{{ $user->email }}" name="email" class="form-control" id="email" pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$">
+                <input type="number" value="{{ $user->id }}" name="uid" class="form-control" id="uid" hidden>
+                <input type="number" value="{{ $user->roleID }}" name="roleID" class="form-control" id="roleID" hidden>
             </div>
         </div>
 

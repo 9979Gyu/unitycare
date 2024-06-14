@@ -78,9 +78,17 @@
         <div class="message">
             <p>Hi {{ $mailData['name'] }},</p>
             <br>
-            <p>Terima kasih telah mendaftar di UnityCare. 
+            <p>
+                Terima kasih telah mendaftar di UnityCare. 
                 Mohon mengesahkan email ini untuk mengaktifkan 
                 akaun UnityCare anda.
+            </p>
+            <p>
+                Berikut adalah nama pengguna dan kata laluan sementara akaun anda:
+                <br>
+                <b>Nama Pengguna: {{ $mailData['name'] }}</b>
+                <br>
+                <b>Kata Laluan: {{ $mailData['password'] }}</b>
             </p>
             <div class="button-container">
                 <button><a href="{{ url('/verifyEmail?token=' . $mailData['remember_token']) }}">
@@ -88,7 +96,7 @@
                 </a></button>
             </div>
 
-            <p>Jika ada kesulitan mengklik tombol "Pengesahan Email", 
+            <p>Jika ada kesulitan mengklik butang "Pengesahan Email", 
                 klik URL di bawah: 
             </p>
             <p>

@@ -36,31 +36,35 @@
         </button>
 
         <!-- Modal -->
-        <div class="modal fade" id="confirmBox" tabindex="-1" aria-labelledby="confirmBoxLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="confirmBoxLabel">Pengesahan Nombor Pendaftaran SSM</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row mb-3">
-                            <label for="ssmRegNo" class="col-sm-2 col-form-label required">Nombor Pendaftaran</label>
-                            <div class="col-sm-12">
-                                <input type="text" name="usertype" id="usertype" value="enterprise" hidden>
-                                <input type="text" name="ssmRegNo" class="form-control touppercase" id="ssmRegNo" required placeholder="Contoh: 202005123456">
+        <form method="post" action="/check-user" id="checkform">
+            @csrf
+            <div class="modal fade" id="confirmBox" tabindex="-1" aria-labelledby="confirmBoxLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="confirmBoxLabel">Pengesahan Nombor Pendaftaran SSM</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row mb-3">
+                                <label for="ssmRegNo" class="col-form-label required">Nombor Pendaftaran</label>
+                                <div class="col-sm-12">
+                                    <input type="text" name="usertype" id="usertype" value="enterprise" hidden>
+                                    <input type="number" name="roleID" value="3" class="form-control" id="roleID" hidden>
+                                    <input type="text" name="ssmRegNo" class="form-control touppercase" id="ssmRegNo" required placeholder="Contoh: 202005123456">
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-primary">Hantar</button>
-                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Tutup</button>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">Hantar</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </form>
     </div>
-
+<!-- 
     <form action="/store" method="post" class="container" id="addForm">
         @csrf
         <div class="mb-3">
@@ -97,10 +101,10 @@
             <div class="col-sm-10">
                 <input type="text" value="{{ old('address') }}" name="address" class="form-control touppercase" id="address" required readonly>
             </div>
-        </div>
+        </div>-->
 
         <!-- auto sort state and city based on postal code -->
-        <div class="row mb-3">
+        <!-- <div class="row mb-3">
             <label for="postalCode" class="col-sm-2 col-form-label required">Poskod</label>
             <div class="col-sm-4">
                 <input type="number" name="postalCode" class="form-control" id="postalCode" required readonly>
@@ -157,68 +161,14 @@
             </div>
         </div>
 
-    </form>
+    </form> -->
 
     <br>
 
+    <script src="{{ asset('js/postcodeScript.js') }}"></script>
     <script type="text/javascript">
         $(document).ready(function(){
             $("#addForm").hide();
-
-            $('#confirmBox .btn-primary').click(function(e) {
-
-                $.post('/checkUser', {
-                    ssm: $('#ssmRegNo').val(), 
-                    _token: '{{ csrf_token() }}'
-                }, 
-                function(data) {
-                    // The server should return a JSON object with a 'success' property
-                    if (data.success) {
-                        $("#confirmModal").hide();
-                        $('#confirmBox').modal('hide');
-                        $('#addForm').show();
-                        document.body.style.overflow = 'auto';
-
-                        $('#name').val(data.user.name);
-                        $('#regNo').val(data.user.registrationNo);
-                        $('#contactNo').val(data.user.contactNo);
-                        $('#address').val(data.user.address);
-                        $('#postalCode').val(data.user.postcode);
-                        $('#state').empty();
-                        $('#city').empty();
-                        $("#state").append('<option>' + data.user.state + '</option>');
-                        $("#city").append('<option>' + data.user.city + '</option>');
-                        $('#email').val(data.user.email);
-                    } else {
-                        alert('Nombor pendaftaran tidak dikenali');
-                    }
-                });
-            });
-
-            $("#postalCode").on('change', function(){
-                var postcode = $(this).val();
-                if(postcode){
-                    $.ajax({
-                        url: '/search',
-                        type: 'GET',
-                        data: {postcode: postcode},
-                        success: function(data){
-                            $('#state').empty();
-                            $("#city").empty();
-                            data.forEach(function(item){
-                                $("#state").append('<option>' + item.state + '</option>');
-                                $("#city").append('<option>' + item.city + '</option>');
-                            });
-                        }
-                    });
-                }
-                else{
-                    $('#state').empty();
-                    $("#city").empty();
-                    $("#state").append('<option selected>Pilih Negeri</option>');
-                    $("#city").append('<option selected>Pilih Bandar</option>');
-                }
-            });
         });
     </script>
 

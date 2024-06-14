@@ -37,31 +37,35 @@
         </button>
 
         <!-- Modal -->
-        <div class="modal fade" id="confirmBox" tabindex="-1" aria-labelledby="confirmBoxLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="confirmBoxLabel">Pengesahan IC</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row mb-3">
-                            <label for="ic" class="col-sm-2 col-form-label required">IC</label>
-                            <div class="col-sm-10">
-                                <input type="number" name="ic" class="form-control" id="ic" pattern="\d{12}" title="Sila berikan nombor IC yang betul" required placeholder="Contoh: 021221041234">
+        <form method="post" action="check-user" id="checkForm">
+            @csrf
+            <div class="modal fade" id="confirmBox" tabindex="-1" aria-labelledby="confirmBoxLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="confirmBoxLabel">Pengesahan IC</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row mb-3">
+                                <label for="ic" class="col-sm-2 col-form-label required">IC</label>
+                                <div class="col-sm-10">
+                                    <input type="number" name="roleID" value="5" class="form-control" id="roleID" hidden>
+                                    <input type="number" name="ic" class="form-control" id="ic" pattern="\d{12}" title="Sila berikan nombor IC yang betul" required placeholder="Contoh: 021221041234">
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-primary">Hantar</button>
-                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Tutup</button>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary">Hantar</button>
+                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Tutup</button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </form>
     </div>
 
-    <form action="/store" method="post" class="container" id="addForm">
+    <!-- <form action="/store" method="post" class="container" id="addForm">
         @csrf
         <div class="mb-3">
             <h5>Maklumat Peribadi</h5>
@@ -107,10 +111,10 @@
             <div class="col-sm-10">
                 <input type="text" value="{{ old('address') }}" name="address" class="form-control touppercase" id="address" required readonly>
             </div>
-        </div>
+        </div> -->
 
         <!-- auto sort state and city based on postal code -->
-        <div class="row mb-3">
+        <!-- <div class="row mb-3">
             <label for="postalCode" class="col-sm-2 col-form-label required">Poskod</label>
             <div class="col-sm-4">
                 <input type="number" name="postalCode" class="form-control" id="postalCode" required readonly>
@@ -167,85 +171,15 @@
             </div>
         </div>
 
-    </form>
+    </form>-->
 
     <br>
 
+    <script src="{{ asset('js/postcodeScript.js') }}"></script>
     <script type="text/javascript">
         $(document).ready(function(){
             $("#addForm").hide();
 
-            $('#confirmBox .btn-primary').click(function(e) {
-                $.ajax({
-                    // URL of the server endpoint
-                    url: '/checkUser',
-                    // HTTP method
-                    type: 'POST',
-                    // Data to pass
-                    data: {
-                        ic: $('#ic').val(),
-                        role: 5,
-                        _token: '{{ csrf_token() }}' // CSRF token
-                    },
-                    // Expected data type of the response
-                    dataType: 'json',
-                    success: function(data) {
-                        // Callback function to handle the response
-                        if (data.success) {
-                            $("#confirmModal").hide();
-                            $('#confirmBox').modal('hide');
-                            $('#addForm').show();
-                            document.body.style.overflow = 'auto';
-
-                            $('#name').val(data.user.name);
-                            $('#ICNo').val(data.user.ICNo);
-                            $('#contactNo').val(data.user.contactNo);
-                            $('#address').val(data.user.address);
-                            $('#postalCode').val(data.user.postcode);
-                            $('#state').empty();
-                            $('#city').empty();
-                            $("#state").append('<option>' + data.user.state + '</option>');
-                            $("#city").append('<option>' + data.user.city + '</option>');
-                            $('#email').val(data.user.email);
-                        } 
-                        else {
-                            // If the server returns failure
-                            alert('Nombor kad pengenalan tidak dikenali');
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        // Error handling if the AJAX request fails
-                        console.error(error); 
-                        // Optionally, you can display an error message to the user
-                        alert('System crashed');
-                    }
-                });
-            });
-
-            $("#postalCode").on('change', function(){
-                var postcode = $(this).val();
-                if(postcode){
-                    $.ajax({
-                        url: '/search',
-                        type: 'GET',
-                        data: {postcode: postcode},
-                        success: function(data){
-                            $('#state').empty();
-                            $("#city").empty();
-                            data.forEach(function(item){
-                                $("#state").append('<option>' + item.state + '</option>');
-                                $("#city").append('<option>' + item.city + '</option>');
-                            });
-                        }
-                    });
-                }
-                else{
-                    $('#state').empty();
-                    $("#city").empty();
-                    $("#state").append('<option selected>Pilih Negeri</option>');
-                    $("#city").append('<option selected>Pilih Bandar</option>');
-                }
-            });
         });
     </script>
 

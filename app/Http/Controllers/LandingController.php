@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Auth;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use GuzzleHttp\Client; // to get response from external api
 
 class LandingController extends Controller{
 
@@ -29,25 +30,31 @@ class LandingController extends Controller{
 
             // Retrieve sectors based on approved application which the user has made
             $sectors = Sector::whereHas('organizations.jobOffers.applications', function ($query) use ($poorId) {
-                $query->where('approval_status', 2)
-                ->where('status', 1)
-                ->where('poor_id', $poorId);
+                $query->where([
+                    ['approval_status', 2],
+                    ['status', 1],
+                    ['poor_id', $poorId]
+                ]);
             })
             ->with([
                 'organizations.jobOffers' => function ($query) use ($poorId) {
                     $query->whereHas('applications', function ($query) use ($poorId) {
-                        $query->where('approval_status', 2)
-                        ->where('status', 1)
-                        ->where('poor_id', $poorId);
+                        $query->where([
+                            ['approval_status', 2],
+                            ['status', 1],
+                            ['poor_id', $poorId]
+                        ]);
                     })
                     ->with([
                         'shiftType',
                         'jobType',
                         'organization',
                         'applications' => function ($query) use ($poorId){
-                            $query->where('approval_status', 2)
-                            ->where('status', 1)
-                            ->where('poor_id', $poorId);
+                            $query->where([
+                                ['approval_status', 2],
+                                ['status', 1],
+                                ['poor_id', $poorId]
+                            ]);
                         }
                     ]);
                 }
@@ -57,7 +64,10 @@ class LandingController extends Controller{
         else{
             // Retrieve sectors that have associated job offers
             $sectors = Sector::whereHas('organizations.jobOffers', function ($query) {
-                $query->where('approval_status', 2);
+                $query->where([
+                    ['approval_status', 2],
+                    ['status', 1],
+                ]);
             })
             ->with([
                 'organizations.jobOffers' => function ($query) {
@@ -65,6 +75,10 @@ class LandingController extends Controller{
                         'shiftType',
                         'jobType',
                         'organization'
+                    ])
+                    ->where([
+                        ['approval_status', 2],
+                        ['status', 1],
                     ]);
                 },
                 // Ensures that the organization related to jobOffers is eagerly loaded
