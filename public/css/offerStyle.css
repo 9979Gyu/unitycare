@@ -53,3 +53,16 @@
 .badge {
     font-size: 15px;
 }
+
+/* Ensure flex items wrap and fill the space evenly */
+.search-bar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+/* Ensure select elements fill the remaining space */
+.select2 {
+    flex: 1;
+    max-width: 100%;
+}

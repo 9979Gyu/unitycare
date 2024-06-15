@@ -38,13 +38,22 @@ class PostcodeController extends Controller
         $type = $request->get('type');
 
         if($type == "program"){
-            $citiesstates = Program::where([
+            $cities = Program::where([
                 ['status', 1],
                 ['approved_status', 2],
             ])
-            ->select('venue')
-            ->distinct()
-            ->get();
+            ->select('city as location')->distinct();
+
+            // Retrieve distinct states
+            $states = Program::where([
+                ['status', 1],
+                ['approved_status', 2],
+            ])
+            ->select('state as location')->distinct();
+
+            // Combine the results
+            $citiesstates = $cities->union($states)->orderBy('location', 'asc')->get();
+            
         }
         elseif($type == "offer"){
             // Retrieve distinct cities

@@ -5,7 +5,12 @@ $(document).ready(function() {
     // Hide the explaination input field
     $("#more").hide();
     
-    $('.select2').select2({
+    $('#keyword').select2({
+        placeholder: 'Kata kunci',
+        allowClear: true,
+    });
+
+    $('#citystate').select2({
         placeholder: 'Bandar atau negeri',
         allowClear: true,
     });
