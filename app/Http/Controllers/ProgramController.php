@@ -597,6 +597,7 @@ class ProgramController extends Controller
             'programs.*', 
             'programs.description->desc as description',
             'programs.description->reason as reason',
+            'users.id as userid',
             'users.name as username', 
             'users.contactNo as contact_no', 
             'users.email as useremail',

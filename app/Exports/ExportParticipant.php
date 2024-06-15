@@ -7,38 +7,31 @@ use App\Models\Participant;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
+use Carbon\Carbon;
+
 
 class ExportParticipant implements FromCollection, WithHeadings, ShouldAutoSize
 {
-    private $id;
-    private $state;
-    private $selectedPosition;
-    private $userID;
-    private $startDate;
-    private $endDate;
+    private $selectedParticipants;
 
     /**
     * @return \Illuminate\Support\Collection
     */
-    public function __construct($id, $state, $selectedPosition, $userID, $startDate, $endDate)
+    public function __construct($selectedParticipants)
     {
-        $this->id = $id;
-        $this->state = $state;
-        $this->selectedPosition = $selectedPosition;
-        $this->userID = $userID;
-        $this->startDate = $startDate;
-        $this->endDate = $endDate;
+        $this->selectedParticipants = $selectedParticipants;
     }
 
     public function parseDate($olddate){
         try {
+
             // Parse the date with the specified format
             $date = Carbon::createFromFormat('Y-m-d', $olddate);
 
             // Set the locale to Malay
             $date->locale('ms');
 
-            // Format the date to 'dddd, D MMMM YYYY' (without time since it's not provided)
+            // Format the date, e.g., 'dddd, D MMMM YYYY'
             $formattedDate = $date->isoFormat('dddd, D MMMM YYYY');
 
             return $formattedDate;
@@ -51,109 +44,29 @@ class ExportParticipant implements FromCollection, WithHeadings, ShouldAutoSize
 
     public function collection()
     {
-        if(isset($this->selectedPosition)){
+        if(isset($this->selectedParticipants)){
+            $selectedParticipants = $this->selectedParticipants->map(function ($item) {
+                
+                $olddate = explode(' ', $item->created_at);
+                $datetime = $this->parseDate($olddate[0]) . ' ' . $olddate[1];
 
-            if($this->state == 0){
-                $selectedParticipants = Participant::join('programs', 'programs.program_id', '=', 'participants.program_id')
-                ->join('users', 'users.id', '=', 'participants.user_id')
-                ->join('poors', 'poors.user_id', '=', 'users.id')
-                ->join('disability_types as dt', 'dt.dis_type_id', '=', 'poors.disability_type')
-                ->join('user_types as ut', 'ut.user_type_id', '=', 'participants.user_type_id')
-                ->where([
-                    ['participants.status', $this->state],
-                    ['programs.status', 1],
-                    ['programs.approved_status', 2],
-                    ['programs.program_id', $this->selectedPosition],
-                    ['participants.created_at', '>=', $this->startDate],
-                    ['participants.created_at', '<=', $this->endDate],
-                ])
-                ->select(
-                    'participants.*',
-                    'users.name as username',
-                    'users.email as useremail',
-                    'users.contactNo as usercontact',
-                    'poors.disability_type',
-                    'dt.name as category',
-                    'programs.name as name',
-                    'ut.name as typename',
-                )
-                ->orderBy("participants.created_at", "asc")
-                ->get();
-            }
-            elseif($this->state == 4){
-                $selectedParticipants = Participant::join('programs', 'programs.program_id', '=', 'participants.program_id')
-                ->join('users', 'users.id', '=', 'participants.user_id')
-                ->join('poors', 'poors.user_id', '=', 'users.id')
-                ->join('disability_types as dt', 'dt.dis_type_id', '=', 'poors.disability_type')
-                ->join('user_types as ut', 'ut.user_type_id', '=', 'participants.user_type_id')
-                ->where([
-                    ['participants.status', 1],
-                    ['programs.status', 1],
-                    ['programs.approved_status', 2],
-                    ['programs.program_id', $this->selectedPosition],
-                    ['participants.created_at', '>=', $this->startDate],
-                    ['participants.created_at', '<=', $this->endDate],
-                ])
-                ->select(
-                    'participants.*',
-                    'users.name as username',
-                    'users.email as useremail',
-                    'users.contactNo as usercontact',
-                    'poors.disability_type',
-                    'dt.name as category',
-                    'programs.name as name',
-                    'ut.name as typename',
-                )
-                ->orderBy("participants.created_at", "asc")
-                ->get();
-            }
-            else{
-                $selectedParticipants = Participant::join('programs', 'programs.program_id', '=', 'participants.program_id')
-                ->join('users', 'users.id', '=', 'participants.user_id')
-                ->join('poors', 'poors.user_id', '=', 'users.id')
-                ->join('disability_types as dt', 'dt.dis_type_id', '=', 'poors.disability_type')
-                ->join('user_types as ut', 'ut.user_type_id', '=', 'participants.user_type_id')
-                ->where([
-                    ['participants.status', 1],
-                    ['programs.status', 1],
-                    ['programs.approved_status', 2],
-                    // ['programs.user_id', $userID],
-                    ['participants.user_type_id', $this->state],
-                    ['programs.program_id', $this->selectedPosition],
-                    ['participants.created_at', '>=', $this->startDate],
-                    ['participants.created_at', '<=', $this->endDate],
-                ])
-                ->select(
-                    'participants.*',
-                    'users.name as username',
-                    'users.email as useremail',
-                    'users.contactNo as usercontact',
-                    'poors.disability_type',
-                    'dt.name as category',
-                    'programs.name as name',
-                    'ut.name as typename',
-                )
-                ->orderBy("participants.created_at", "asc")
-                ->get();
-            }
+                $usercontact = '(+60)' . $item->joined_usercontact;
+                $creatorcontact = '(+60)' . $item->program_creator_contact;
 
-            dd($selectedParticipants);
+                return[
+                    'Nama Pemohon' => $item->joined_username,
+                    'Emel Pemohon' => $item->joined_useremail,
+                    'Telefon Nombor Pemohon' => $usercontact,
+                    'Kategori' => $item->category,
+                    'Jenis' => $item->typename,
+                    'Tarikh Mohon' => $datetime, 
+                    'Program' => $item->program_name, 
+                    'Nama Penganjur' => $item->program_creator_name,
+                    'Emel Penganjur' => $item->program_creator_email,
+                    'Telefon Nombor Penganjur' => $creatorcontact,
+                ];
 
-            if(isset($selectedParticipants)){
-                $selectedParticipants = $selectedParticipants->map(function ($item) {
-
-                    return[
-                        'Nama Pemohon' => $item->username,
-                        'Emel Pemohon' => $item->useremail,
-                        'Telefon Nombor Pemohon' => $item->usercontact,
-                        'Kategori' => $item->disability_type,
-                        'Jenis' => $item->typename,
-                        'Tarikh Mohon' => parseDate($item->created_at), 
-                        'Program' => $item->name, 
-                    ];
-                });
-
-            }
+            });
             return collect($selectedParticipants);
             
         }
@@ -170,6 +83,9 @@ class ExportParticipant implements FromCollection, WithHeadings, ShouldAutoSize
             'Jenis',
             'Tarikh Mohon',
             'Program',
+            'Nama Penganjur',
+            'Emel Penganjur',
+            'Telefon Nombor Penganjur',
         ];
     }
 }

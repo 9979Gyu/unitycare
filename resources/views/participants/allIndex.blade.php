@@ -31,15 +31,15 @@
         <input type="number" name="roleID" id="roleID" value="{{ $roleNo }}" hidden>
 
         <div class="row mb-3">
-            <div class="col-sm-6">
-                <select name="organization" id="organization" class="form-control select2 ">
-                    <option value="0" selected>Pilih Penganjur</option>
-                    @foreach($users as $user)
-                        <option value="{{ $user->id }}">{{ $user->name }}</option>
+            <div class="col-sm-4">
+                <select name="organization" id="organization" class="form-control select2">
+                    <option value="0" selected>Pilih Syarikat</option>
+                    @foreach($organizations as $org)
+                        <option value="{{ $org->id }}">{{ $org->name }}</option>
                     @endforeach
                 </select>
             </div>
-            <div class="col-sm-6">
+            <div class="col-sm-4">
                 <select name="program" id="program" class="form-control select2">
                     <option value="0" selected>Pilih Program</option>
                 </select>

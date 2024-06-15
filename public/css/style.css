@@ -74,3 +74,6 @@ body{
     height: 180px;
 }
 
+.select2 {
+    width:100%!important;
+}

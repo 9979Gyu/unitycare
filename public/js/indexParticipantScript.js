@@ -3,20 +3,54 @@ $(document).ready(function() {
     $('.select2').select2();
 
     var requestTable;
-    var selectedState = 4;
-    var selectedID = $('#program').val();
+    var selectedState = 1;
+    var selectedOrg = $('#organization').val();
+    var selectedProgram = $("#program").val();
+    fetch_data(selectedState, selectedOrg, selectedProgram); 
+
+    $("#organization").on('change', function(){
+
+        selectedOrg = $(this).val();
+
+        $.ajax({
+            method: 'GET',
+            dataType: 'json',
+            url: "/getUpdatedPrograms",
+            success: function(response) {
+
+                var allPrograms = response.allPrograms;
+
+                $("#program").empty();
+
+                $("#program").append('<option value="0">Pilih Program</option>');
+                $.each(allPrograms, function(index, program) {
+                    
+                    if(program.userid == selectedOrg){
+                        $("#program").append('<option value="' + program.program_id + '">' + program.name + '</option>');
+                    }
+
+                });
+
+                $("#program").prop('selectedIndex', 1).trigger('change');
+
+            },
+            error: function (data) {
+                $('.condition-message').html(data);
+            }
+        });
+    });
 
     $("#program").on('change', function(){
         // Get the selected program
-        selectedID = $(this).val();
+        selectedProgram = $(this).val();
 
         // Call fetch_data() with the selected program
-        fetch_data(selectedState, selectedID); 
+        fetch_data(selectedState, selectedOrg, selectedProgram); 
     });
 
     $('#allRadio, #volunteerRadio, #poorRadio, #deleteRadio').change(function() {
         if ($('#allRadio').is(':checked')) {
-            selectedState = 4;
+            selectedState = 1;
         }
         else if ($('#volunteerRadio').is(':checked')) {
             selectedState = 2;
@@ -29,10 +63,11 @@ $(document).ready(function() {
         }
         
         // Fetch data based on the selected position
-        fetch_data(selectedState, selectedID);
+        fetch_data(selectedState, selectedOrg, selectedProgram); 
+
     });
 
-    function fetch_data(selectedState, selectedID) {
+    function fetch_data(selectedState, selectedOrg, selectedProgram) {
 
         // Make AJAX request to fetch data based on the selected program
         if ($.fn.DataTable.isDataTable('#requestTable')) {
@@ -70,7 +105,8 @@ $(document).ready(function() {
                 url: "/getparticipants",
                 data: {
                     rid: $("#roleID").val(),
-                    programID: selectedID,
+                    programID: selectedProgram,
+                    userID : selectedOrg,
                     selectedState: selectedState
                 },
                 type: 'GET',
@@ -81,7 +117,7 @@ $(document).ready(function() {
                 "className": "text-center",
                 "width": "2%"
             }, {
-                "targets": [1, 2, 3, 4, 5],
+                "targets": [1, 2, 3, 4, 5, 6],
                 "className": "text-center",
             },], 
             columns: [{
@@ -93,7 +129,7 @@ $(document).ready(function() {
                 }
             }, {
                 data: function(row) {
-                    return row.username + ' <br>' + row.useremail + ' <br>+60' + row.usercontact;
+                    return row.joined_username + ' <br>' + row.joined_useremail + ' <br>+60' + row.joined_usercontact;
                 },
                 name: 'user',
                 orderable: true,
@@ -116,11 +152,18 @@ $(document).ready(function() {
                 orderable: true,
                 searchable: true
             }, {
-                data: "name",
+                data: "program_name",
                 name: 'name',
                 orderable: true,
                 searchable: true
-            },  ]
+            }, {
+                data: function(row) {
+                    return row.program_creator_name + ' <br>' + row.program_creator_email + ' <br>+60' + row.program_creator_contact;
+                },
+                name: 'creator',
+                orderable: true,
+                searchable: true,
+            }, ]
             
         });
     }
