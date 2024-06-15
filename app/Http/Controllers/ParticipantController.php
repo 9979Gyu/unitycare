@@ -27,6 +27,7 @@ class ParticipantController extends Controller
                 'users.id',
                 'users.name',
             )
+            ->distinct()
             ->get();
         }
         else{
@@ -38,6 +39,7 @@ class ParticipantController extends Controller
                 'users.id',
                 'users.name',
             )
+            ->distinct()
             ->get();
         }
 

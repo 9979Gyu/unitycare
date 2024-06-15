@@ -9,6 +9,7 @@ use App\Http\Controllers\JobController;
 use App\Http\Controllers\OfferController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\LandingController;
+use App\Http\Controllers\ReportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -57,6 +58,8 @@ Route::post('/export-jobs', [JobController::class, 'exportJobs']);
 Route::post('/export-offers', [OfferController::class, 'exportOffers']);
 Route::post('/export-applications', [ApplicationController::class, 'exportApplications']);
 Route::post('/export-participants', [ParticipantController::class, 'exportParticipants']);
+Route::post('/export-specs', [ReportController::class, 'exportProgramsWithSpecs']);
+
 
 Route::get('/create', [UserController::class, 'create']);
 Route::post('/store', [UserController::class, 'store']);
@@ -138,5 +141,7 @@ Route::get('/search', [LandingController::class, 'search']);
 // Route::get('/getCountPosition', [LandingController::class, 'getCountPosition']);
 // Route::get('/getCountOffer', [LandingController::class, 'getCountOffer']);
 
-
+// Report
+Route::get('/getProgramsWithSpecs', [ReportController::class, 'getAllProgramsDetailsDatatable']);
+Route::get('/index-programs', [ReportController::class, 'indexPrograms']);
 

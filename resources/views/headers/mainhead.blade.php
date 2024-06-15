@@ -104,6 +104,8 @@
                                 <li><a class="dropdown-item" href="/createprogram/{{ Auth::user()->roleID }}"><b>Tambah</b></a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="/indexparticipant"><b>Peserta</b></a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="/index-programs"><b>Laporan</b></a></li>
                             @endif
                         </ul>
                     </li>
