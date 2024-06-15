@@ -65,7 +65,7 @@
         <div class="row mb-3">
             <label for="postalCode" class="col-sm-2 col-form-label required">Poskod</label>
             <div class="col-sm-4">
-                <input type="number" name="postalCode" class="form-control" id="postalCode" required>
+                <input type="number" value="{{ old('postal_code') }}" name="postalCode" class="form-control" id="postalCode" required>
             </div>
             <label for="state" class="col-sm-2 col-form-label required">Negeri</label>
             <div class="col-sm-4">

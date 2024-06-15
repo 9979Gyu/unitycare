@@ -61,6 +61,31 @@
             </div>
         </div>
 
+        <!-- Working Location -->
+        <div class="row mb-3">
+            <label for="postalCode" class="col-sm-2 col-form-label required">Poskod</label>
+            <div class="col-sm-4">
+                <input type="number" value="{{ $program->postal_code }}" name="postalCode" class="form-control" id="postalCode" required>
+            </div>
+            <label for="state" class="col-sm-2 col-form-label required">Negeri</label>
+            <div class="col-sm-4">
+                <select name="state" id="state" class="form-select">
+                    <option selected>{{ $program->state }}</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="row mb-3">            
+            <label for="city" class="col-sm-2 col-form-label required">Bandar</label>
+            <div class="col-sm-10">
+                <select name="city" id="city" class="form-select">
+                    <option selected>{{ $program->city }}</option>
+                </select>
+            </div>
+        </div>
+
+        <br>
+
         <div class="row mb-3">
             <label for="start_date" class="col-sm-2 col-form-label required">Tarikh Bermula</label>
             <div class="col-sm-4">
@@ -120,7 +145,8 @@
         </div>
 
     </form>
-
+    
+    <script src="{{ asset('js/postcodeScript.js') }}"></script>
     <script>
         $(document).ready(function(){
             today = new Date();

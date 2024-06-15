@@ -143,6 +143,7 @@ $(document).ready(function() {
                                             '<div><h5 class="card-title">' + program.name + '</h5>' +
                                                 '<p class="card-text">' + program.venue + '</p>' +
                                                 '<p class="card-text">' + program.description + '</p>' +
+                                                '<p class="card-text text-secondary">kemaskini ' + parseDate(program.updated_at) + '</p>' +
                                             '</div>' +
                                             '<div>' +
                                                 '<p><a href="/editprogram/' + program.program_id + '" class="btn btn-warning">Kemaskini</a></p>' +
@@ -160,7 +161,8 @@ $(document).ready(function() {
                                             '<div><h5 class="card-title">' + program.name + '</h5>' +
                                                 '<p class="card-text">' + program.venue + '</p>' +
                                                 '<p class="card-text">' + program.description + '</p>' +
-                                                '<p class="card-text"> <b>Declined: ' + program.reason + '</b></p>' +
+                                                '<p class="card-text"> <b>Ditolak: ' + program.reason + '</b></p>' +
+                                                '<p class="card-text text-secondary">kemaskini ' + parseDate(program.updated_at) + '</p>' +
                                             '</div>' +
                                             '<div>' +
                                                 '<p><a href="/editprogram/' + program.program_id + '" class="btn btn-warning">Kemaskini</a></p>' +

@@ -31,9 +31,9 @@
                             <b>Jadi Ahli</b>
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item" href="/create?user=enterprise"><b>Syarikat</b></a></li>
+                            <li><a class="dropdown-item" href="/create?user=Syarikat"><b>Syarikat</b></a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="/create?user=volunteer"><b>Sukarelawan</b></a></li>
+                            <li><a class="dropdown-item" href="/create?user=Sukarelawan"><b>Sukarelawan</b></a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="/createspecial"><b>B40/OKU</b></a></li>
                         </ul>

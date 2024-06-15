@@ -18,11 +18,12 @@ $(document).ready(function() {
             url: "/getUpdatedPrograms",
             success: function(response) {
 
+                console.log("here");
                 var allPrograms = response.allPrograms;
 
                 $("#program").empty();
-
                 $("#program").append('<option value="0">Pilih Program</option>');
+
                 $.each(allPrograms, function(index, program) {
                     
                     if(program.userid == selectedOrg){
@@ -31,7 +32,7 @@ $(document).ready(function() {
 
                 });
 
-                $("#program").prop('selectedIndex', 1).trigger('change');
+                $("#program").prop('selectedIndex', 0).trigger('change');
 
             },
             error: function (data) {
