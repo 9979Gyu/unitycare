@@ -18,7 +18,6 @@ $(document).ready(function() {
             url: "/getUpdatedPrograms",
             success: function(response) {
 
-                console.log("here");
                 var allPrograms = response.allPrograms;
 
                 $("#program").empty();

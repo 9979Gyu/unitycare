@@ -28,7 +28,6 @@ class ParticipantController extends Controller
                 'users.name',
             )
             ->get();
-
         }
         else{
             $users = User::where([
@@ -176,67 +175,51 @@ class ParticipantController extends Controller
                 if($selectedState == 0 || $selectedState == 1){
                     $selectedParticipants = Participant::where('participants.status', $selectedState)
                     ->join('users as joined_users', 'joined_users.id', '=', 'participants.user_id')
-                    ->join('poors', 'poors.user_id', '=', 'joined_users.id')
-                    ->join('disability_types as dt', 'dt.dis_type_id', '=', 'poors.disability_type')
                     ->join('user_types as ut', 'ut.user_type_id', '=', 'participants.user_type_id')
                     ->join('programs', 'programs.program_id', '=', 'participants.program_id')
+                    ->join('users as program_creator', 'program_creator.id', '=', 'programs.user_id')
                     ->where([
                         ['programs.status', 1],
                         ['programs.approved_status', 2],
                         ['programs.program_id', $selectedProgram],
                         ['programs.user_id', $selectedOrganization]
-
-                    ])
-                    ->join('users as program_creator', 'program_creator.id', '=', 'programs.user_id')
-                    ->select(
-                        'participants.*',
-                        'joined_users.name as joined_username',
-                        'joined_users.email as joined_useremail',
-                        'joined_users.contactNo as joined_usercontact',
-                        'poors.disability_type',
-                        'dt.name as category',
-                        'programs.name as program_name',
-                        'ut.name as typename',
-                        'program_creator.name as program_creator_name',
-                        'program_creator.email as program_creator_email',
-                        'program_creator.contactNo as program_creator_contact'
-                    )
-                    ->orderBy("participants.created_at", "asc")
-                    ->get();
+                    ]);
 
                 }
                 else{
                     $selectedParticipants = Participant::where('participants.status', 1)
                     ->join('users as joined_users', 'joined_users.id', '=', 'participants.user_id')
-                    ->join('poors', 'poors.user_id', '=', 'joined_users.id')
-                    ->join('disability_types as dt', 'dt.dis_type_id', '=', 'poors.disability_type')
                     ->join('user_types as ut', 'ut.user_type_id', '=', 'participants.user_type_id')
                     ->join('programs', 'programs.program_id', '=', 'participants.program_id')
+                    ->join('users as program_creator', 'program_creator.id', '=', 'programs.user_id')
                     ->where([
                         ['programs.status', 1],
                         ['programs.approved_status', 2],
                         ['programs.program_id', $selectedProgram],
                         ['programs.user_id', $selectedOrganization],
-                        ['participants.user_type_id', $selectedState],                        
-                    ])
-                    ->join('users as program_creator', 'program_creator.id', '=', 'programs.user_id')
-                    ->select(
-                        'participants.*',
-                        'joined_users.name as joined_username',
-                        'joined_users.email as joined_useremail',
-                        'joined_users.contactNo as joined_usercontact',
-                        'poors.disability_type',
-                        'dt.name as category',
-                        'programs.name as program_name',
-                        'ut.name as typename',
-                        'program_creator.name as program_creator_name',
-                        'program_creator.email as program_creator_email',
-                        'program_creator.contactNo as program_creator_contact'
-                    )
-                    ->orderBy("participants.created_at", "asc")
-                    ->get();
-
+                        ['participants.user_type_id', $selectedState], 
+                    ]);
                 }
+
+                $selectedParticipants = $selectedParticipants->select(
+                    'participants.*',
+                    'joined_users.name as joined_username',
+                    'joined_users.email as joined_useremail',
+                    'joined_users.contactNo as joined_usercontact',
+                    'poors.disability_type',
+                    'dt.name as category',
+                    'programs.name as program_name',
+                    'ut.name as typename',
+                    'program_creator.name as program_creator_name',
+                    'program_creator.email as program_creator_email',
+                    'program_creator.contactNo as program_creator_contact'
+                )
+                ->leftJoin('poors', function ($join) {
+                    $join->on('poors.user_id', '=', 'joined_users.id');
+                })
+                ->leftJoin('disability_types as dt', 'dt.dis_type_id', '=', 'poors.disability_type')
+                ->orderBy("participants.created_at", "asc")
+                ->get();
             }
 
             if(isset($selectedParticipants)){
