@@ -100,13 +100,15 @@
             <thead>
                 <tr style="text-align:center">
                     <th> No. </th>
-                    <th>Nama</th>
-                    <th>Tempat</th>
-                    <th>Bermula</th>
-                    <th>Tamat</th>
+                    <th>Program</th>
+                    <th>Jenis</th>
                     <th>Penerangan</th>
-                    <th>Pengurus</th>
+                    <th>Lokasi</th>
+                    <th>Tarikh Mula</th>
+                    <th>Tarikh Tamat</th>
+                    <th>Peserta</th>
                     <th>Tarikh Tutup Permohonan</th>
+                    <th>Penganjur</th>
                     <th>Tindakan</th>
                 </tr>
             </thead>

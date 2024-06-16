@@ -92,7 +92,7 @@ $(document).ready(function() {
                 "className": "text-center",
                 "width": "2%"
             }, {
-                "targets": [1, 2, 3, 4, 5, 6, 7, 8],
+                "targets": [1, 2, 3, 4, 5, 6, 7, 8, 9],
                 "className": "text-center",
             },], 
             columns: [{
@@ -107,43 +107,51 @@ $(document).ready(function() {
                 name: 'name',
                 orderable: true,
                 searchable: true,
-            },
-            {
-                data: "venue",
-                name: 'venue',
+            }, {
+                data: 'typename',
+                name: 'typename',
                 orderable: true,
                 searchable: true,
-            }, {
-                data: function(row) {
-                    return row.start_date + ' ' + row.start_time;
-                },
-                name: 'start_datetime',
-                orderable: true,
-                searchable: true
-            }, {
-                data: function(row) {
-                    return row.end_date + ' ' + row.end_time;
-                },
-                name: 'end_datetime',
-                orderable: true,
-                searchable: true
             }, {
                 data: 'description',
                 name: 'description',
                 orderable: true,
                 searchable: true,
-            },{
-                data: function(row) {
-                    return 'Nama: ' + row.username.toUpperCase() + 
-                    '<br>Emel: ' + row.useremail + 
-                    '<br>Telefon: 0' + row.usercontact;
-                },
-                name: 'contact',
+            }, {
+                data: 'address',
+                name: 'address',
+                orderable: true,
+                searchable: true,
+            }, {
+                data: 'start',
+                name: 'start_datetime',
                 orderable: true,
                 searchable: true
-            },{
+            }, {
+                data: 'end',
+                name: 'end_datetime',
+                orderable: true,
+                searchable: true
+            }, {
+                data: function(row) {
+                    return row.vol + 
+                    '<br>' + row.poor;
+                },
+                name: 'participants',
+                orderable: true,
+                searchable: true
+            }, {
                 data: 'close_date',
                 name: 'close_date',
+                orderable: true,
+                searchable: true
+            }, {
+                data: function(row) {
+                    return row.username.toUpperCase() + 
+                    '<br>' + row.useremail + 
+                    '<br>+60' + row.usercontact;
+                },
+                name: 'creator',
                 orderable: true,
                 searchable: true
             }, {

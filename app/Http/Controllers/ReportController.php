@@ -63,7 +63,14 @@ class ReportController extends Controller
                 ])
                 ->join('types', 'types.type_id', '=', 'programs.type_id')
                 ->join('users as u', 'u.id', '=', 'programs.user_id')
-                ->join('program_specs as ps', 'ps.program_id', '=', 'programs.program_id')
+                ->join('program_specs as ps1', 'ps1.program_id', '=', 'programs.program_id')
+                ->where('ps1.user_type_id', 2)
+                ->join('program_specs as ps2', 'ps2.program_id', '=', 'programs.program_id')
+                ->where('ps2.user_type_id', 3)
+                ->leftJoin('users as processed', function($join) {
+                    $join->on('processed.id', '=', 'programs.approved_by')
+                         ->whereNotNull('programs.approved_by');
+                })
                 ->where([
                     ['u.status', 1],
                     ['u.id', $selectedUser],
@@ -75,8 +82,14 @@ class ReportController extends Controller
                 }
 
                 // user select option other than Semua Jenis
-                if($selectedType != 3){
-                    $query->where('types.type_id', $selectedType);
+                if($selectedType == 'vol'){
+                    $query->where('types.type_id', 1);
+                }
+                elseif($selectedType == 'skill'){
+                    $query->where('types.type_id', 2);
+                }
+                elseif($selectedType != 'all'){
+                    $query->where('programs.program_id', $selectedType);
                 }
 
                 $selectedPrograms = $query->select(
@@ -85,14 +98,39 @@ class ReportController extends Controller
                     'u.name as username',
                     'u.email as useremail',
                     'u.contactNo as usercontact',
-                    'ps.*'
+                    'ps1.qty_limit as vol_limit',
+                    'ps1.qty_enrolled as vol_enrolled',
+                    'ps2.qty_limit as poor_limit',
+                    'ps2.qty_enrolled as poor_enrolled',
+                    'processed.name as processedname',
+                    'processed.email as processedemail',
                 )
                 ->orderBy('programs.updated_at', 'desc')
                 ->get();
 
                 // Transform the data but keep it as a collection of objects
                 $selectedPrograms->transform(function ($program) {
+
+                    $program->reason = json_decode($program->description, true)['reason'] ?? '';
                     $program->description = json_decode($program->description, true)['desc'] ?? '';
+
+                    if($program->approved_at != null){
+                        $approved_at = explode(' ', $program->approved_at);
+                        $program->approved_at = $this->parseDate($approved_at[0]) . ' ' . $approved_at[1];
+                    }
+
+                    if($program->approved_status == 0){
+                        $approval = "Ditolak";
+                    }
+                    elseif($program->approved_status == 1){
+                        $approval = "Belum Diproses";
+                    }
+                    else{
+                        $approval = "Telah Diluluskan";
+                    }
+
+                    $program->approval = $approval;
+
                     $program->address = $program->venue . ', ' . $program->postal_code . 
                     ', ' . $program->city . ', ' . $program->state;
 
@@ -107,63 +145,11 @@ class ReportController extends Controller
                     $closeDate = $program->close_date;
                     $program->close_date = $this->parseDate($closeDate);
 
-                    $program->participant = $program->qty_enrolled . '/' . $program->qty_limit;
+                    $program->vol = 'Sukarelawan: ' . $program->vol_enrolled . '/' . $program->vol_limit . ' orang';
+                    $program->poor = 'B40/OKU: ' . $program->poor_enrolled . '/' . $program->poor_limit . ' orang';
 
                     return $program;
                 });
-
-            //     $combinedPrograms = collect();
-
-            //     $selectedPrograms->each(function ($program) use ($combinedPrograms) {
-            //         // Check if the program already exists in $combinedPrograms
-            //         $existingProgram = $combinedPrograms->where('program_id', $program->program_id)->first();
-
-            //         if ($existingProgram) {
-            //             // Add program_specs based on user_type_id
-            //             if ($program->user_type_id == 2) { // Volunteer
-            //                 $existingProgram->vol_limit = $program->qty_limit;
-            //                 $existingProgram->vol_enrolled = $program->qty_enrolled;
-            //             } elseif ($program->user_type_id == 3) { // Poor
-            //                 $existingProgram->poor_limit = $program->qty_limit;
-            //                 $existingProgram->poor_enrolled = $program->qty_enrolled;
-            //             }
-            //         } else {
-            //             // Create a new entry in $combinedPrograms
-            //             $combinedPrograms->push([
-            //                 'program_id' => $program->program_id,
-            //                 'name' => $program->name,
-            //                 'status' => $program->status,
-            //                 'start_date' => $program->start_date,
-            //                 'start_time' => $program->start_time,
-            //                 'end_date' => $program->end_date,
-            //                 'end_time' => $program->end_time,
-            //                 'description' => json_decode($program->description, true)['desc'] ?? '',
-            //                 'venue' => $program->venue,
-            //                 'type_id' => $program->type_id,
-            //                 'user_id' => $program->user_id,
-            //                 'approved_by' => $program->approved_by,
-            //                 'approved_at' => $program->approved_at,
-            //                 'approved_status' => $program->approved_status,
-            //                 'created_at' => $program->created_at,
-            //                 'updated_at' => $program->updated_at,
-            //                 'close_date' => $program->close_date,
-            //                 'postal_code' => $program->postal_code,
-            //                 'state' => $program->state,
-            //                 'city' => $program->city,
-            //                 'typename' => $program->typename,
-            //                 'username' => $program->username,
-            //                 'useremail' => $program->useremail,
-            //                 'usercontact' => $program->usercontact,
-            //                 'address' => $program->address,
-            //                 'start' => $program->start,
-            //                 'end' => $program->end,
-            //                 'vol_limit' => ($program->user_type_id == 2) ? $program->qty_limit : 0,
-            //                 'vol_enrolled' => ($program->user_type_id == 2) ? $program->qty_enrolled : 0,
-            //                 'poor_limit' => ($program->user_type_id == 3) ? $program->qty_limit : 0,
-            //                 'poor_enrolled' => ($program->user_type_id == 3) ? $program->qty_enrolled : 0,
-            //             ]);
-            //         }
-            //     });
 
             }
 
@@ -262,21 +248,33 @@ class ReportController extends Controller
                 ])
                 ->join('types', 'types.type_id', '=', 'programs.type_id')
                 ->join('users as u', 'u.id', '=', 'programs.user_id')
-                ->join('users as processed', 'processed.id', '=', 'programs.approved_by')
-                ->join('program_specs as ps', 'ps.program_id', '=', 'programs.program_id')
+                ->join('program_specs as ps1', 'ps1.program_id', '=', 'programs.program_id')
+                ->where('ps1.user_type_id', 2)
+                ->join('program_specs as ps2', 'ps2.program_id', '=', 'programs.program_id')
+                ->where('ps2.user_type_id', 3)
+                ->leftJoin('users as processed', function($join) {
+                    $join->on('processed.id', '=', 'programs.approved_by')
+                         ->whereNotNull('programs.approved_by');
+                })
                 ->where([
                     ['u.status', 1],
                     ['u.id', $selectedUser],
                 ]);
 
                 // user select radio button other than Active
-                if($selectedState < 3 ){
+                if($selectedState != 3 && $selectedState != 4){
                     $query->where('programs.approved_status', $selectedState);
                 }
 
                 // user select option other than Semua Jenis
-                if($selectedType != 3){
-                    $query->where('types.type_id', $selectedType);
+                if($selectedType == 'vol'){
+                    $query->where('types.type_id', 1);
+                }
+                elseif($selectedType == 'skill'){
+                    $query->where('types.type_id', 2);
+                }
+                elseif($selectedType != 'all'){
+                    $query->where('programs.program_id', $selectedType);
                 }
 
                 $selectedPrograms = $query->select(
@@ -288,10 +286,15 @@ class ReportController extends Controller
                     'processed.name as processedname',
                     'processed.email as processedemail',
                     'processed.contactNo as processedcontact',
-                    'ps.*'
+                    'ps1.qty_limit as vol_limit',
+                    'ps1.qty_enrolled as vol_enrolled',
+                    'ps2.qty_limit as poor_limit',
+                    'ps2.qty_enrolled as poor_enrolled',
                 )
                 ->orderBy('programs.updated_at', 'desc')
                 ->get();
+
+
 
                 // Transform the data but keep it as a collection of objects
                 $selectedPrograms->transform(function ($program) {
@@ -310,10 +313,13 @@ class ReportController extends Controller
                     $closeDate = $program->close_date;
                     $program->close_date = $this->parseDate($closeDate);
 
-                    $approved_at = explode(' ', $program->approved_at);
-                    $program->approved_at = $this->parseDate($approved_at[0]) . ' ' . $approved_at[1];
+                    if($program->approved_at != null){
+                        $approved_at = explode(' ', $program->approved_at);
+                        $program->approved_at = $this->parseDate($approved_at[0]) . ' ' . $approved_at[1];
+                    }
 
-                    $program->participant = $program->qty_enrolled . '/' . $program->qty_limit;
+                    $program->vol = 'Sukarelawan: ' . $program->vol_enrolled . '/' . $program->vol_limit . ' orang';
+                    $program->poor = 'B40/OKU: ' . $program->poor_enrolled . '/' . $program->poor_limit . ' orang';
 
                     return $program;
                 });

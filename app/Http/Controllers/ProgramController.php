@@ -296,6 +296,8 @@ class ProgramController extends Controller
                     'user_id' => Auth::user()->id,
                     'status' => 1,
                     'approved_status' => 1,
+                    'approved_by' => null,
+                    'approved_at' => null,
                     'state' => $request->get('state'),
                     'city' => $request->get('city'),
                     'postal_code' => $request->get('postalCode'),
@@ -493,30 +495,50 @@ class ProgramController extends Controller
             // Handling for retrieve programs based on approval state and program type
             if(isset($rid) && isset($state) && isset($type) && isset($status)){
 
-                $query = Program::where('status', $status)->with('organization');
+                $query = Program::where('programs.status', $status)
+                ->join('users', 'users.id', '=', 'programs.user_id')
+                ->join('types', 'types.type_id', '=', 'programs.type_id')
+                ->join('program_specs as ps1', 'ps1.program_id', '=', 'programs.program_id')
+                ->where('ps1.user_type_id', 2)
+                ->join('program_specs as ps2', 'ps2.program_id', '=', 'programs.program_id')
+                ->where('ps2.user_type_id', 3);
 
                 if($state != 3) {
-                    $query->where('approved_status', $state);
+                    $query->where('programs.approved_status', $state);
                 }
 
                 if($type != 3) {
-                    $query->where('type_id', $type);
+                    $query->where('programs.type_id', $type);
                 }
 
-                $selectedPrograms = $query->orderBy('updated_at', 'desc')->get();
+                $selectedPrograms = $query->select(
+                    'programs.*',
+                    'types.name as typename',
+                    'users.name as username',
+                    'users.email as useremail',
+                    'users.contactNo as usercontact',
+                    'ps1.qty_limit as vol_qty_limit',
+                    'ps2.qty_limit as poor_qty_limit'
+                )->orderBy('programs.updated_at', 'desc')
+                ->get();
 
                 // Transform the data but keep it as a collection of objects
                 $selectedPrograms->transform(function ($program) {
                     $program->description = json_decode($program->description, true)['desc'] ?? '';
-                    $program->username = $program->organization->name ?? '';
-                    $program->useremail = $program->organization->email ?? '';
-                    $program->usercontact = $program->organization->contactNo ?? '';
+
+                    $program->address = $program->venue . ', ' . $program->postal_code . 
+                    ', ' . $program->city . ', ' . $program->state;
+
+                    $program->vol = 'Sukarelawan: ' . $program->vol_qty_limit . ' orang';
+                    $program->poor = 'B40/OKU: ' . $program->poor_qty_limit . ' orang';
 
                     $startDate = $program->start_date;
                     $program->start_date = $this->parseDate($startDate);
+                    $program->start = $program->start_date . ' ' . $program->start_time;
 
                     $endDate = $program->end_date;
                     $program->end_date = $this->parseDate($endDate);
+                    $program->end = $program->end_date . ' ' . $program->end_time;
 
                     $closeDate = $program->close_date;
                     $program->close_date = $this->parseDate($closeDate);
@@ -642,12 +664,71 @@ class ProgramController extends Controller
             $startDate = $request->get('startDate');
             $endDate = $request->get('endDate');
 
+            // User select radio dipadam
             if($state == 4){
                 $status = 0;
             }
+
+            if(isset($roleID) && isset($state) && isset($type) && isset($status)){
+
+                $query = Program::where([
+                    ['programs.status', $status],
+                    ['programs.start_date', '>=', $startDate],
+                    ['programs.start_date', '<=', $endDate],
+                ])
+                ->join('users', 'users.id', '=', 'programs.user_id')
+                ->join('types', 'types.type_id', '=', 'programs.type_id')
+                ->join('program_specs as ps1', 'ps1.program_id', '=', 'programs.program_id')
+                ->where('ps1.user_type_id', 2)
+                ->join('program_specs as ps2', 'ps2.program_id', '=', 'programs.program_id')
+                ->where('ps2.user_type_id', 3);
+
+                if($state != 3) {
+                    $query->where('programs.approved_status', $state);
+                }
+
+                if($type != 3) {
+                    $query->where('programs.type_id', $type);
+                }
+
+                $selectedPrograms = $query->select(
+                    'programs.*',
+                    'types.name as typename',
+                    'users.name as username',
+                    'users.email as useremail',
+                    'users.contactNo as usercontact',
+                    'ps1.qty_limit as vol_qty_limit',
+                    'ps2.qty_limit as poor_qty_limit'
+                )->orderBy('programs.updated_at', 'desc')
+                ->get();
+
+                // Transform the data but keep it as a collection of objects
+                $selectedPrograms->transform(function ($program) {
+                    $program->description = json_decode($program->description, true)['desc'] ?? '';
+
+                    $program->address = $program->venue . ', ' . $program->postal_code . 
+                    ', ' . $program->city . ', ' . $program->state;
+
+                    $program->vol = 'Sukarelawan: ' . $program->vol_qty_limit . ' orang';
+                    $program->poor = 'B40/OKU: ' . $program->poor_qty_limit . ' orang';
+
+                    $startDate = $program->start_date;
+                    $program->start_date = $this->parseDate($startDate);
+                    $program->start = $program->start_date . ' ' . $program->start_time;
+
+                    $endDate = $program->end_date;
+                    $program->end_date = $this->parseDate($endDate);
+                    $program->end = $program->end_date . ' ' . $program->end_time;
+
+                    $closeDate = $program->close_date;
+                    $program->close_date = $this->parseDate($closeDate);
+
+                    return $program;
+                });
+
+            }
             
-            return Excel::download(new ExportProgram(
-                $roleID, $state, $type, $status, $startDate, $endDate), 
+            return Excel::download(new ExportProgram($selectedPrograms), 
                 'Programs-' . time() . '.xlsx'
             );
         }

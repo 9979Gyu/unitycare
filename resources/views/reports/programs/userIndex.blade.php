@@ -41,9 +41,9 @@
             </div>
             <div class="col-sm-6">
                 <select name="type" name="type" id="type" class="form-control select2">
-                    <option value="3" selected>Semua Jenis</option>
-                    <option value="1">Sukarelawan</option>
-                    <option value="2">Pembangunan Kemahiran</option>
+                    <option value="all" selected>Semua Jenis</option>
+                    <option value="vol">Sukarelawan</option>
+                    <option value="skill">Pembangunan Kemahiran</option>
                 </select>
             </div> 
         </div>
@@ -118,9 +118,10 @@
                     <th>Tarikh Mula</th>
                     <th>Tarikh Tamat</th>
                     <th>Peserta</th>
-                    <!-- <th>Peserta</th> -->
                     <th>Tarikh Tutup Permohonan</th>
                     <th>Penganjur</th>
+                    <th>Status</th>
+                    <th>Diproses Oleh</th>
                     <th>Tindakan</th>
                 </tr>
             </thead>
@@ -143,6 +144,60 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger" id="delete">Padam</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Approve Modal -->
+    <div class="modal fade" id="approveModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="approveModalLabel">Lulus Program</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Adakah anda pasti untuk meluluskan program?
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="approve">Lulus</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Decline Modal -->
+    <div class="modal fade" id="declineModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="declineModalLabel">Tolak Program</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Adakah anda pasti untuk menolakkan program? </p>
+                    <div>
+                        <label for="reason" class="required">Sebab</label>
+                        <select name="reason" id="reason" class="form-select">
+                            <option value="0" selected>Pilih Sebab</option>
+                            <option value="missing">Kekurangan maklumat</option>
+                            <option value="unclear">Penerangan tidak jelas</option>
+                            <option value="others">Lain-lain</option>
+                        </select>
+                        <br>
+                        <div id="more">
+                            <label for="explain" class="required">Penerangan</label>
+                            <input type="text" name="explain" class="form-control" id="explain" placeholder="Tidak sesuai untuk peserta" required>
+                        </div>
+                    </div>      
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="decline">Tolak</button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
                 </div>
             </div>

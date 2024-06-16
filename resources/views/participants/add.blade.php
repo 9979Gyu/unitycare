@@ -44,6 +44,12 @@
                     <td colspan="3" id="address">{{ $program->venue }}, {{ $program->postal_code }}, {{ $program->state }}, {{ $program->city }}</td>
                 </tr>
                 <tr>
+                    <th>Map</th>
+                    <td colspan="3">
+                        <div id="map"></div>
+                    </td>
+                </tr>
+                <tr>
                     <th scope="row">Mula</th>
                     <td colspan="3">{{ $program->start_date }} {{ $program->start_time }}</td>
                 </tr>
@@ -83,7 +89,7 @@
                     <th scope="row">Pilihan</th>
                     <input type="number" name="program_id" value="{{ $program->program_id }}" hidden>
                     <td colspan="3">
-                    @if($participantExist == 0 && $program->close_date >= today() && $program->user_id != Auth::user()->id)
+                    @if($participantExist == 0 && $program->close_date >= today() && $program->user_id != Auth::user()->id && Auth::user()->roleID != 3)
                         @if(Auth::user()->roleID == 5)
                             @if($poorRemain > 0)
                                 <button type="submit" class="btn btn-success" name="button_id" value="3"><b>Jadi Peserta</b></button>
@@ -98,12 +104,6 @@
                         @endif
                     @endif
                     <button type="button" class="btn btn-secondary" onclick="window.location='/viewprogram'"><b>Tutup</b></button>
-                    </td>
-                </tr>
-                <tr>
-                    <th>Map</th>
-                    <td colspan="3">
-                        <div id="map"></div>
                     </td>
                 </tr>
             </table>

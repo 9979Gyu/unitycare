@@ -103,7 +103,7 @@ $(document).ready(function() {
                             '</svg> Tarik Diri</a>';
                         }
                         else{
-                            if(program.close_date >= todayDate() && program.user_id != $uid){
+                            if(program.close_date >= todayDate() && program.user_id != $uid && $("#roleID").val() != 3){
                                 button += '<a class="applyAnchor btn btn-success" href="/joinprogram/' + program.program_id + '">' +
                                 '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-person-plus-fill" viewBox="0 0 16 16">' +
                                 '<path d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>' +

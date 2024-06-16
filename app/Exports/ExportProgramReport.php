@@ -48,12 +48,7 @@ class ExportProgramReport implements FromCollection, withHeadings, ShouldAutoSiz
 
                 $usercontact = '(+60)' . $item->usercontact;
 
-                if($item->user_type_id == 2){
-                    $participant = $item->participant . ' (Sukarelawan)';
-                }
-                else if($item->user_type_id == 3){
-                    $participant = $item->participant . ' (B40/OKU)';
-                }
+                $participant = $item->vol . ', ' . $item->poor;
 
                 if($item->approved_status == 0){
                     $approval = "Ditolak";
