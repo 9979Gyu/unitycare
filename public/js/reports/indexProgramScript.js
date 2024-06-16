@@ -189,7 +189,7 @@ $(document).ready(function(){
                     searchable: true
                 }, {
                     data: function(row) {
-                        return row.username.toUpperCase() + 
+                        return row.username + 
                         '<br>' + row.useremail + 
                         '<br>+60' + row.usercontact;
                     },

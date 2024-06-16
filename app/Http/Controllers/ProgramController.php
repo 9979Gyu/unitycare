@@ -24,12 +24,14 @@ class ProgramController extends Controller
         $program = Program::where('program_id', $programID)->first();
         $user = User::where('id', $program->user_id)->select('username', 'email')->first();
 
+        $date = explode($offer->approved_at, " ");
+
         Mail::to($user->email)->send(new NotifyJoinEmail([
             'name' => $user->username,
             'subject' => 'program',
             'approval' => $program->approved_status,
             'offer' => $program->name,
-            'datetime' => $program->approved_at,
+            'datetime' => DateController::parseDate($date[0]) . ' ' . $date[1],
         ]));
     }
 

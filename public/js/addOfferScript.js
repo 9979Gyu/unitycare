@@ -88,7 +88,7 @@ $(document).ready(function(){
 
         if(jobName){
             $.ajax({
-                url: '/getPositions',
+                url: '/getAllPositions',
                 type: 'GET',
                 data: {jobName: jobName},
                 success: function(data){

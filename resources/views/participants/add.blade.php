@@ -14,9 +14,13 @@
         </div>
     @endif
 
-    @if (session()->has('error'))
-        <div class="alert alert-danger condition-message">
-            {{ session('error') }}
+    @if ($errors->any())
+        <div class="alert alert-danger condition-message"">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
         </div>
     @endif
 
@@ -42,12 +46,6 @@
                 <tr>
                     <th scope="row">Tempat</th>
                     <td colspan="3" id="address">{{ $program->venue }}, {{ $program->postal_code }}, {{ $program->city }}, {{ $program->state }}</td>
-                </tr>
-                <tr>
-                    <th>Map</th>
-                    <td colspan="3">
-                        <div id="map"></div>
-                    </td>
                 </tr>
                 <tr>
                     <th scope="row">Mula</th>
@@ -84,6 +82,12 @@
                     <td>{{ $program->organization->name }}</td>
                     <td>+60{{ $program->organization->contactNo }}</td>
                     <td>{{ $program->organization->email }}</td>
+                </tr>
+                <tr>
+                    <th>Peta</th>
+                    <td colspan="3">
+                        <div id="map"></div>
+                    </td>
                 </tr>
                 <tr>
                     <th scope="row">Pilihan</th>

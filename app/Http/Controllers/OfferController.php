@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Job;
+use App\Models\User;
 use App\Models\Application;
 use App\Models\Job_Type;
 use App\Models\Job_Offer;
@@ -14,10 +15,30 @@ use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\Exports\ExportOffer;
 use Maatwebsite\Excel\Facades\Excel;
-
+use Illuminate\Support\Facades\Mail;
+use App\Mail\NotifyJoinEmail;
 
 class OfferController extends Controller
 {
+    // Email to notify user about the creation of job
+    public function notifyUser($offerID){
+
+        $offer = Job_Offer::where('job_offers.offer_id', $offerID)
+        ->join('jobs', 'jobs.job_id', '=', 'job_offers.job_id')
+        ->first();
+        $user = User::where('id', $offer->user_id)->select('username', 'email')->first();
+
+        $date = explode($offer->approved_at, " ");
+
+        Mail::to($user->email)->send(new NotifyJoinEmail([
+            'name' => $user->username,
+            'subject' => 'pekerjaan',
+            'approval' => $offer->approval_status,
+            'offer' => $offer->position,
+            'datetime' => DateController::parseDate($date[0]) . ' ' . $date[1],
+        ]));
+    }
+
     // Function to display list of job offered
     public function index(){
 
@@ -124,6 +145,9 @@ class OfferController extends Controller
             $result = $job_offer->save();
 
             if($result){
+
+                $this->notifyUser($job_offer->offer_id);
+
                 return redirect('/viewoffer')->with('success', 'Berjaya didaftarkan');
             }
         }
@@ -235,9 +259,12 @@ class OfferController extends Controller
                 'end_time' => $request->get('end_time'),
                 'quantity' => $request->get('quantity'),
                 'quantity_enrolled' => 0,
+                'updated_at' => date('Y-m-d H:i:s'),
             ]);
 
             if($result){
+                $this->notifyUser($id);
+
                 return redirect('/viewoffer')->with('success', 'Data berjaya dikemaskini');
             }
         }
@@ -258,8 +285,11 @@ class OfferController extends Controller
             'status' => 0,
         ]);  
 
-        if($update)
+        if($update){
+            // send email to verify all applied and approval_status is 1 user
             return redirect()->back()->with('success', 'Berjaya dipadam');
+        }
+            
 
         return redirect()->back()->withErrors(["message" => "Tidak berjaya dipadam"]);
 
@@ -275,13 +305,18 @@ class OfferController extends Controller
         return response()->json($jobs);
     }
 
-    public function getJobsByUser(){
-        $jobs = Job::select('jobs.name')
-        ->join('job_offers as jo', 'jo.job_id', '=', 'jobs.id')
+    public function getJobsByUser(Request $request){
+        $userID = $request->get('selectedUser');
+        $jobs = Job_Offer::join('jobs', 'jobs.job_id', '=', 'job_offers.job_id')
         ->where([
             ['jobs.status', 1],
-            ['jo.status', 1],
+            ['job_offers.status', 1],
+            ['job_offers.user_id', $userID]
         ])
+        ->select(
+            'jobs.job_id',
+            'jobs.name', 
+        )
         ->distinct('jobs.name')
         ->get();
 
@@ -291,10 +326,29 @@ class OfferController extends Controller
     // Function to get list of position related to the selected jobs from database
     public function getPositions(Request $request){
         $jobName = $request->get('jobName');
+        $userID = $request->get('userID');
 
         $positions = Job::where([
-            ['name', 'like', '%' . $jobName . '%'],
-            ['status', 1]
+            ['jobs.name', 'like', '%' . $jobName . '%'],
+            ['jobs.status', 1]
+        ])
+        ->join('job_offers', 'job_offers.job_id', '=', 'jobs.job_id')
+        ->where([
+            ['job_offers.user_id', $userID]
+        ])
+        ->get();
+
+        $positions = $positions->unique('job_id');
+
+        return response()->json($positions);
+    }
+
+    public function getAllPositions(Request $request){
+        $jobName = $request->get('jobName');
+
+        $positions = Job::where([
+            ['jobs.name', 'like', '%' . $jobName . '%'],
+            ['jobs.status', 1]
         ])
         ->get();
 
@@ -385,6 +439,144 @@ class OfferController extends Controller
         $roleNo = Auth::user()->roleID;
 
         return view('offers.index', compact('roleNo'));
+    }
+
+    public function getOffersByPositionDatatable(Request $request)
+    {
+        if(request()->ajax()){
+            $roleID = $request->get('rid');
+            $userID = $request->get('selectedUser');
+            $jobID = $request->get('selectedPosition');
+            $state = $request->get('selectedState');
+            $status = $request->get('status');
+
+            // Handling for retrieve programs based on approval state and program type
+            if(isset($roleID) && isset($userID) && isset($jobID) && isset($state) && isset($status)){
+
+                $query = Job_Offer::where([
+                    ['job_offers.status', $status],
+                    ['job_offers.user_id', $userID],
+                    ['job_offers.job_id', $jobID]
+                ])
+                ->join('users as u', 'u.id', '=', 'job_offers.user_id')
+                ->leftJoin('users as processed', function($join) {
+                    $join->on('processed.id', '=', 'job_offers.approved_by')
+                         ->whereNotNull('job_offers.approved_by');
+                })
+                ->join('job_types as jt', 'jt.job_type_id', '=', 'job_offers.job_type_id')
+                ->join('shift_types as st', 'st.shift_type_id', '=', 'job_offers.shift_type_id')
+                ->join('jobs as j', 'j.job_id', '=', 'job_offers.job_id');
+
+                if($state != 3){
+
+                    $query = $query->where('job_offers.approval_status', $state);
+                }
+
+                $selectedOffers = $query->select(
+                    'job_offers.*',
+                    'u.name as username', 
+                    'u.contactNo as usercontact', 
+                    'u.email as useremail',
+                    'processed.name as processedname', 
+                    'processed.email as processedemail',
+                    'j.name as jobname',
+                    'j.position as jobposition',
+                    'jt.name as typename',
+                    'st.name as shiftname',
+                    'job_offers.description->description as description',
+                    'job_offers.description->reason as reason',
+                )
+                ->orderBy('job_offers.updated_at', 'desc')
+                ->get();
+
+                // Transform the data but keep it as a collection of objects
+                $selectedOffers->transform(function ($offer) {
+
+                    if($offer->approved_at != null){
+                        $approved_at = explode(' ', $offer->approved_at);
+                        $offer->approved_at = DateController::parseDate($approved_at[0]) . ' ' . $approved_at[1];
+                    }
+
+                    if($offer->approval_status == 0){
+                        $approval = "Ditolak";
+                    }
+                    elseif($offer->approval_status == 1){
+                        $approval = "Belum Diproses";
+                    }
+                    else{
+                        $approval = "Telah Diluluskan";
+                    }
+
+                    $offer->approval = $approval;
+
+                    $offer->address = $offer->venue . ', ' . $offer->postal_code . 
+                    ', ' . $offer->city . ', ' . $offer->state;
+
+                    $startDate = $offer->start_date;
+                    $offer->start_date = DateController::parseDate($startDate);
+                    $offer->start = $offer->start_date . ' ' . $offer->start_time;
+
+                    $endDate = $offer->end_date;
+                    $offer->end_date = DateController::parseDate($endDate);
+                    $offer->end = $offer->end_date . ' ' . $offer->end_time;
+
+                    $offer->people = $offer->quantity_enrolled . '/' . $offer->quantity . ' orang';
+
+                    return $offer;
+                });
+            }
+
+            if(isset($selectedOffers)){
+
+                $table = Datatables::of($selectedOffers);
+
+                $table->addColumn('action', function ($row) {
+                    $token = csrf_token();
+                    $btn = '<div class="d-flex justify-content-center">';
+                    $btn = $btn . '<a href="/joinoffer/' . $row->offer_id . '"><span class="badge badge-primary m-1"> Lihat </span></a>';
+                    
+                    //  Is admin or staff
+                    if(Auth::user()->roleID == 1 || Auth::user()->roleID == 2){
+                        
+                        if($row->approval_status == 1){
+                            // Program is pending approval
+                            $btn .= '<div>';
+                            $btn = $btn . '<a class="approveAnchor" href="#" id="' . $row->offer_id . '"><span class="badge badge-success m-1" data-bs-toggle="modal" data-bs-target="#approveModal"> Lulus </span></a>';
+                            $btn = $btn . '<a class="declineAnchor" href="#" id="' . $row->offer_id . '"><span class="badge badge-danger m-1" data-bs-toggle="modal" data-bs-target="#declineModal"> Tolak </span></a>';
+                            $btn .= '</div>';
+                        }
+                        else{
+                            $btn .= '<div>';
+                            $btn = $btn . '<a class="declineAnchor" href="#" id="' . $row->offer_id . '"><span class="badge badge-danger m-1" data-bs-toggle="modal" data-bs-target="#declineModal"> Tolak </span></a>';
+                            $btn .= '</div>';
+
+                        }
+                    }
+                    else{
+                        if($row->user_id == Auth::user()->id){
+                            if($row->approval_status == 1){
+                                
+                                // Program is pending approval
+                                $btn .= '<div>';
+                                $btn = $btn . '<a href="/editoffer/' . $row->offer_id . '"><span class="badge badge-warning m-1"> Kemaskini </span></a>';
+                                $btn .= '</div>';
+                            }
+                        }
+                        $btn = $btn . '<a class="deleteAnchor" href="#" id="' . $row->offer_id . '"><span class="badge badge-danger m-1" data-bs-toggle="modal" data-bs-target="#deleteModal"> Padam </span></a>';
+                    }
+
+                    $btn = $btn . '</div>';
+
+                    return $btn;
+
+                });
+    
+                $table->rawColumns(['action']);
+
+                return $table->make(true);
+            }
+
+        }
     }
 
     // Function to get list of job offers
@@ -491,6 +683,9 @@ class OfferController extends Controller
 
             // If successfully update the program
             if($update){
+
+                $this->notifyUser($id);
+
                 // direct user to view program page with success messasge
                 return redirect('/viewoffer')->with('success', 'Data berjaya dikemaskini');
             }
@@ -536,6 +731,7 @@ class OfferController extends Controller
 
             // If successfully update the program
             if($update){
+                $this->notifyUser($id);
                 // direct user to view program page with success messasge
                 return redirect('/viewoffer')->with('success', 'Data berjaya dikemaskini');
             }

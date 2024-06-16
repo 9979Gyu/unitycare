@@ -26,7 +26,7 @@
 
     <br>
 
-    <form method="POST" action="/export-applications" class="container" id="excel">
+    <form method="POST" action="/export-offers" class="container" id="excel">
         @csrf
         <input type="number" name="roleID" id="roleID" value="{{ $roleNo }}" hidden>
         <div class="row mb-3">
@@ -42,7 +42,7 @@
 
         <div class="row mb-3">
             <div class="col-sm-6">
-                <select name="job" id="job" class="form-control select2 ">
+                <select name="jobname" id="jobname" class="form-control select2 ">
  
                 </select>
             </div>
@@ -111,18 +111,23 @@
 
     </form>
 
-
     <div class="table-responsive">
         <table id="requestTable" class="table table-bordered table-striped dt-responsive" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
             <thead>
                 <tr style="text-align:center">
                     <th> No. </th>
-                    <th>Pemohon</th>
-                    <th>Peringkat Pendidikan</th>
-                    <th>Kategori</th>
-                    <th>Sebab Mohon</th>
-                    <th>Tarikh Mohon</th>
-                    <th>Jawatan</th>
+                    <th>Pekerjaan</th>
+                    <th>Jenis</th>
+                    <th>Syif</th>
+                    <th>Lokasi</th>
+                    <th>Bermula</th>
+                    <th>Tamat</th>
+                    <th>Purata Gaji</th>
+                    <th>Pekerja Diperlukan</th>
+                    <th>Penerangan</th>
+                    <th>Pengurus</th>
+                    <th>Status</th>
+                    <th>Diproses</th>
                     <th>Tindakan</th>
                 </tr>
             </thead>
@@ -137,11 +142,11 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="approveModalLabel">Lulus Permohonan</h5>
+                    <h5 class="modal-title" id="approveModalLabel">Lulus Perkerjaan</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    Adakah anda pasti untuk meluluskan permohonan?
+                    Adakah anda pasti untuk meluluskan perkerjaan?
 
                 </div>
                 <div class="modal-footer">
@@ -157,22 +162,23 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="declineModalLabel">Tolak Permohonan</h5>
+                    <h5 class="modal-title" id="declineModalLabel">Tolak Perkerjaan</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Adakah anda pasti untuk menolakkan permohonan? </p>
+                    <p>Adakah anda pasti untuk menolakkan perkerjaan? </p>
                     <div>
                         <label for="reason" class="required">Sebab</label>
                         <select name="reason" id="reason" class="form-select">
                             <option value="0" selected>Pilih Sebab</option>
+                            <option value="missing">Kekurangan maklumat</option>
                             <option value="unclear">Penerangan tidak jelas</option>
                             <option value="others">Lain-lain</option>
                         </select>
                         <br>
                         <div id="more">
                             <label for="explain" class="required">Penerangan</label>
-                            <input type="text" name="explain" class="form-control" id="explain" placeholder="Tidak sesuai untuk pemohon" required>
+                            <input type="text" name="explain" class="form-control" id="explain" placeholder="Tidak sesuai untuk B40/OKU" required>
                         </div>
                     </div>      
 
@@ -185,8 +191,28 @@
         </div>
     </div>
 
-    <script src="{{ asset('js/indexApplicationScript.js') }}"></script>
+    <!-- Delete Modal -->
+    <div class="modal fade" id="deleteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Padam Perkerjaan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Adakah anda pasti untuk memadam perkerjaan?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="delete">Padam</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ asset('js/reports/indexOfferScript.js') }}"></script>
     <script src="{{ asset('js/modalScript.js') }}"></script>
+    <script src="{{ asset('js/dateScript.js') }}"></script>
 
 
 @endsection

@@ -16,7 +16,41 @@ use Carbon\Carbon;
 
 class ReportController extends Controller
 {
-    //
+    // Function to view list of offer
+    public function indexOffers(){
+        $roleNo = Auth::user()->roleID;
+
+        if($roleNo == 1 || $roleNo == 2){
+            $users = User::where([
+                ['users.status', 1],
+            ])
+            ->join('job_offers as offers', 'offers.user_id', '=', 'users.id')
+            ->select(
+                'users.id',
+                'users.name',
+            )
+            ->orderBy('users.name')
+            ->distinct()
+            ->get();
+        }
+        else{
+            $users = User::where([
+                ['status', 1],
+                ['id', Auth::user()->id]
+            ])
+            ->select(
+                'users.id',
+                'users.name',
+            )
+            ->orderBy('users.name')
+            ->distinct()
+            ->get();
+        }
+
+        return view('reports.offers.index', compact('roleNo', 'users'));
+
+    }
+
     public function indexPrograms(){
         $roleNo = Auth::user()->roleID;
 

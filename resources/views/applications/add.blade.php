@@ -31,13 +31,15 @@
             </tr>
             <tr>
                 <th scope="row">Tempat</th>
-                <td colspan="3">{{ $offer->venue }}, {{ $offer->postal_code }}, {{ $offer->city }}, {{ $offer->state }}</td>
+                <td colspan="3" id="address">{{ $offer->venue }}, {{ $offer->postal_code }}, {{ $offer->city }}, {{ $offer->state }}</td>
             </tr>
             <tr>
-                <th>Map</th>
-                <td colspan="3">
-                    <div id="map"></div>
-                </td>
+                <th scope="row">Mula</th>
+                <td colspan="3">{{ $offer->start_date }} {{ $offer->start_time }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Tamat</th>
+                <td colspan="3">{{ $offer->end_date }} {{ $offer->end_time }}</td>
             </tr>
             <tr>
                 <th scope="row">Jenis</th>
@@ -65,6 +67,12 @@
                 <td>{{ $offer->organization->name }}</td>
                 <td>+60{{ $offer->organization->contactNo }}</td>
                 <td>{{ $offer->organization->email }}</td>
+            </tr>
+            <tr>
+                <th>Peta</th>
+                <td colspan="3">
+                    <div class="border-radius" id="map"></div>
+                </td>
             </tr>
             <tr>
                 <th scope="row">Pilihan</th>

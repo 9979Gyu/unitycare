@@ -1,17 +1,22 @@
 $(document).ready(function() {
 
+    // Disabled the Tolak button in modal
+    $("#decline").prop("disabled", true);
+    // Hide the explaination input field
+    $("#more").hide();
+
     $('#organization').select2({
         placeholder: 'Pilih Penganjur',
     });
 
-    $('#job').select2({
+    $('#jobname').select2({
         placeholder: 'Pilih Pekerjaan',
     });
 
     $('#position').select2({
         placeholder: 'Pilih Jawatan',
     });
-
+    
     var requestTable;
     var selectedState = 3;
     var selectedUser;
@@ -25,63 +30,69 @@ $(document).ready(function() {
         // set value
         selectedUser = $("#organization option:selected").val();
         // get job list for dropdown
-       // To get list of job name
+        getJob(selectedUser);
+    });
+
+    function getJob(selectedUser){
         $.ajax({
-            url: '/getJobsByUser',
             type: 'GET',
+            url: "/getJobsByUser",
             data: { selectedUser: selectedUser },
-            success: function(data){
-                
-                $('#job').empty();
-                $("#job").append('<option value="0">Pilih Pekerjaan</option>');
+            success: function(data) {
+                $("#jobname").empty();
+                $("#jobname").append('<option value="0" selected>Pilih Pekerjaan</option>');
+                data.forEach(function(item){
+                    $("#jobname").append('<option value="' + item.name + '">' + item.name + '</option>');
 
-                // append 'name' to the option
-                data.forEach(function(job){
-                    // Append each job as an option to the job select element
-                    $("#job").append('<option value="' + job.name + '">' + job.name + '</option>');
                 });
-
+            },
+            error: function (data) {
+                $('.condition-message').html(data);
             }
         });
+    }
+
+    $("#jobname").on('change', function(){
+        // set value
+        selectedJob = $("#jobname option:selected").val();
+        // get job list for dropdown
+        getPosition(selectedJob, selectedUser);
     });
 
-    $("#job").on('change', function(){
-        var jobName = $("#job option:selected").text();
-
-        if(jobName){
-            $.ajax({
-                url: '/getPositions',
-                type: 'GET',
-                data: { 
-                    jobName: jobName,
-                    userID: selectedUser 
-                },
-                success: function(data){
-                    $('#position').empty();
-                    $("#position").append('<option value="0">Pilih Jawatan</option>');
-
-                    data.forEach(function(item){
-                        $("#position").append('<option value="' + item.job_id + '">' + 
-                        item.position + '</option>');
-                    });
-                }
-            });
-        }
-        else{
-            $('#position').empty();
-            $("#position").append('<option selected>Pilih Jawatan</option>');
-        }
-    });
+    // Funciton to display list of city and states
+    function getPosition(selectedJob, selectedUser){
+        $.ajax({
+            type: 'GET',
+            url: "/getPositions",
+            data:  { 
+                jobName : selectedJob,
+                userID: selectedUser
+            },
+            success: function(data) {
+                $("#position").empty();
+                $("#position").append('<option value="0" selected>Pilih Jawatan</option>');
+                data.forEach(function(item){
+                    $("#position").append('<option value="' + item.job_id + '">' + item.position + '</option>');
+                });
+            },
+            error: function (data) {
+                $('.condition-message').html(data);
+            }
+        });
+    }
 
     $("#position").on('change', function(){
-        // Get the selected position
-        selectedPosition = $(this).val();
+        // set value
+        selectedPosition = $("#position option:selected").val();
 
-        // Call fetch_data() with the selected position
-        fetch_data(selectedState, selectedPosition); 
+        console.log(selectedUser, selectedPosition, selectedState, status);
+        // get job list for dropdown
+        fetch_data(selectedUser, selectedPosition, selectedState, status);
     });
-
-    $('#allRadio, #pendingRadio, #approveRadio, #declineRadio').change(function() {
+    
+    // Function to handle radio button value
+    $('#allRadio, #pendingRadio, #approveRadio, #declineRadio, #deleteRadio').change(function() {
+        status = 1;
         if ($('#allRadio').is(':checked')) {
             selectedState = 3;
         }
@@ -94,14 +105,15 @@ $(document).ready(function() {
         else if ($('#declineRadio').is(':checked')) {
             selectedState = 0;
         }
-        
+        else if ($('#deleteRadio').is(':checked')) {
+            status = 0
+        }
+
         // Fetch data based on the selected position
-        fetch_data(selectedState, selectedPosition);
+        fetch_data(selectedUser, selectedPosition, selectedState, status);
     });
-
-    function fetch_data(selectedState, selectedPosition) {
-
-        console.log("this is state: " + selectedState + " this is position: " + selectedPosition);
+    
+    function fetch_data(selectedUser, selectedPosition, selectedState, status) {
 
         // Make AJAX request to fetch data based on the selected position
         if ($.fn.DataTable.isDataTable('#requestTable')) {
@@ -136,11 +148,13 @@ $(document).ready(function() {
             processing: true,
             serverSide: true,
             ajax: {
-                url: "/getapplications",
+                url: "/getoffersbyposition",
                 data: {
                     rid: $("#roleID").val(),
-                    selectedState: selectedState,
-                    positionID: selectedPosition
+                    selectedUser : selectedUser, 
+                    selectedPosition : selectedPosition, 
+                    selectedState : selectedState, 
+                    status : status
                 },
                 type: 'GET',
 
@@ -150,7 +164,7 @@ $(document).ready(function() {
                 "className": "text-center",
                 "width": "2%"
             }, {
-                "targets": [1, 2, 3, 4, 5, 6],
+                "targets": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
                 "className": "text-center",
             },], 
             columns: [{
@@ -161,42 +175,90 @@ $(document).ready(function() {
                     return meta.row + meta.settings._iDisplayStart + 1;
                 }
             }, {
-                data: function(row) {
-                    return row.useremail + ' <br>+60' + row.usercontact;
+                data: function(row){
+                    return row.jobname + ' - ' + row.jobposition
                 },
-                name: 'user',
+                name: 'name',
                 orderable: true,
                 searchable: true,
             }, {
-                data: "edu_level",
-                name: 'edu_level',
+                data: "typename",
+                name: 'type',
                 orderable: true,
                 searchable: true,
             }, {
-                data: "category",
-                name: 'category',
+                data: "shiftname",
+                name: 'shift',
                 orderable: true,
                 searchable: true,
             }, {
-                data: function(row) {
-                    if(row.reason != "" && row.description != "")
-                        return row.description + ' <br><b class="text-danger">Ditolak: ' + row.reason + '</b>';
-                    else if(row.reason != "" && row.description == "")
-                        return '<b>Ditolak: ' + row.reason + '</b>';
-                    else
-                        return row.description;
-                },
-                name: 'description',
-                orderable: false,
-                searchable: true,
-            }, {
-                data: "applied_date",
-                name: 'applied_date',
+                data: 'address',
+                name: 'location',
                 orderable: true,
                 searchable: true
             }, {
-                data: "position",
-                name: 'position',
+                data: 'start',
+                name: 'startdatetime',
+                orderable: true,
+                searchable: true
+            }, {
+                data: 'end',
+                name: 'enddatetime',
+                orderable: true,
+                searchable: true
+            }, {
+                data: function(row) {
+                    return 'RM ' + numberWithCommas(row.min_salary) + ' - RM ' + numberWithCommas(row.max_salary);
+                },
+                name: 'salary',
+                orderable: true,
+                searchable: true
+            }, {
+                data: "people",
+                name: 'quantity',
+                orderable: true,
+                searchable: true
+            }, {
+                data: "description",
+                name: 'description',
+                orderable: true,
+                searchable: true
+            }, {
+                data: function(row) {
+                    return row.username + 
+                    '<br>' + row.useremail + 
+                    '<br>+60' + row.usercontact;
+                },
+                name: 'contact',
+                orderable: true,
+                searchable: true
+            }, {
+                data: function(row) {
+                    if(row.approval_status == 0){
+                        return '<span class="text-danger"><b>' + row.approval + ': ' + row.reason + '</b></span>';
+                    }
+                    else if(row.approval_status == 2){
+                        return '<span class="text-success"><b>' + row.approval + '</b></span>';
+                    }
+                    else{
+                        return '<span><b>' + row.approval + '</b></span>';
+                    }
+                },
+                name: 'approval',
+                orderable: true,
+                searchable: true
+            }, {
+                data: function(row) {
+                    if(row.processedname != null){
+                        return row.processedname + 
+                        '<br>' + row.processedemail +
+                        '<br> Pada: ' + row.approved_at;
+                    }
+                    else{
+                        return " ";
+                    }
+                },
+                name: 'processed',
                 orderable: true,
                 searchable: true
             }, {
@@ -208,11 +270,6 @@ $(document).ready(function() {
             
         });
     }
-
-    // Disabled the Tolak button in modal
-    $("#decline").prop("disabled", true);
-    // Hide the explaination input field
-    $("#more").hide();
 
     // csrf token for ajax
     $.ajaxSetup({
@@ -231,32 +288,33 @@ $(document).ready(function() {
             $.ajax({
                 type: 'POST',
                 dataType: 'html',
-                url: "/deleteprogram",
+                url: "/deleteoffer",
                 data: { selectedID : selectedID },
-                success: function(data) {
+                success: function(response) {
                     $('#deleteModal').modal('hide');
-                    $('.condition-message').html(data);
+                    $('.condition-message').html(response);
 
                     requestTable.ajax.reload();
                 },
-                error: function (data) {
-                    $('.condition-message').html(data);
+                error: function(xhr, status, error) {
+                    // Handle error
+                    console.error(xhr.responseText);
                 }
             })
         }
     });
 
+    // Function to approve job offer
     $(document).on('click', '.approveAnchor', function() {
         selectedID = $(this).attr('id');
     });
 
     $('#approve').click(function() {
-        
         $.ajax({
             type: 'POST',
             dataType: 'html',
-            url: "/approveapplication",
-            data: {selectedID : selectedID },
+            data: {selectedID : selectedID},
+            url: "/approveoffer",
             success: function(data) {
                 $('#approveModal').modal('hide');
                 $('.condition-message').html(data);
@@ -322,7 +380,7 @@ $(document).ready(function() {
         $.ajax({
             type: 'POST',
             dataType: 'html',
-            url: "/declineapplication",
+            url: "/declineoffer",
             data: {
                 reason: declineReason,
                 selectedID: selectedID
@@ -337,6 +395,31 @@ $(document).ready(function() {
                 $('.condition-message').html(data);
             }
         });
+    });
+
+    $(document).on('click', '.dismissAnchor', function() {
+        selectedID = $(this).attr('id');
+    });
+
+    $('#dismiss').click(function() {
+        if (selectedID) {
+            $.ajax({
+                type: 'POST',
+                dataType: 'html',
+                url: "/dismissoffer",
+                data: { selectedID : selectedID },
+                success: function(data) {
+                    $('#dismissModal').modal('hide');
+                    $('.condition-message').html(data);
+                    
+                    requestTable.ajax.reload();
+
+                },
+                error: function (data) {
+                    $('.condition-message').html(data);
+                }
+            })
+        }
     });
 
 });

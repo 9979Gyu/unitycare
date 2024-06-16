@@ -114,10 +114,12 @@ Route::post('/storejob', [JobController::class, 'store']);
 Route::get('/createoffer', [OfferController::class, 'create']);
 Route::get('/getJobsFromDB', [OfferController::class, 'getJobs']);
 Route::get('/getPositions', [OfferController::class, 'getPositions']);
+Route::get('/getAllPositions', [OfferController::class, 'getAllPositions']);
 Route::get('/getJobsByUser', [OfferController::class, 'getJobsByUser']);
 Route::post('/storeoffer', [OfferController::class, 'store']);
 Route::get('/viewoffer', [OfferController::class, 'index']);
 Route::get('/getoffers', [OfferController::class, 'getOffersDatatable']);
+Route::get('/getoffersbyposition', [OfferController::class, 'getOffersByPositionDatatable']);
 Route::post('/deleteoffer', [OfferController::class, 'destroy']);
 Route::get('/getUpdatedOffers', [OfferController::class, 'getUpdatedOffers']);
 Route::post('/deleteoffer', [OfferController::class, 'destroy']);
@@ -145,4 +147,5 @@ Route::get('/search', [LandingController::class, 'search']);
 // Report
 Route::get('/getProgramsWithSpecs', [ReportController::class, 'getAllProgramsDetailsDatatable']);
 Route::get('/index-programs', [ReportController::class, 'indexPrograms']);
+Route::get('/index-offers', [ReportController::class, 'indexOffers']);
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\Job;
 use App\Models\Poor;
 use App\Models\Job_Type;
@@ -14,17 +15,85 @@ use DataTables;
 use Illuminate\Support\Facades\Auth;
 use App\Exports\ExportApplication;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\NotifyJoinEmail;
 
 class ApplicationController extends Controller
 {
+
+    // Email to notify user about the creation of job
+    public function notifyUser($offerID){
+
+        $offer = Job_Offer::where('job_offers.offer_id', $offerID)
+        ->join('jobs', 'jobs.job_id', '=', 'job_offers.job_id')
+        ->join('applications as a', 'a.offer_id', '=', 'job_offers.offer_id')
+        ->select(
+            'jobs.position',
+            'a.approval_status',
+            'a.approved_at',
+            'a.applied_date',
+            'a.poor_id'
+        )
+        ->first();
+
+        $user = User::join('poors', 'poors.user_id', '=', 'users.id')
+        ->where('poors.poor_id', $offer->poor_id)
+        ->select('users.username', 'users.email')
+        ->first();
+        
+        if($offer->approved_at == null){
+            $offer->approved_at = $offer->applied_date;
+        }
+
+        dd($offer);
+
+        $date = explode(" ", $offer->approved_at);
+        $convertedDate = DateController::parseDate($date[0]);
+
+        Mail::to($user->email)->send(new NotifyJoinEmail([
+            'name' => $user->username,
+            'subject' => 'pekerjaan',
+            'approval' => $offer->approval_status,
+            'offer' => $offer->position,
+            'datetime' => $convertedDate . ' ' . $date[1],
+        ]));
+    }
 
     public function index(){
         if(Auth::check()){
 
             $roleNo = Auth::user()->roleID;
 
-            if($roleNo == 1 || $roleNo == 3){
-                return view('applications.index', compact('roleNo'));
+            if($roleNo == 1){
+                $users = User::where([
+                    ['users.status', 1],
+                ])
+                ->join('job_offers as offers', 'offers.user_id', '=', 'users.id')
+                ->select(
+                    'users.id',
+                    'users.name',
+                )
+                ->orderBy('users.name')
+                ->distinct()
+                ->get();
+
+                return view('applications.index', compact('roleNo', 'users'));
+
+            }
+            else if($roleNo == 3){
+                $users = User::where([
+                    ['status', 1],
+                    ['id', Auth::user()->id]
+                ])
+                ->select(
+                    'users.id',
+                    'users.name',
+                )
+                ->orderBy('users.name')
+                ->distinct()
+                ->get();
+
+                return view('applications.index', compact('roleNo', 'users'));
             }
 
         }
@@ -40,6 +109,9 @@ class ApplicationController extends Controller
             ])
             ->with(['organization', 'jobType', 'shiftType', 'job'])
             ->first();
+
+            $offer->start_date = DateController::parseDate($offer->start_date);
+            $offer->end_date = DateController::parseDate($offer->end_date);
 
             $alreadyApply = Job_Offer::where([
                 ['status', 1],
@@ -142,6 +214,7 @@ class ApplicationController extends Controller
                 $result = $application->save();
     
                 if($result){
+                    $this->notifyUser($offerID);
                     return view('offers.index', compact('roleNo', 'uid'));
                 }
             }
@@ -303,6 +376,12 @@ class ApplicationController extends Controller
                 'approved_at' => $currentDateTime,
             ]);
 
+            if($update){
+                $offerID = Application::where('application_id', $id)->value('offer_id');
+            
+                $this->notifyUser($offerID);
+            }
+            
             // Direct user to view program page with success messasge
             return redirect('/viewapplication')->with('success', 'Data berjaya dikemaskini');
         }
@@ -347,6 +426,10 @@ class ApplicationController extends Controller
 
             // If successfully update the program
             if($update){
+
+                $offerID = Application::where('application_id', $id)->value('offer_id');
+                $this->notifyUser($offerID);
+
                 // direct user to view program page with success messasge
                 return redirect('/viewapplication')->with('success', 'Data berjaya dikemaskini');
             }
@@ -393,6 +476,9 @@ class ApplicationController extends Controller
                 ]);
 
                 if($updateOthers){
+
+                    // Send email to notify organization
+
                     // Direct user to view program page with success messasge
                     return redirect('/viewapplication')->with('success', 'Data berjaya dikemaskini');
                 }
@@ -421,6 +507,9 @@ class ApplicationController extends Controller
 
         // If successfully update the status, decline other offer
         if($update){
+
+            // Send email to notify organization
+
             // Direct user to view program page with success messasge
             return redirect('/viewapplication')->with('success', 'Data berjaya dikemaskini');
         }
