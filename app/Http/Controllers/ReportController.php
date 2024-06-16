@@ -29,6 +29,7 @@ class ReportController extends Controller
                 'users.id',
                 'users.name',
             )
+            ->orderBy('users.name')
             ->distinct()
             ->get();
         }
@@ -41,6 +42,7 @@ class ReportController extends Controller
                 'users.id',
                 'users.name',
             )
+            ->orderBy('users.name')
             ->distinct()
             ->get();
         }

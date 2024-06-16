@@ -13,6 +13,7 @@ class Program extends Model
     protected $primaryKey = 'program_id';
 
     protected $fillable = [
+        'program_id',
         'name',
         'start_date',
         'start_time',

@@ -207,7 +207,8 @@ $(document).ready(function() {
         $.ajax({
             type: 'POST',
             dataType: 'html',
-            url: "/approveprogram/" + selectedID,
+            data: {selectedID : selectedID },
+            url: "/approveprogram",
             success: function(data) {
                 $('#approveModal').modal('hide');
                 $('.condition-message').html(data);

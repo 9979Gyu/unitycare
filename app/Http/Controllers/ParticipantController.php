@@ -27,6 +27,7 @@ class ParticipantController extends Controller
                 'users.id',
                 'users.name',
             )
+            ->orderBy('users.name')
             ->distinct()
             ->get();
         }
@@ -39,6 +40,7 @@ class ParticipantController extends Controller
                 'users.id',
                 'users.name',
             )
+            ->orderBy('users.name')
             ->distinct()
             ->get();
         }

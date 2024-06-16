@@ -13,10 +13,25 @@ use Illuminate\Support\Facades\Auth;
 use App\Exports\ExportProgram;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\NotifyJoinEmail;
 
 class ProgramController extends Controller
 {
-    //
+    // Email to notify user about the creation of program
+    public function notifyUser($programID){
+
+        $program = Program::where('program_id', $programID)->first();
+        $user = User::where('id', $program->user_id)->select('username', 'email')->first();
+
+        Mail::to($user->email)->send(new NotifyJoinEmail([
+            'name' => $user->username,
+            'subject' => 'program',
+            'approval' => $program->approved_status,
+            'offer' => $program->name,
+            'datetime' => $program->approved_at,
+        ]));
+    }
 
     public static function getProgramsByApprovedStatus(){
 
@@ -191,6 +206,8 @@ class ProgramController extends Controller
 
             $addPoor->save();
 
+            $this->notifyUser($program->program_id);
+
             return redirect('/viewprogram')->with('success', 'Program berjaya didaftarkan');
         }
         else{
@@ -284,32 +301,34 @@ class ProgramController extends Controller
                 "reason" => "",
             ];
 
-            $result = DB::table('programs')
-                ->where([
-                    ['program_id', $id],
-                    ['user_id', Auth::user()->id]
-                ])
-                ->update([
-                    'name' => $request->get('name'),
-                    'start_date' => $request->get('start_date'),
-                    'start_time' => $request->get('start_time'),
-                    'end_date' => $request->get('end_date'),
-                    'end_time' => $request->get('end_time'),
-                    'close_date' => $request->get('close_date'),
-                    'description' => json_encode($desc),
-                    'venue' => $request->get('address'),
-                    'state' => $request->get('state'),
-                    'city' => $request->get('city'),
-                    'postal_code' => $request->get('postalCode'),
-                    'user_id' => Auth::user()->id,
-                    'status' => 1,
-                    'approved_status' => 1,
-                    'approved_by' => null,
-                    'approved_at' => null,
-                    'updated_at' => date('Y-m-d H:i:s'),
-                ]);
+            $name = $request->get('name');
+
+            $result = Program::where([
+                ['program_id', $id],
+                ['user_id', Auth::user()->id]
+            ])
+            ->update([
+                'name' => $name,
+                'start_date' => $request->get('start_date'),
+                'start_time' => $request->get('start_time'),
+                'end_date' => $request->get('end_date'),
+                'end_time' => $request->get('end_time'),
+                'close_date' => $request->get('close_date'),
+                'description' => json_encode($desc),
+                'venue' => $request->get('address'),
+                'state' => $request->get('state'),
+                'city' => $request->get('city'),
+                'postal_code' => $request->get('postalCode'),
+                'user_id' => Auth::user()->id,
+                'status' => 1,
+                'approved_status' => 1,
+                'approved_by' => null,
+                'approved_at' => null,
+                'updated_at' => date('Y-m-d H:i:s'),
+            ]);
 
             if($result){
+
                 $updateVol = DB::table('program_specs')
                 ->where([
                     ['program_id', $id],
@@ -327,6 +346,8 @@ class ProgramController extends Controller
                 ->update([
                     'qty_limit' => $request->get('poor'),
                 ]);
+                
+                $this->notifyUser($id);
 
                 return redirect('/index-programs')->with('success', 'Data berjaya dikemaskini');
             }
@@ -385,8 +406,10 @@ class ProgramController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function updateApproval($id)
+    public function updateApproval(Request $request)
     {
+        $id = $request->get('selectedID');
+
         // Update the program details
         $update = DB::table('programs')
             ->where([
@@ -396,10 +419,14 @@ class ProgramController extends Controller
             ->update([
                 'approved_status' => 2,
                 'approved_by' => Auth::user()->id, 
+                'approved_at' => date('Y-m-d H:i:s'),
             ]);
 
         // If successfully update the program
         if($update){
+
+            $this->notifyUser($id);
+
             // direct user to view program page with success messasge
             return redirect('/viewprogram')->with('success', 'Data berjaya dikemaskini');
         }
@@ -426,20 +453,26 @@ class ProgramController extends Controller
         // Encode the array back to JSON
         $newDesc = json_encode($descArray);
 
+        $id = $request->selectedID;
+
         // Update the program details
         $update = DB::table('programs')
         ->where([
-            ['program_id', $request->selectedID],
+            ['program_id', $id],
             ['status', 1],
         ])
         ->update([
             'approved_status' => 0,
             'approved_by' => Auth::user()->id, 
+            'approved_at' => date('Y-m-d H:i:s'),
             'description' => $newDesc
         ]);
 
         // If successfully update the program
         if($update){
+
+            $this->notifyUser($id);
+
             // direct user to view program page with success messasge
             return redirect('/viewprogram')->with('success', 'Data berjaya dikemaskini');
         }
