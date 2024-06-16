@@ -68,7 +68,7 @@ Route::get('/view/{roleNo}', [UserController::class, 'index']);
 Route::get('/getstaff', [UserController::class, 'getUsersDatatable'])->name('user.getAllDatatable');
 Route::get('/edituser/{id}', [UserController::class, 'edit']);
 Route::post('/updateuser', [UserController::class, 'update']);
-Route::post('/deleteuser/{id}', [UserController::class, 'destroy']);
+Route::post('/deleteuser', [UserController::class, 'destroy']);
 Route::get('/set-password', [UserController::class, 'indexChangePassword']);
 Route::post('/change-password', [UserController::class, 'changePassword']);
 Route::post('/reset', [UserController::class, 'changePasswordEmail']);

@@ -97,7 +97,6 @@ $(document).ready(function() {
     var idToDelete;
     $(document).on('click', '.deleteAnchor', function() {
         idToDelete = $(this).attr('id');
-        console.log(idToDelete);
     });
 
     $('#delete').click(function() {
@@ -105,7 +104,8 @@ $(document).ready(function() {
             $.ajax({
                 type: 'POST',
                 dataType: 'html',
-                url: "/deleteuser/" + idToDelete,
+                data: { selectedID : idToDelete },
+                url: "/deleteuser",
                 success: function(data) {
                     $('#deleteModal').modal('hide');
                     $('.condition-message').html(data);

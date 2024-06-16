@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Poor;
+use App\Models\Program;
+use App\Models\Job_Offer;
 use Facade\FlareClient\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -384,9 +386,10 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request)
     {
         //
+        $id = $request->get('selectedID');
         $result = DB::table('users')
             ->where('id', $id)
             ->update([
@@ -394,6 +397,17 @@ class UserController extends Controller
             ]);
 
         if($result){
+
+            Program::where('user_id', $id)
+            ->update([
+                'status' => 0,
+            ]);
+
+            Job_Offer::where('user_id', $id)
+            ->update([
+                'status' => 0,
+            ]);
+
             return redirect()->back()->with('success', 'Berjaya dipadam');
         }
         else{
@@ -462,6 +476,9 @@ class UserController extends Controller
             $user = Auth::user();
 
             if($user->status == 0){
+
+                Auth::logout();
+
                 $user->remember_token = Str::random(32);
                 $user->save();
 
