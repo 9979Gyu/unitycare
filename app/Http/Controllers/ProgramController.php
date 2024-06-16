@@ -254,7 +254,7 @@ class ProgramController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
         //
         $rules = [
@@ -277,13 +277,18 @@ class ProgramController extends Controller
 
         if($validated){
 
+            $id = $request->get("program_id");
+
             $desc = [
                 "desc" => $request->get('description'),
                 "reason" => "",
             ];
 
             $result = DB::table('programs')
-                ->where('program_id', $id)
+                ->where([
+                    ['program_id', $id],
+                    ['user_id', Auth::user()->id]
+                ])
                 ->update([
                     'name' => $request->get('name'),
                     'start_date' => $request->get('start_date'),
@@ -293,14 +298,15 @@ class ProgramController extends Controller
                     'close_date' => $request->get('close_date'),
                     'description' => json_encode($desc),
                     'venue' => $request->get('address'),
+                    'state' => $request->get('state'),
+                    'city' => $request->get('city'),
+                    'postal_code' => $request->get('postalCode'),
                     'user_id' => Auth::user()->id,
                     'status' => 1,
                     'approved_status' => 1,
                     'approved_by' => null,
                     'approved_at' => null,
-                    'state' => $request->get('state'),
-                    'city' => $request->get('city'),
-                    'postal_code' => $request->get('postalCode'),
+                    'updated_at' => date('Y-m-d H:i:s'),
                 ]);
 
             if($result){
@@ -321,10 +327,12 @@ class ProgramController extends Controller
                 ->update([
                     'qty_limit' => $request->get('poor'),
                 ]);
-            }
-            
 
-            return redirect('/viewprogram')->with('success', 'Data berjaya dikemaskini');
+                return redirect('/index-programs')->with('success', 'Data berjaya dikemaskini');
+            }
+
+            return redirect()->back()->with(['error' => 'Data tidak berjaya dikemaskini']);
+  
         }
         else{
             $validator = Validator::make($request->all(), $rules);
@@ -463,25 +471,6 @@ class ProgramController extends Controller
             return redirect()->back()->withErrors(["message" => "Tidak berjaya dipadam"]);
         }
     }
-
-    public function parseDate($olddate){
-        try {
-            // Parse the date with the specified format
-            $date = Carbon::createFromFormat('Y-m-d', $olddate);
-
-            // Set the locale to Malay
-            $date->locale('ms');
-
-            // Format the date to 'dddd, D MMMM YYYY' (without time since it's not provided)
-            $formattedDate = $date->isoFormat('dddd, D MMMM YYYY');
-
-            return $formattedDate;
-
-        } 
-        catch (Exception $e) {
-            return $date;
-        }
-    }
     
     // Function to get list of programs
     public function getProgramsDatatable(Request $request)
@@ -533,15 +522,15 @@ class ProgramController extends Controller
                     $program->poor = 'B40/OKU: ' . $program->poor_qty_limit . ' orang';
 
                     $startDate = $program->start_date;
-                    $program->start_date = $this->parseDate($startDate);
+                    $program->start_date = DateController::parseDate($startDate);
                     $program->start = $program->start_date . ' ' . $program->start_time;
 
                     $endDate = $program->end_date;
-                    $program->end_date = $this->parseDate($endDate);
+                    $program->end_date = DateController::parseDate($endDate);
                     $program->end = $program->end_date . ' ' . $program->end_time;
 
                     $closeDate = $program->close_date;
-                    $program->close_date = $this->parseDate($closeDate);
+                    $program->close_date = DateController::parseDate($closeDate);
 
                     return $program;
                 });
@@ -713,15 +702,15 @@ class ProgramController extends Controller
                     $program->poor = 'B40/OKU: ' . $program->poor_qty_limit . ' orang';
 
                     $startDate = $program->start_date;
-                    $program->start_date = $this->parseDate($startDate);
+                    $program->start_date = DateController::parseDate($startDate);
                     $program->start = $program->start_date . ' ' . $program->start_time;
 
                     $endDate = $program->end_date;
-                    $program->end_date = $this->parseDate($endDate);
+                    $program->end_date = DateController::parseDate($endDate);
                     $program->end = $program->end_date . ' ' . $program->end_time;
 
                     $closeDate = $program->close_date;
-                    $program->close_date = $this->parseDate($closeDate);
+                    $program->close_date = DateController::parseDate($closeDate);
 
                     return $program;
                 });

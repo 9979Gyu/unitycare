@@ -116,7 +116,7 @@ class ReportController extends Controller
 
                     if($program->approved_at != null){
                         $approved_at = explode(' ', $program->approved_at);
-                        $program->approved_at = $this->parseDate($approved_at[0]) . ' ' . $approved_at[1];
+                        $program->approved_at = DateController::parseDate($approved_at[0]) . ' ' . $approved_at[1];
                     }
 
                     if($program->approved_status == 0){
@@ -135,15 +135,15 @@ class ReportController extends Controller
                     ', ' . $program->city . ', ' . $program->state;
 
                     $startDate = $program->start_date;
-                    $program->start_date = $this->parseDate($startDate);
+                    $program->start_date = DateController::parseDate($startDate);
                     $program->start = $program->start_date . ' ' . $program->start_time;
 
                     $endDate = $program->end_date;
-                    $program->end_date = $this->parseDate($endDate);
+                    $program->end_date = DateController::parseDate($endDate);
                     $program->end = $program->end_date . ' ' . $program->end_time;
 
                     $closeDate = $program->close_date;
-                    $program->close_date = $this->parseDate($closeDate);
+                    $program->close_date = DateController::parseDate($closeDate);
 
                     $program->vol = 'Sukarelawan: ' . $program->vol_enrolled . '/' . $program->vol_limit . ' orang';
                     $program->poor = 'B40/OKU: ' . $program->poor_enrolled . '/' . $program->poor_limit . ' orang';
@@ -303,19 +303,19 @@ class ReportController extends Controller
                     ', ' . $program->city . ', ' . $program->state;
 
                     $startDate = $program->start_date;
-                    $program->start_date = $this->parseDate($startDate);
+                    $program->start_date = DateController::parseDate($startDate);
                     $program->start = $program->start_date . ' ' . $program->start_time;
 
                     $endDate = $program->end_date;
-                    $program->end_date = $this->parseDate($endDate);
+                    $program->end_date = DateController::parseDate($endDate);
                     $program->end = $program->end_date . ' ' . $program->end_time;
 
                     $closeDate = $program->close_date;
-                    $program->close_date = $this->parseDate($closeDate);
+                    $program->close_date = DateController::parseDate($closeDate);
 
                     if($program->approved_at != null){
                         $approved_at = explode(' ', $program->approved_at);
-                        $program->approved_at = $this->parseDate($approved_at[0]) . ' ' . $approved_at[1];
+                        $program->approved_at = DateController::parseDate($approved_at[0]) . ' ' . $approved_at[1];
                     }
 
                     $program->vol = 'Sukarelawan: ' . $program->vol_enrolled . '/' . $program->vol_limit . ' orang';
@@ -334,25 +334,5 @@ class ReportController extends Controller
         
         return redirect()->back()->withErrors(["message" => "Eksport Excel tidak berjaya"]);
         
-    }
-
-    // Function to parse format for date
-    public function parseDate($olddate){
-        try {
-            // Parse the date with the specified format
-            $date = Carbon::createFromFormat('Y-m-d', $olddate);
-
-            // Set the locale to Malay
-            $date->locale('ms');
-
-            // Format the date to 'dddd, D MMMM YYYY' (without time since it's not provided)
-            $formattedDate = $date->isoFormat('dddd, D MMMM YYYY');
-
-            return $formattedDate;
-
-        } 
-        catch (Exception $e) {
-            return $date;
-        }
     }
 }

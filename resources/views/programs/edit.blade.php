@@ -20,11 +20,13 @@
         </div>
     @endif
 
-    <form action="/updateprogram/{{$program->program_id}}" method="post" class="container" id="editForm">
+    <form action="/updateprogram" method="post" class="container" id="editForm">
         @csrf
         <div class="mb-3">
             <h5>Maklumat Program</h5>
         </div>
+
+        <input type="text" name="program_id" value="{{$program->program_id}}" hidden>
 
         <div class="row mb-3">
             <label for="name" class="col-sm-2 col-form-label required">Nama</label>

@@ -62,6 +62,10 @@ class ParticipantController extends Controller
             )
             ->first();
 
+            $program->start_date = DateController::parseDate($program->start_date);
+            $program->end_date = DateController::parseDate($program->end_date);
+            $program->close_date = DateController::parseDate($program->close_date);
+
             $volLimit = Program::where([
                 ['program_id', $id],
                 ['status', 1],

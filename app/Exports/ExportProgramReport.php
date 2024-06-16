@@ -22,25 +22,6 @@ class ExportProgramReport implements FromCollection, withHeadings, ShouldAutoSiz
         $this->selectedPrograms = $selectedPrograms;
     }
 
-    public function parseDate($olddate){
-        try {
-            // Parse the date with the specified format
-            $date = Carbon::createFromFormat('Y-m-d', $olddate);
-
-            // Set the locale to Malay
-            $date->locale('ms');
-
-            // Format the date to 'dddd, D MMMM YYYY' (without time since it's not provided)
-            $formattedDate = $date->isoFormat('dddd, D MMMM YYYY');
-
-            return $formattedDate;
-
-        } 
-        catch (Exception $e) {
-            return $date;
-        }
-    }
-
     public function collection()
     {
         if(isset($this->selectedPrograms)){

@@ -92,7 +92,7 @@ Route::post('/storeprogram', [ProgramController::class, 'store']);
 Route::get('/getprogram', [ProgramController::class, 'getProgramsDatatable']);
 Route::get('/getProgramById', [ProgramController::class, 'getProgramById']);
 Route::get('/editprogram/{id}', [ProgramController::class, 'edit']);
-Route::post('/updateprogram/{id}', [ProgramController::class, 'update']);
+Route::post('/updateprogram', [ProgramController::class, 'update']);
 Route::post('/approveprogram/{id}', [ProgramController::class, 'updateApproval']);
 Route::post('/declineprogram', [ProgramController::class, 'declineApproval']);
 Route::post('/deleteprogram', [ProgramController::class, 'destroy']);
