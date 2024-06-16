@@ -41,7 +41,7 @@
                 </tr>
                 <tr>
                     <th scope="row">Tempat</th>
-                    <td colspan="3" id="address">{{ $program->venue }}, {{ $program->postal_code }}, {{ $program->state }}, {{ $program->city }}</td>
+                    <td colspan="3" id="address">{{ $program->venue }}, {{ $program->postal_code }}, {{ $program->city }}, {{ $program->state }}</td>
                 </tr>
                 <tr>
                     <th>Map</th>

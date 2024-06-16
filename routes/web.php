@@ -114,6 +114,7 @@ Route::post('/storejob', [JobController::class, 'store']);
 Route::get('/createoffer', [OfferController::class, 'create']);
 Route::get('/getJobsFromDB', [OfferController::class, 'getJobs']);
 Route::get('/getPositions', [OfferController::class, 'getPositions']);
+Route::get('/getJobsByUser', [OfferController::class, 'getJobsByUser']);
 Route::post('/storeoffer', [OfferController::class, 'store']);
 Route::get('/viewoffer', [OfferController::class, 'index']);
 Route::get('/getoffers', [OfferController::class, 'getOffersDatatable']);

@@ -29,3 +29,20 @@ function parseDate(date){
     return formattedDate;
 
 }
+
+// Function to validate start and end dates and times
+function validateDateTime(startDate, endDate, startTime, endTime) {
+    if(endTime != ''){
+        if (startDate > endDate) {
+            return false;
+        } 
+        else if (startDate == endDate && startTime >= endTime) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function numberWithCommas(num){
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}

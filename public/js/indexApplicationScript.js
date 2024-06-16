@@ -8,7 +8,7 @@ $(document).ready(function() {
 
     // To get list of job name
     $.ajax({
-        url: '/getJobsFromDB',
+        url: '/getJobsByUser',
         type: 'GET',
         success: function(data){
             

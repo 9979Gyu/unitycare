@@ -71,6 +71,12 @@
 
         <!-- Working Location -->
         <div class="row mb-3">
+            <label for="address" class="col-sm-2 col-form-label required">Tempat</label>
+            <div class="col-sm-10">
+                <input type="text" value="{{ $offer->venue }}" name="address" class="form-control" id="address" required>
+            </div>
+        </div>
+        <div class="row mb-3">
             <label for="postalCode" class="col-sm-2 col-form-label required">Poskod</label>
             <div class="col-sm-4">
                 <input type="number" name="postalCode" class="form-control" id="postalCode" value="{{ $offer->postal_code }}" required readonly>
@@ -95,11 +101,44 @@
         
         <br>
 
+        <div class="row mb-3" id="start">
+            <label for="start_date" class="col-sm-2 col-form-label required">Tarikh Bermula</label>
+            <div class="col-sm-4">
+                <input type="date" value="{{ $offer->start_date }}" name="start_date" class="form-control" id="start_date">
+            </div>
+
+            <label for="start_time" class="col-sm-2 col-form-label required">Masa Bermula</label>
+            <div class="col-sm-4">
+                <input type="time" value="{{ $offer->start_time }}" name="start_time" class="form-control" id="start_time">
+            </div>
+        </div>
+
+        <div class="row mb-3" id="end">
+            <label for="end_date" class="col-sm-2 col-form-label required">Tarikh Tamat</label>
+            <div class="col-sm-4">
+                <input type="date" value="{{$offer->end_date }}" name="end_date" class="form-control" id="end_date">
+            </div>
+
+            <label for="end_time" class="col-sm-2 col-form-label required">Masa Tamat</label>
+            <div class="col-sm-4">
+                <input type="time" value="{{ $offer->end_time }}" name="end_time" class="form-control" id="end_time">
+            </div>
+        </div>
+        
+        <br>
+
         <!-- Full Job Description -->
         <div class="row mb-3">
             <label for="description" class="col-sm-2 col-form-label required">Penerangan Penuh Pekerjaan</label>
             <div class="col-sm-10">
                 <textarea name="description" class="form-control" id="description" placeholder="Kemahiran diperlukan, Peringkat pendidikan" required>{{ $offer->description }}</textarea>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <label for="quantity" class="col-sm-2 col-form-label required">Bilangan Pekerja Diperlukan</label>
+            <div class="col-sm-10">
+                <input type="number" value="{{ $offer->quantity }}" min="1" name="quantity" class="form-control" id="quantity" required>
             </div>
         </div>
         

@@ -54,21 +54,41 @@ class OfferController extends Controller
 
     // Function to store offer into job_offers table in database
     public function store(Request $request){
-        $rules = [
-            'position' => 'required',
-            'jobType' => 'required',
-            'shiftType' => 'required',
-            'postalCode' => 'required',
-            'state' => 'required',
-            'city' => 'required',
-            'description' => 'required',
-            'salaryStart' => 'required',
-            'salaryEnd' => 'required',
-            'start_date' => 'required',
-            'end_date' => 'required',
-            'start_time' => 'required',
-            'end_time' => 'required',
-        ];
+
+        $jobTypes = $request->get('jobType');
+
+        if($jobTypes != 1){
+            $rules = [
+                'position' => 'required',
+                'jobType' => 'required',
+                'shiftType' => 'required',
+                'address' => 'required',
+                'postalCode' => 'required',
+                'state' => 'required',
+                'city' => 'required',
+                'description' => 'required',
+                'salaryStart' => 'required',
+                'salaryEnd' => 'required',
+                'start_date' => 'required',
+                'end_date' => 'required',
+                'start_time' => 'required',
+                'end_time' => 'required',
+            ];
+        }
+        else{
+            $rules = [
+                'position' => 'required',
+                'jobType' => 'required',
+                'shiftType' => 'required',
+                'postalCode' => 'required',
+                'address' => 'required',
+                'state' => 'required',
+                'city' => 'required',
+                'description' => 'required',
+                'salaryStart' => 'required',
+                'salaryEnd' => 'required',
+            ];
+        }
 
         $validated = $request->validate($rules);
 
@@ -83,6 +103,7 @@ class OfferController extends Controller
                 'job_id' => $request->get('position'),
                 'job_type_id' => $request->get('jobType'),
                 'shift_type_id' => $request->get('shiftType'),
+                'venue' => ucwords(trim($request->get('address'))),
                 'postal_code' => $request->get('postalCode'),
                 'state' => $request->get('state'),
                 'city' => $request->get('city'),
@@ -96,6 +117,8 @@ class OfferController extends Controller
                 'start_time' => $request->get('start_time'),
                 'end_date' => $request->get('end_date'),
                 'end_time' => $request->get('end_time'),
+                'quantity' => $request->get('quantity'),
+                'quantity_enrolled' => 0,
             ]);
 
             $result = $job_offer->save();
@@ -142,17 +165,43 @@ class OfferController extends Controller
     // Function to update edited offer into job_offers table in database
     public function update(Request $request){
 
-        $rules = [
-            'position' => 'required',
-            'jobType' => 'required',
-            'shiftType' => 'required',
-            'postalCode' => 'required',
-            'state' => 'required',
-            'city' => 'required',
-            'description' => 'required',
-            'salaryStart' => 'required',
-            'salaryEnd' => 'required',
-        ];
+        $jobTypes = $request->get('jobType');
+
+        if($jobTypes != 1){
+            $rules = [
+                'position' => 'required',
+                'jobType' => 'required',
+                'shiftType' => 'required',
+                'address' => 'required',
+                'postalCode' => 'required',
+                'state' => 'required',
+                'city' => 'required',
+                'description' => 'required',
+                'salaryStart' => 'required',
+                'salaryEnd' => 'required',
+                'start_date' => 'required',
+                'end_date' => 'required',
+                'start_time' => 'required',
+                'end_time' => 'required',
+                'quantity' => 'required',
+
+            ];
+        }
+        else{
+            $rules = [
+                'position' => 'required',
+                'jobType' => 'required',
+                'shiftType' => 'required',
+                'postalCode' => 'required',
+                'address' => 'required',
+                'state' => 'required',
+                'city' => 'required',
+                'description' => 'required',
+                'salaryStart' => 'required',
+                'salaryEnd' => 'required',
+                'quantity' => 'required',
+            ];
+        }
 
         $validated = $request->validate($rules);
 
@@ -170,6 +219,7 @@ class OfferController extends Controller
                 'job_id' => $request->get('position'),
                 'job_type_id' => $request->get('jobType'),
                 'shift_type_id' => $request->get('shiftType'),
+                'venue' => ucwords(trim($request->get('address'))),
                 'postal_code' => $request->get('postalCode'),
                 'state' => $request->get('state'),
                 'city' => $request->get('city'),
@@ -179,6 +229,12 @@ class OfferController extends Controller
                 'max_salary' => $request->get('salaryEnd'),
                 'user_id' => Auth::user()->id,
                 'approval_status' => 1,
+                'start_date' => $request->get('start_date'),
+                'start_time' => $request->get('start_time'),
+                'end_date' => $request->get('end_date'),
+                'end_time' => $request->get('end_time'),
+                'quantity' => $request->get('quantity'),
+                'quantity_enrolled' => 0,
             ]);
 
             if($result){
@@ -214,6 +270,19 @@ class OfferController extends Controller
         $jobs = Job::select('name')
         ->where('status', 1)
         ->distinct('name')
+        ->get();
+
+        return response()->json($jobs);
+    }
+
+    public function getJobsByUser(){
+        $jobs = Job::select('jobs.name')
+        ->join('job_offers as jo', 'jo.job_id', '=', 'jobs.id')
+        ->where([
+            ['jobs.status', 1],
+            ['jo.status', 1],
+        ])
+        ->distinct('jobs.name')
         ->get();
 
         return response()->json($jobs);

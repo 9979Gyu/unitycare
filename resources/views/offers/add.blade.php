@@ -1,9 +1,5 @@
 @extends('layouts.app')
 
-@push('styles')
-    <link href="{{ asset('css/offerAddStyle.css') }}" rel="stylesheet">
-@endpush
-
 @section('title')
     UnityCare-Pekerjaan
 @endsection
@@ -19,9 +15,13 @@
         </div>
     @endif
 
-    @if (session()->has('error'))
-        <div class="alert alert-danger condition-message">
-            {{ session('error') }}
+    @if ($errors->any())
+        <div class="alert alert-danger condition-message"">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
         </div>
     @endif
 
@@ -59,7 +59,7 @@
             <div class="col-sm-4">
                 <select name="jobType" id="jobType" class="form-control select2">
                     @foreach($jobTypes as $jobType)
-                        <option value="{{ $jobType->job_type_id }}">{{ $jobType->name }}</option>
+                        <option value="{{ $jobType->job_type_id }}" data-toggle="tooltip{{ $jobType->job_type_id }}" data-placement="top" title="{{ $jobType->description }}">{{ $jobType->name }}</option>
                     @endforeach
                 </select>
             </div>
@@ -68,7 +68,7 @@
             <div class="col-sm-4">
                 <select name="shiftType" id="shiftType" class="form-control select2">
                     @foreach($shiftTypes as $shiftType)
-                        <option value="{{ $shiftType->shift_type_id }}">{{ $shiftType->name }}</option>
+                        <option value="{{ $shiftType->shift_type_id }}" data-toggle="tooltip{{ $shiftType->shift_type_id }}" data-placement="top" title="{{ $shiftType->description }}">{{ $shiftType->name }}</option>
                     @endforeach
                 </select>
             </div>
@@ -80,7 +80,7 @@
         <div class="row mb-3">
             <label for="address" class="col-sm-2 col-form-label required">Tempat</label>
             <div class="col-sm-10">
-                <input type="text" value="{{ old('address') }}" name="address" class="form-control touppercase" id="address" required>
+                <input type="text" value="{{ old('address') }}" name="address" class="form-control" id="address" required>
             </div>
         </div>
 
@@ -144,7 +144,7 @@
         </div>
 
         <div class="row mb-3">
-            <label for="quantity" class="col-sm-2 col-form-label required">Penerangan Penuh Pekerjaan</label>
+            <label for="quantity" class="col-sm-2 col-form-label required">Bilangan Pekerja Diperlukan</label>
             <div class="col-sm-10">
                 <input type="number" value="{{ old('quantity') }}" min="1" name="quantity" class="form-control" id="quantity" required>
             </div>
@@ -182,5 +182,7 @@
 
     <script src="{{ asset('js/addOfferScript.js') }}"></script>
     <script src="{{ asset('js/postcodeScript.js') }}"></script>
+    <script src="{{ asset('js/dateScript.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 
 @endsection

@@ -4,11 +4,6 @@ $(document).ready(function() {
     $("#decline").prop("disabled", true);
     // Hide the explaination input field
     $("#more").hide();
-    
-    $('#keyword').select2({
-        placeholder: 'Kata kunci',
-        allowClear: true,
-    });
 
     $('#citystate').select2({
         placeholder: 'Bandar atau negeri',
@@ -23,8 +18,8 @@ $(document).ready(function() {
         fetch_data(selectedState, status);
     }
     else{
-        updateCardContainer();
         getCityState();
+        updateCardContainer();
     }
     
     $("#searchBtn").click(function(){
@@ -46,7 +41,7 @@ $(document).ready(function() {
                 
                 $("#citystate").empty();
                 data.forEach(function(item){
-                    $("#citystate").append('<option>' + item.location + '</option>');
+                    $("#citystate").append('<option value="' + item.location + '">' + item.location + '</option>');
                 });
             },
             error: function (data) {
@@ -65,93 +60,155 @@ $(document).ready(function() {
                 
                 $(".card-container").empty();
 
-                // Get the value of the input box and selected option
-                var keyword = $('#keyword').val().toLowerCase();
-                var citystate = $('#citystate option:selected').val().toLowerCase();
+                if (data.allOffers.length == 0) {
+                    $(".card-container").append("<div class='m-2'>Tiada rekod berkenaan</div>");
+                }
 
-                // Filter offers based on keyword and citystate
-                var filteredOffers = data.allOffers.filter(function(offer) {
-                    var matchKeyword = true;
-                    var matchCityState = true;
-        
-                    if (keyword) {
-                        matchKeyword = offer.jobname.toLowerCase().includes(keyword) ||
-                                       offer.jobposition.toLowerCase().includes(keyword) ||
-                                       offer.shiftname.toLowerCase().includes(keyword) ||
-                                       offer.typename.toLowerCase().includes(keyword) ||
-                                       offer.username.toLowerCase().includes(keyword);
-                    }
-        
-                    if (citystate) {
-                        matchCityState = offer.city.toLowerCase() === citystate ||
-                                         offer.state.toLowerCase() === citystate;
-                    }
-        
-                    return matchKeyword && matchCityState;
-                });
+                // Get the value of the input box and selected option
+                var keyword = $('#keyword').val();
+                var citystate = $('#citystate option:selected').val();
 
                 var enrolled = $.map(data.enrolledOffers, function(el) { 
-                    return { oid: el.oid, approval_status: el.approval_status, reason: el.reason, description: el.description }; 
+                    return { 
+                        oid: el.oid, 
+                        approval_status: el.approval_status, 
+                        reason: el.reason, 
+                        description: el.description 
+                    }; 
                 });
 
-                $.each(filteredOffers, function(index, offer){
+                $.each(data.allOffers, function(index, offer){
 
-                    var button;
+                    keyword = keyword ? keyword.toLowerCase() : null;
+                    citystate = citystate ? citystate.toLowerCase() : null;
+                    if(
+                        (!keyword || matchesKeyword(offer, keyword)) && 
+                        (!citystate || matchesCityState(offer, citystate))
+                    ){
 
-                    minsal = numberWithCommas(offer.min_salary);
-                    maxsal = numberWithCommas(offer.max_salary);
+                        var button;
 
-                    
-                    button = '<a class="viewAnchor btn btn-info m-2" href="/joinoffer/' + offer.offer_id + '">' +
-                        '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">' +
-                        '<path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>' +
-                        '</svg> Lihat </a>';
+                        minsal = numberWithCommas(offer.min_salary);
+                        maxsal = numberWithCommas(offer.max_salary);
 
-                    // B40 / OKU
-                    if($("#roleID").val() == 5 && offer.approval_status == 2){
-                        // Apply
-                        // If contain same program id
-                        var enrolledOffer = enrolled.find(e => e.oid === offer.offer_id);
+                        button = '<a class="viewAnchor btn btn-info m-2" href="/joinoffer/' + offer.offer_id + '">' +
+                            '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">' +
+                            '<path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>' +
+                            '</svg> Lihat </a>';
 
-                        if(enrolledOffer){
-                            if(enrolledOffer.approval_status == 1){
-                                button += '<a class="dismissAnchor btn btn-danger" href="#" id="' + offer.offer_id + '" data-bs-toggle="modal" data-bs-target="#dismissModal">' +
-                                    '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-person-dash-fill" viewBox="0 0 16 16">' +
-                                    '<path fill-rule="evenodd" d="M11 7.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5"/>' +
-                                    '<path d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>' +
-                                    '</svg> Tarik Diri</a>';
+                        // B40 / OKU
+                        if($("#roleID").val() == 5 && offer.approval_status == 2){
+                            // Apply
+                            // If contain same program id
+                            var enrolledOffer = enrolled.find(e => e.oid === offer.offer_id);
+
+                            if(enrolledOffer){
+                                if(enrolledOffer.approval_status == 1){
+                                    button += '<a class="dismissAnchor btn btn-danger" href="#" id="' + offer.offer_id + '" data-bs-toggle="modal" data-bs-target="#dismissModal">' +
+                                        '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-person-dash-fill" viewBox="0 0 16 16">' +
+                                        '<path fill-rule="evenodd" d="M11 7.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5"/>' +
+                                        '<path d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>' +
+                                        '</svg> Tarik Diri</a>';
+                                }
+
+                                if(enrolledOffer.approval_status == 2){
+                                    $(".card-container").append(
+                                        '<p><div class="card" id="' + offer.offer_id + '">' +
+                                            '<div class="card-body d-flex justify-content-between">' +
+                                                '<div><p class="card-text text-success"><b> Permohonan Diterima. Sila Membuat Keputusan </b></p>' +
+                                                '<h4 class="card-title">' + offer.jobposition + '</h4>' +
+                                                '<div><p class="card-text">' + offer.username + '<br>' + offer.venue + ', ' + offer.postal_code + ', ' + offer.city + ', ' + offer.state + '</p>' +
+                                                    '<p class="card-text badge badge-primary"> RM ' + minsal + ' - RM ' + maxsal + ' sebulan</p>' +
+                                                    ' <p class="card-text badge badge-primary">' + offer.typename + '</p>' +
+                                                    ' <p class="card-text badge badge-primary">' + offer.shiftname + '</p>' +
+                                                    // '<p class="card-text">' + offer.description.replace(/\n/g, '<br>') + '</p>' +
+                                                '</div></div>' +
+                                                '<div>' + button + '</div>' +
+                                            '</div>' +
+                                        '</div></p>'
+                                    );
+                                }
+                                else if(enrolledOffer.approval_status == 0){
+                                    $(".card-container").append(
+                                        '<p><div class="card" id="' + offer.offer_id + '">' +
+                                            '<div class="card-body d-flex justify-content-between">' +
+                                                '<div><p class="card-text text-danger"><b> Permohonan Ditolak ' + enrolledOffer.reason + ' </b></p>' +
+                                                '<h4 class="card-title">' + offer.jobposition + '</h4>' +
+                                                '<div><p class="card-text">' + offer.username + '<br>' + offer.venue + ', ' + offer.postal_code + ', ' + offer.city + ', ' + offer.state + '</p>' +
+                                                    '<p class="card-text badge badge-primary"> RM ' + minsal + ' - RM ' + maxsal + ' sebulan</p>' +
+                                                    ' <p class="card-text badge badge-primary">' + offer.typename + '</p>' +
+                                                    ' <p class="card-text badge badge-primary">' + offer.shiftname + '</p>' +
+                                                    // '<p class="card-text">' + offer.description.replace(/\n/g, '<br>') + '</p>' +
+                                                '</div></div>' +
+                                                '<div>' + button + '</div>' +
+                                            '</div>' +
+                                        '</div></p>'
+                                    );
+                                }
+                                else{
+                                    $(".card-container").append(
+                                        '<p><div class="card" id="' + offer.offer_id + '">' +
+                                            '<div class="card-body d-flex justify-content-between">' +
+                                                '<div><h4 class="card-title">' + offer.jobposition + '</h4>' +
+                                                '<div><p class="card-text">' + offer.username + '<br>' + offer.venue + ', ' + offer.postal_code + ', ' + offer.city + ', ' + offer.state + '</p>' +
+                                                    '<p class="card-text badge badge-primary"> RM ' + minsal + ' - RM ' + maxsal + ' sebulan</p>' +
+                                                    ' <p class="card-text badge badge-primary">' + offer.typename + '</p>' +
+                                                    ' <p class="card-text badge badge-primary">' + offer.shiftname + '</p>' +
+                                                    // '<p class="card-text">' + offer.description.replace(/\n/g, '<br>') + '</p>' +
+                                                    '<p class="card-text"><b> Sebab mohon: ' + enrolledOffer.description + ' </b></p>' +
+                                                '</div></div>' +
+                                                '<div>' + button + '</div>' +
+                                            '</div>' +
+                                        '</div></p>'
+                                    );
+                                }
                             }
+                            else{
+                                // button += '<a class="applyAnchor btn btn-success" href="/joinoffer/' + offer.offer_id + '">' +
+                                //     '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-person-plus-fill" viewBox="0 0 16 16">' +
+                                //     '<path d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>' +
+                                //     '<path fill-rule="evenodd" d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5"/>' +
+                                //     '</svg> Mohon</a>';
 
-                            if(enrolledOffer.approval_status == 2){
                                 $(".card-container").append(
                                     '<p><div class="card" id="' + offer.offer_id + '">' +
                                         '<div class="card-body d-flex justify-content-between">' +
-                                            '<div><p class="card-text text-success"><b> Permohonan Diterima. Sila Membuat Keputusan </b></p>' +
-                                            '<h4 class="card-title">' + offer.jobposition + '</h4>' +
-                                            '<div><p class="card-text">' + offer.username + '<br>' + offer.city + ', ' + offer.state + '</p>' +
+                                            '<div><h4 class="card-title">' + offer.jobposition + '</h4>' +
+                                            '<div><p class="card-text">' + offer.username + '<br>' + offer.venue + ', ' + offer.postal_code + ', ' + offer.city + ', ' + offer.state + '</p>' +
                                                 '<p class="card-text badge badge-primary"> RM ' + minsal + ' - RM ' + maxsal + ' sebulan</p>' +
                                                 ' <p class="card-text badge badge-primary">' + offer.typename + '</p>' +
                                                 ' <p class="card-text badge badge-primary">' + offer.shiftname + '</p>' +
-                                                '<p class="card-text">' + offer.description + '</p>' +
+                                                // '<p class="card-text">' + offer.description.replace(/\n/g, '<br>') + '</p>' +
+                                                '<p class="card-text text-secondary"> kemaskini ' + parseDate(offer.updateDate) + '</p>' +
                                             '</div></div>' +
                                             '<div>' + button + '</div>' +
                                         '</div>' +
                                     '</div></p>'
                                 );
                             }
-                            else if(enrolledOffer.approval_status == 0){
+
+                        }
+                        else if(offer.user_id == $("#uid").val()){
+
+                            if(offer.approval_status <= 1){
+                                button += '<a href="/editoffer/' + offer.offer_id + '" class="btn btn-warning m-2">Kemaskini</a>' +
+                                '<a class="deleteAnchor btn btn-danger m-2" href="#" id="' + offer.offer_id + '" data-bs-toggle="modal" data-bs-target="#deleteModal">Padam</a>';
+                            }
+
+                            if(offer.reason == ""){
                                 $(".card-container").append(
                                     '<p><div class="card" id="' + offer.offer_id + '">' +
                                         '<div class="card-body d-flex justify-content-between">' +
-                                            '<div><p class="card-text text-danger"><b> Permohonan Ditolak ' + enrolledOffer.reason + ' </b></p>' +
-                                            '<h4 class="card-title">' + offer.jobposition + '</h4>' +
-                                            '<div><p class="card-text">' + offer.username + '<br>' + offer.city + ', ' + offer.state + '</p>' +
+                                            '<div><h4 class="card-title">' + offer.jobposition + '</h4>' +
+                                            '<div><p class="card-text">' + offer.username + '<br>' + offer.venue + ', ' + offer.postal_code + ', ' + offer.city + ', ' + offer.state + '</p>' +
                                                 '<p class="card-text badge badge-primary"> RM ' + minsal + ' - RM ' + maxsal + ' sebulan</p>' +
                                                 ' <p class="card-text badge badge-primary">' + offer.typename + '</p>' +
                                                 ' <p class="card-text badge badge-primary">' + offer.shiftname + '</p>' +
-                                                '<p class="card-text">' + offer.description + '</p>' +
+                                                // '<p class="card-text">' + offer.description.replace(/\n/g, '<br>') + '</p>' +
+                                                '<p class="card-text text-secondary"> kemaskini ' + parseDate(offer.updateDate) + '</p>' +
                                             '</div></div>' +
-                                            '<div>' + button + '</div>' +
+                                            '<div>' + button + 
+                                            '</div>' +
                                         '</div>' +
                                     '</div></p>'
                                 );
@@ -160,92 +217,43 @@ $(document).ready(function() {
                                 $(".card-container").append(
                                     '<p><div class="card" id="' + offer.offer_id + '">' +
                                         '<div class="card-body d-flex justify-content-between">' +
-                                            '<div><h4 class="card-title">' + offer.jobposition + '</h4>' +
-                                            '<div><p class="card-text">' + offer.username + '<br>' + offer.city + ', ' + offer.state + '</p>' +
+                                            '<div><p class="card-text"> <b>Ditolak: ' + offer.reason + '</b></p>' +
+                                            '<h4 class="card-title">' + offer.jobposition + '</h4>' +
+                                            '<div><p class="card-text">' + offer.username + '<br>' + offer.venue + ', ' + offer.postal_code + ', ' + offer.city + ', ' + offer.state + '</p>' +
                                                 '<p class="card-text badge badge-primary"> RM ' + minsal + ' - RM ' + maxsal + ' sebulan</p>' +
                                                 ' <p class="card-text badge badge-primary">' + offer.typename + '</p>' +
                                                 ' <p class="card-text badge badge-primary">' + offer.shiftname + '</p>' +
-                                                '<p class="card-text">' + offer.description + '</p>' +
-                                                '<p class="card-text"><b> Sebab mohon: ' + enrolledOffer.description + ' </b></p>' +
+                                                // '<p class="card-text">' + offer.description.replace(/\n/g, '<br>') + '</p>' +
+                                                '<p class="card-text text-secondary"> kemaskini ' + parseDate(offer.updateDate) + '</p>' +
                                             '</div></div>' +
-                                            '<div>' + button + '</div>' +
+                                            '<div>' + button + 
+                                            '</div>' +
                                         '</div>' +
                                     '</div></p>'
                                 );
                             }
                         }
-                        else{
-                            // button += '<a class="applyAnchor btn btn-success" href="/joinoffer/' + offer.offer_id + '">' +
-                            //     '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-person-plus-fill" viewBox="0 0 16 16">' +
-                            //     '<path d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>' +
-                            //     '<path fill-rule="evenodd" d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5"/>' +
-                            //     '</svg> Mohon</a>';
 
-                            $(".card-container").append(
-                                '<p><div class="card" id="' + offer.offer_id + '">' +
-                                    '<div class="card-body d-flex justify-content-between">' +
-                                        '<div><h4 class="card-title">' + offer.jobposition + '</h4>' +
-                                        '<div><p class="card-text">' + offer.username + '<br>' + offer.city + ', ' + offer.state + '</p>' +
-                                            '<p class="card-text badge badge-primary"> RM ' + minsal + ' - RM ' + maxsal + ' sebulan</p>' +
-                                            ' <p class="card-text badge badge-primary">' + offer.typename + '</p>' +
-                                            ' <p class="card-text badge badge-primary">' + offer.shiftname + '</p>' +
-                                            '<p class="card-text">' + offer.description + '</p>' +
-                                            '<p class="card-text text-secondary"> kemaskini ' + offer.updateDate + '</p>' +
-                                        '</div></div>' +
-                                        '<div>' + button + '</div>' +
-                                    '</div>' +
-                                '</div></p>'
-                            );
-                        }
-
-                    }
-                    else if(offer.user_id == $("#uid").val()){
-
-                        if(offer.approval_status <= 1){
-                            button += '<a href="/editoffer/' + offer.offer_id + '" class="btn btn-warning m-2">Kemaskini</a>' +
-                            '<a class="deleteAnchor btn btn-danger m-2" href="#" id="' + offer.offer_id + '" data-bs-toggle="modal" data-bs-target="#deleteModal">Padam</a>';
-                        }
-
-                        if(offer.reason == ""){
-                            $(".card-container").append(
-                                '<p><div class="card" id="' + offer.offer_id + '">' +
-                                    '<div class="card-body d-flex justify-content-between">' +
-                                        '<div><h4 class="card-title">' + offer.jobposition + '</h4>' +
-                                        '<div><p class="card-text">' + offer.username + '<br>' + offer.city + ', ' + offer.state + '</p>' +
-                                            '<p class="card-text badge badge-primary"> RM ' + minsal + ' - RM ' + maxsal + ' sebulan</p>' +
-                                            ' <p class="card-text badge badge-primary">' + offer.typename + '</p>' +
-                                            ' <p class="card-text badge badge-primary">' + offer.shiftname + '</p>' +
-                                            '<p class="card-text">' + offer.description + '</p>' +
-                                            '<p class="card-text text-secondary"> kemaskini ' + offer.updateDate + '</p>' +
-                                        '</div></div>' +
-                                        '<div>' + button + 
-                                        '</div>' +
-                                    '</div>' +
-                                '</div></p>'
-                            );
-                        }
-                        else{
-                            $(".card-container").append(
-                                '<p><div class="card" id="' + offer.offer_id + '">' +
-                                    '<div class="card-body d-flex justify-content-between">' +
-                                        '<div><p class="card-text"> <b>Ditolak: ' + offer.reason + '</b></p>' +
-                                        '<h4 class="card-title">' + offer.jobposition + '</h4>' +
-                                        '<div><p class="card-text">' + offer.username + '<br>' + offer.city + ', ' + offer.state + '</p>' +
-                                            '<p class="card-text badge badge-primary"> RM ' + minsal + ' - RM ' + maxsal + ' sebulan</p>' +
-                                            ' <p class="card-text badge badge-primary">' + offer.typename + '</p>' +
-                                            ' <p class="card-text badge badge-primary">' + offer.shiftname + '</p>' +
-                                            '<p class="card-text">' + offer.description + '</p>' +
-                                            '<p class="card-text text-secondary"> kemaskini ' + offer.updateDate + '</p>' +
-                                        '</div></div>' +
-                                        '<div>' + button + 
-                                        '</div>' +
-                                    '</div>' +
-                                '</div></p>'
-                            );
-                        }
                     }
                     
                 });
+                
+                function matchesKeyword(offer, keyword) {
+                    return offer.jobname.toLowerCase().includes(keyword) ||
+                    offer.jobposition.toLowerCase().includes(keyword) ||
+                    offer.shiftname.toLowerCase().includes(keyword) ||
+                    offer.typename.toLowerCase().includes(keyword) ||
+                    offer.username.toLowerCase().includes(keyword) ||
+                    offer.start_date.includes(keyword) ||
+                    offer.end_date.includes(keyword);
+                }
+                
+                function matchesCityState(offer, cityState) {
+                    return offer.city.toLowerCase().includes(cityState) ||
+                    offer.state.toLowerCase().includes(cityState) ||
+                    offer.venue.toLowerCase().includes(cityState);
+                }
+
             },
             error: function (data) {
                 $('.condition-message').html(data);
@@ -347,7 +355,7 @@ $(document).ready(function() {
                 searchable: true,
             }, {
                 data: function(row) {
-                    return row.city + ', ' + row.state;
+                    return row.venue + ', ' + row.postal_code + ', ' + row.city + ', ' + row.state;
                 },
                 name: 'location',
                 orderable: true,

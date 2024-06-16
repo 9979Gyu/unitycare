@@ -15,7 +15,7 @@ class CreateJobOffersTable extends Migration
     {
         Schema::create('job_offers', function (Blueprint $table) {
             $table->id('offer_id');
-            $table->string('description');
+            $table->text('description');
             $table->string('state');
             $table->string('city');
             $table->integer('postal_code');

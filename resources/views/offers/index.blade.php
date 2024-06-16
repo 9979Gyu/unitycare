@@ -44,9 +44,7 @@
                         <path d="M0 12.5A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5V6.85L8.129 8.947a.5.5 0 0 1-.258 0L0 6.85z"/>
                     </svg>
                 </div>
-                <select name="keyword" id="keyword" class="form-control select2 flex-grow-1 mb-2 mb-lg-0">
-                    
-                </select>
+                <input type="text" name="keyword" id="keyword" class="form-control flex-grow-1 mb-2 mb-lg-0" placeholder="Kata kunci">
                 <div class="input-group-prepend tooltip-container m-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-geo-alt-fill" viewBox="0 0 16 16" data-bs-toggle="tooltip" 
                     title="Kawasan program diadakan">
@@ -108,5 +106,6 @@
     </div>
 
     <script src="{{ asset('js/indexOfferScript.js') }}"></script>
+    <script src="{{ asset('js/dateScript.js') }}"></script>
 
 @endsection

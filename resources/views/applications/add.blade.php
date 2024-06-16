@@ -31,7 +31,13 @@
             </tr>
             <tr>
                 <th scope="row">Tempat</th>
-                <td colspan="3">{{ $offer->city }}, {{ $offer->state }}</td>
+                <td colspan="3">{{ $offer->venue }}, {{ $offer->postal_code }}, {{ $offer->city }}, {{ $offer->state }}</td>
+            </tr>
+            <tr>
+                <th>Map</th>
+                <td colspan="3">
+                    <div id="map"></div>
+                </td>
             </tr>
             <tr>
                 <th scope="row">Jenis</th>
@@ -47,7 +53,7 @@
             </tr>
             <tr>
                 <th scope="row">Penerangan</th>
-                <td colspan="3">{{ json_decode($offer->description, true)['description'] }}</td>
+                <td colspan="3">{!! nl2br(e(json_decode($offer->description, true)['description'])) !!}</td>
             </tr>
             <tr>
                 <th scope="row" rowspan="2">Pengurus</th>
@@ -150,6 +156,12 @@
         </div>
     </form>
 
+    <!-- Leaflet initialization script -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+    <script src="{{ asset('js/mapScript.js') }}"></script>
     <script src="{{ asset('js/processApplicationScript.js') }}"></script>
+    
 
 @endsection

@@ -21,7 +21,7 @@ class CreateProgramsTable extends Migration
             $table->time('start_time');
             $table->date('end_date');
             $table->time('end_time');
-            $table->string('description');
+            $table->text('description');
             $table->string('venue');
             $table->unsignedBigInteger('type_id');
             $table->foreign('type_id')->references('type_id')->on('types')->onDelete('cascade');
