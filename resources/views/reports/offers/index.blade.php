@@ -123,8 +123,8 @@
                     <th>Jenis</th>
                     <th>Syif</th>
                     <th>Lokasi</th>
-                    <th>Bermula</th>
-                    <th>Tamat</th>
+                    <th>Tarikh</th>
+                    <th>Masa</th>
                     <th>Purata Gaji</th>
                     <th>Pekerja Diperlukan</th>
                     <th>Penerangan</th>

@@ -126,9 +126,6 @@ Route::post('/updateoffer', [OfferController::class, 'update']);
 
 Route::post('/approval', [OfferController::class, 'updateApproval']);
 Route::post('/deleteoffer', [OfferController::class, 'destroy']);
-
-
-Route::get('/getoffers', [OfferController::class, 'getOffersDatatable']);
 Route::get('/getUpdatedOffers', [OfferController::class, 'getUpdatedOffers']);
 
 

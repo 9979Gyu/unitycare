@@ -13,6 +13,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
+use App\Exports\ExportOffer;
+use Maatwebsite\Excel\Facades\Excel;
+
 class OfferController extends Controller
 {
     // Function to display the view for list of offer
@@ -217,23 +220,19 @@ class OfferController extends Controller
                     ', ' . $offer->city . ', ' . $offer->state;
 
                     $startDate = $offer->start_date;
+                    $endDate = $offer->end_date;
 
-                    if($startDate != null){
+                    if($startDate != null && $endDate != null){
                         $offer->start_date = DateController::parseDate($startDate);
-                        $offer->start = $offer->start_date . ' ' . $offer->start_time;
+                        $offer->end_date = DateController::parseDate($endDate);
+
+                        $offer->start = $offer->start_date . ' hingga ' . $offer->end_date;
                     }
                     else{
                         $offer->start = '';
                     }
-                    
-                    $endDate = $offer->end_date;
-                    if($endDate != null){
-                        $offer->end_date = DateController::parseDate($endDate);
-                        $offer->end = $offer->end_date . ' ' . $offer->end_time;
-                    }
-                    else{
-                        $offer->end = '';
-                    }
+
+                    $offer->end = $offer->start_time . ' hingga ' . $offer->end_time;
                    
                     $offer->people = $offer->quantity_enrolled . '/' . $offer->quantity . ' orang';
 
@@ -743,6 +742,141 @@ class OfferController extends Controller
             'allOffers' => $allOffers,
             'enrolledOffers' => $enrolledOffers
         ]);        
+    }
+
+    // Function to export offers
+    public function exportOffers(Request $request){
+
+        // Validate the request data
+        $rules = [
+            'organization' => 'required',
+            'position' => 'required',
+            'statusFilter' => 'required',
+            'startDate' => 'required',
+            'endDate' => 'required',
+        ];
+
+        $validated = $request->validate($rules);
+
+        if($validated){
+            $userID = $request->get('organization');
+            $jobID = $request->get('position');
+            $state = $request->get('statusFilter');
+            $status = 1;
+            $startDate = $request->get('startDate');
+            $endDate = $request->get('endDate');
+
+            // Handling for retrieve offers based on conditions
+            if(isset($userID) && isset($jobID) && isset($state) && isset($status)){
+
+                // User choose Dipadam
+                if($state == 4){
+                    $status = 0;
+                }
+
+            
+                $query = Job_Offer::where([
+                    ['job_offers.status', $status],
+                    ['job_offers.start_date', '>=', $startDate],
+                    ['job_offers.start_date', '<=', $endDate],
+                ])
+                ->join('users as u', 'u.id', '=', 'job_offers.user_id')
+                ->leftJoin('users as processed', function($join) {
+                    $join->on('processed.id', '=', 'job_offers.approved_by')
+                            ->whereNotNull('job_offers.approved_by');
+                })
+                ->join('job_types as jt', 'jt.job_type_id', '=', 'job_offers.job_type_id')
+                ->join('shift_types as st', 'st.shift_type_id', '=', 'job_offers.shift_type_id')
+                ->join('jobs as j', 'j.job_id', '=', 'job_offers.job_id');
+
+                // If user choose Semua
+                if($userID != "all"){
+                    $query->where('job_offers.user_id', $userID);
+                }
+
+                if($jobID != "all"){
+                    $query->where('job_offers.job_id', $jobID);
+                }
+
+                // If user choose to view by approval_status
+                if($state != 3 && $state != 4){
+                    $query = $query->where('job_offers.approval_status', $state);
+                }
+
+                $selectedOffers = $query->select(
+                    'job_offers.*',
+                    'u.name as username', 
+                    'u.contactNo as usercontact', 
+                    'u.email as useremail',
+                    'processed.name as processedname', 
+                    'processed.email as processedemail',
+                    'j.name as jobname',
+                    'j.position as jobposition',
+                    'jt.name as typename',
+                    'st.name as shiftname',
+                    'job_offers.description->description as description',
+                    'job_offers.description->reason as reason',
+                )
+                ->orderBy('job_offers.updated_at', 'desc')
+                ->get();
+
+                // Transform the data but keep it as a collection of objects
+                $selectedOffers->transform(function ($offer) {
+
+                    if($offer->approved_at == null){
+                        $offer->approved_at = $offer->updated_at;
+                    }
+
+                    $approved_at = explode(' ', $offer->approved_at);
+                    $offer->approved_at = DateController::parseDate($approved_at[0]) . ' ' . $approved_at[1];
+
+                    if($offer->approval_status == 0){
+                        $approval = "Ditolak: " . $offer->reason;
+                    }
+                    elseif($offer->approval_status == 1){
+                        $approval = "Belum Diproses";
+                    }
+                    else{
+                        $approval = "Telah Diluluskan";
+                    }
+
+                    $offer->approval = $approval;
+
+                    $offer->address = $offer->venue . ', ' . $offer->postal_code . 
+                    ', ' . $offer->city . ', ' . $offer->state;
+
+                    $startDate = $offer->start_date;
+                    $endDate = $offer->end_date;
+
+                    if($startDate != null && $endDate != null){
+                        $offer->start_date = DateController::parseDate($startDate);
+                        $offer->end_date = DateController::parseDate($endDate);
+
+                        $offer->date = $offer->start_date . ' hingga ' . $offer->end_date;
+                    }
+                    else{
+                        $offer->date = '';
+                    }
+
+                    $offer->time = $offer->start_time . ' hingga ' . $offer->end_time;
+                    
+                    $offer->people = $offer->quantity_enrolled . '/' . $offer->quantity . ' orang';
+
+                    return $offer;
+                });
+            }
+
+            if(isset($selectedOffers)){
+                return Excel::download(new ExportOffer($selectedOffers), 
+                    'Offers-' . time() . '.xlsx'
+                );
+            }
+
+
+        }
+
+        return redirect('/viewoffer')->withErrors(["message" => "Eksport Excel tidak berjaya"]);
+
     }
 
 }
