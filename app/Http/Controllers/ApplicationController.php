@@ -23,37 +23,35 @@ class ApplicationController extends Controller
 {
 
     // Email to notify user about the creation of job
-    public function notifyUser($offerID){
+    public function notifyUser($applicationID){
 
-        $offer = Job_Offer::where('job_offers.offer_id', $offerID)
-        ->join('jobs', 'jobs.job_id', '=', 'job_offers.job_id')
-        ->join('applications as a', 'a.offer_id', '=', 'job_offers.offer_id')
+        $apps = Application::where('applications.application_id', $applicationID)
+        ->join('job_offers as jo', 'jo.offer_id', '=', 'applications.offer_id')
+        ->join('jobs', 'jobs.job_id', '=', 'jo.job_id')
+        ->join('poors', 'poors.poor_id', '=', 'applications.poor_id')
+        ->join('users', 'users.id', '=', 'poors.user_id')
         ->select(
             'jobs.position',
-            'a.approval_status',
-            'a.approved_at',
-            'a.applied_date',
-            'a.poor_id'
+            'applications.approval_status',
+            'applications.approved_at',
+            'applications.applied_date',
+            'users.username',
+            'users.email',
         )
         ->first();
-
-        $user = User::join('poors', 'poors.user_id', '=', 'users.id')
-        ->where('poors.poor_id', $offer->poor_id)
-        ->select('users.username', 'users.email')
-        ->first();
         
-        if($offer->approved_at == null){
-            $offer->approved_at = $offer->applied_date;
+        if($apps->approved_at == null){
+            $apps->approved_at = $apps->applied_date;
         }
 
-        $date = explode(" ", $offer->approved_at);
+        $date = explode(" ", $apps->approved_at);
         $convertedDate = DateController::parseDate($date[0]);
-
-        Mail::to($user->email)->send(new NotifyJoinEmail([
-            'name' => $user->username,
+        
+        Mail::to($apps->email)->send(new NotifyJoinEmail([
+            'name' => $apps->username,
             'subject' => 'pekerjaan',
-            'approval' => $offer->approval_status,
-            'offer' => $offer->position,
+            'approval' => $apps->approval_status,
+            'offer' => $apps->position,
             'datetime' => $convertedDate . ' ' . $date[1],
         ]));
     }
@@ -167,6 +165,7 @@ class ApplicationController extends Controller
 
                 $selectedOffers = $query->select(
                     'applications.*',
+                    'applier.id as user_id',
                     'u.name as username', 
                     'u.contactNo as usercontact', 
                     'u.email as useremail',
@@ -243,28 +242,17 @@ class ApplicationController extends Controller
                     $btn = '<div class="justify-content-center">';
                     $btn .= '<a href="/joinoffer/' . $row->offer_id . '"><span class="btn btn-primary m-1"> Lihat </span></a>';
                     
-                    //  Is admin or staff
-                    if(Auth::user()->roleID == 1 || Auth::user()->roleID == 2){
-                        
-                        if($row->approval_status == 1){
-                            // Program is pending approval
+                    if($row->user_id == Auth::user()->id){
+                        if($row->approval_status == 2 && $row->is_selected == 1){
+                            // Program is approved
                             $btn .= '<div>';
-                            $btn .= '<a class="approveAnchor" href="#" id="' . $row->offer_id . '"><span class="btn btn-success m-1" data-bs-toggle="modal" data-bs-target="#approveModal"> Lulus </span></a>';
+                            $btn .= '<a class="approveAnchor" href="#" id="' . $row->offer_id . '"><span class="btn btn-success m-1" data-bs-toggle="modal" data-bs-target="#approveModal"> Terima </span></a>';
                             $btn .= '<a class="declineAnchor" href="#" id="' . $row->offer_id . '"><span class="btn btn-danger m-1" data-bs-toggle="modal" data-bs-target="#declineModal"> Tolak </span></a>';
                             $btn .= '</div>';
                         }
-                    }
-                    else{
-                        if($row->user_id == Auth::user()->id){
-                            if($row->approval_status == 1){
-                                
-                                // Program is pending approval
-                                $btn .= '<div>';
-                                $btn .= '<a href="/editoffer/' . $row->offer_id . '"><span class="btn btn-warning m-1"> Kemaskini </span></a>';
-                                $btn .= '</div>';
-                            }
+                        else{
+                            $btn .= '<a class="deleteAnchor" href="#" id="' . $row->application_id . '"><span class="btn btn-danger m-1" data-bs-toggle="modal" data-bs-target="#deleteModal"> Padam </span></a>';
                         }
-                        $btn .= '<a class="deleteAnchor" href="#" id="' . $row->offer_id . '"><span class="btn btn-danger m-1" data-bs-toggle="modal" data-bs-target="#deleteModal"> Padam </span></a>';
                     }
 
                     $btn .= '</div>';
@@ -287,6 +275,7 @@ class ApplicationController extends Controller
     public function create($id){
 
         if(Auth::check() && isset($id)){
+
             $offer = Job_Offer::where([
                 ['offer_id', $id],
                 ['status', 1],
@@ -294,8 +283,10 @@ class ApplicationController extends Controller
             ->with(['organization', 'jobType', 'shiftType', 'job'])
             ->first();
 
-            $offer->start_date = DateController::parseDate($offer->start_date);
-            $offer->end_date = DateController::parseDate($offer->end_date);
+            if($offer->start_date != null && $offer->end_date != null){
+                $offer->start_date = DateController::parseDate($offer->start_date);
+                $offer->end_date = DateController::parseDate($offer->end_date);
+            }
 
             $alreadyApply = Job_Offer::where([
                 ['status', 1],
@@ -305,13 +296,22 @@ class ApplicationController extends Controller
             ->whereHas('applications', function($query){
                 $query->where([
                     ['status', 1],
-                    ['approval_status', '>=', 1],
+                    ['approval_status', '<>', 1],
                 ])
                 ->whereHas('poor', function ($query) {
                     $query->where('user_id', Auth::user()->id);
                 });
             })
             ->count();
+
+            $approval = Application::where([
+                ['applications.offer_id', $id],
+                ['applications.status', 1],
+            ])
+            ->join('poors as p', 'p.poor_id', '=', 'applications.poor_id')
+            ->join('users as u', 'u.id', '=', 'p.user_id')
+            ->where('u.id', Auth::user()->id)
+            ->value('approval_status');
 
             $applicationExist = Application::where([
                 ['status', 1],
@@ -328,24 +328,9 @@ class ApplicationController extends Controller
             })
             ->count();
 
-            $selectedApplication = Application::where([
-                ['status', 1],
-                ['approval_status', 2],
-                ['is_selected', 2],
-            ])
-            ->whereHas('jobOffer', function ($query) use ($id) {
-                $query->where([
-                    ['approval_status', 2],
-                ]);
-            })
-            ->whereHas('poor', function ($query) {
-                $query->where('user_id', Auth::user()->id);
-            })
-            ->count();
-
             // dd($applicationExist);
     
-            return view('applications.add', compact('offer', 'applicationExist', 'alreadyApply', 'selectedApplication'));
+            return view('applications.add', compact('offer', 'applicationExist', 'alreadyApply', 'approval'));
         }
 
         return redirect('/login')->withErrors(['message' => 'Anda tidak dibenarkan untuk melayari halaman ini']);
@@ -398,7 +383,7 @@ class ApplicationController extends Controller
                 $result = $application->save();
     
                 if($result){
-                    $this->notifyUser($offerID);
+                    $this->notifyUser($application->application_id);
                     return redirect('/viewoffer')->with('success', 'Data berjaya disimpan');
                 }
             }
@@ -409,10 +394,27 @@ class ApplicationController extends Controller
         
     }
 
+    public function destroy(Request $request){
+        $appID = $request->get('applicationID');
+
+        $update = Application::where('application_id', $appID)
+        ->update([
+            'status' => 0
+        ]);
+
+        if($update){
+            return redirect('/viewapplication')->with('success', 'Data berjaya dipadam');
+        }
+        else{
+            return redirect('/viewapplication')->withErrors(['message' => "Data tidak berjaya dipadam"]);
+        }
+
+    }
+
     public function dismiss(Request $request)
     {
         //
-        $id =  $request->selectedID;
+        $id =  $request->get('offerID');
 
         if(isset($id)){
             $result = Application::where([
@@ -556,175 +558,158 @@ class ApplicationController extends Controller
     }
 
     public function updateApproval(Request $request){
-        $id = $request->get("selectedID");
 
-        $poorID = Application::where([
-            ['application_id', $id],
-            ['status', 1],
-        ])
-        ->value('poor_id');
-        
-        // Get the current date and time
-        $currentDateTime = date('Y-m-d H:i:s');
+        // application id
+        $id = $request->get("offerID");
+        $status = $request->get("approval_status");
 
-        if(isset($id) && isset($currentDateTime)){
-            // Update the program details
-            $update = Application::where([
-                ['application_id', $id],
-                ['status', 1],
-            ])
-            ->update([
-                'approval_status' => 2,
-                'approved_by' => Auth::user()->id, 
-                'approved_at' => $currentDateTime,
-            ]);
+        if(isset($id)){
+            $update = 0;
+
+            if($status == 2){
+
+                // Update the program details
+                $update = Application::where([
+                    ['application_id', $id],
+                    ['status', 1],
+                ])
+                ->update([
+                    'approval_status' => 2,
+                    'approved_by' => Auth::user()->id, 
+                    'approved_at' => date('Y-m-d H:i:s'),
+                    'updated_at' => date('Y-m-d H:i:s'),
+                ]);
+            }
+            else{
+                // Get the current description
+                $currentDesc = Application::where('application_id', $id)
+                ->value('description');
+
+                // Decode the JSON to an associative array
+                $descArray = json_decode($currentDesc, true);
+
+                // Update the 'reason' field
+                $descArray['reason'] = $request->get('reason');
+
+                // Encode the array back to JSON
+                $newDesc = json_encode($descArray);
+
+                // Update the program details
+                $update = Application::where([
+                    ['application_id', $id],
+                    ['status', 1],
+                ])
+                ->update([
+                    'approval_status' => 0,
+                    'approved_by' => Auth::user()->id, 
+                    'description' => $newDesc,
+                    'approved_at' => date('Y-m-d H:i:s'),
+                    'updated_at' => date('Y-m-d H:i:s'),
+                ]);
+                    
+            }
 
             if($update){
-                
-                $offerID = Application::where('application_id', $id)->value('offer_id');
-
-                // Update the number of quantity enrolled in job_offers
-                $updateQty = Job_Offer::where('offer_id', $offerID)
-                ->increment('quantity_enrolled')
-                ->first();
-            
-                $this->notifyUser($offerID);
+                $this->notifyUser($id);
             }
             
-            // Direct user to view program page with success messasge
+            // Direct user to view page with success messasge
             return redirect('/viewapplication')->with('success', 'Data berjaya dikemaskini');
         }
 
-        // direct user to view program page with error messasge
-        return redirect()->back()->withErrors(['message' => "Data tidak berjaya dikemaskini"]);
-
-    }
-
-    public function declineApproval(Request $request){
-
-        // Get the current date and time
-        $currentDateTime = date('Y-m-d H:i:s');
-
-        $id = $request->get("selectedID");
-
-        // Get the current description
-        $currentDesc = Application::where('application_id', $id)
-        ->value('description');
-
-        // Decode the JSON to an associative array
-        $descArray = json_decode($currentDesc, true);
-
-        // Update the 'reason' field
-        $descArray['reason'] = $request->get('reason');
-
-        // Encode the array back to JSON
-        $newDesc = json_encode($descArray);
-
-        if(isset($id)){
-            // Update the program details
-            $update = Application::where([
-                ['application_id', $id],
-                ['status', 1],
-            ])
-            ->update([
-                'approval_status' => 0,
-                'approved_by' => Auth::user()->id, 
-                'description' => $newDesc,
-                'approved_at' => $currentDateTime,
-            ]);
-
-            // If successfully update the program
-            if($update){
-
-                $offerID = Application::where('application_id', $id)->value('offer_id');
-                $this->notifyUser($offerID);
-
-                // direct user to view program page with success messasge
-                return redirect('/viewapplication')->with('success', 'Data berjaya dikemaskini');
-            }
-        }
-
-        // direct user to view program page with error messasge
-        return redirect()->back()->withErrors(['message' => "Data tidak berjaya dikemaskini"]);
+        // direct user to view page with error messasge
+        return redirect('/viewapplication')->withErrors(['message' => "Data tidak berjaya dikemaskini"]);
 
     }
 
     // Function to update user confirm for job offer
     public function confirmOffer(Request $request){
 
-        $id = $request->get('selectedID');
+        $id = $request->get('offerID');
+        $status = $request->get('approval_status');
 
-        // Update user selection
-        $update = Application::where([
-            ['application_id', $id],
+        $apps = Application::where([
+            ['offer_id', $id],
             ['approval_status', 2],
-            ['status', 1]
-        ])
-        ->update([
-            ['is_selected' => 2],
+        ]);
+
+        $update = $apps->update([
+            'is_selected' => $status,
+            'updated_at' => date('Y-m-d H:i:s')
         ]);
 
         // If successfully update the status, decline other offer
         if($update){
 
+            $poorID = Poor::where('user_id', Auth::user()->id)->value('poor_id');
             // Update employment status
-            $update = Poor::where('poor_id', $poorID)->update(['employment_status' => 1]);
+            $employed = Poor::where('user_id', Auth::user()->id)->update(['employment_status' => 1]);
 
-            if($update){
-                
-                // Update other applications status to 0 if the employment status is 1
+            if($employed){
+
+                $appsid = $apps->value('application_id');
+
+                $currentDesc = Application::where('application_id', $appsid)
+                ->value('description');
+
+                // Decode the JSON to an associative array
+                $descArray = json_decode($currentDesc, true);
+
+                // Update the 'reason' field
+                $descArray['reason'] = "System tolak secara automatik";
+
+                // Encode the array back to JSON
+                $newDesc = json_encode($descArray);
+
+                // Update other applications status to 0 if the approval status is 1
                 $updateOthers = Application::where([
                     ['status', 1],
-                    ['approval_status', 1],
+                    ['approval_status', '>=', 1],
                     ['poor_id', $poorID],
-                    ['application_id', '<>', $id]
+                    ['application_id', '<>', $appsid]
                 ])
                 ->update([
-                    ['status' => 0],
-                    ['is_selected' => 0]
+                    'status' => 0,
+                    'is_selected' => 0,
+                    'description' => $newDesc
                 ]);
 
                 if($updateOthers){
 
+                    // Update the number of quantity enrolled in job_offers
+                    $updateQty = Job_Offer::where('offer_id', $id)
+                    ->increment('quantity_enrolled');
+
+                    $jobOffer = Job_Offer::where('offer_id', $id)->first();
+
+                    if ($jobOffer->quantity_enrolled === $jobOffer->quantity) {
+                        // If quantity_enrolled is equal to quantity, set is_full to 1
+                        $jobOffer->update(['is_full' => 1]);
+
+                        // Update remaining user application
+                        Application::where([
+                            ['offer_id', $id],
+                            ['status', 1],
+                            ['approval_status', 1],
+                        ])
+                        ->update([
+                            'approval_status' => 0,
+                            'description' => $newDesc,
+                        ]);
+                        
+                    }
+
                     // Send email to notify organization
 
-                    // Direct user to view program page with success messasge
+                    // Direct user to view page with success messasge
                     return redirect('/viewapplication')->with('success', 'Data berjaya dikemaskini');
                 }
                 
             }
         }
 
-        // direct user to view program page with error messasge
-        return redirect()->back()->withErrors(['message' => "Data tidak berjaya dikemaskini"]);
-    }
-
-    // Function to update user reject for job offer
-    public function rejectOffer(Request $request){
-
-        $id = $request->get('selectedID');
-
-        // Update user selection
-        $update = Application::where([
-            ['application_id', $id],
-            ['approval_status', 2],
-            ['status', 1]
-        ])
-        ->update([
-            ['is_selected' => 0],
-        ]);
-
-        // If successfully update the status, decline other offer
-        if($update){
-
-            // Send email to notify organization
-
-            // Direct user to view program page with success messasge
-            return redirect('/viewapplication')->with('success', 'Data berjaya dikemaskini');
-        }
-
-        // direct user to view program page with error messasge
-        return redirect()->back()->withErrors(['message' => "Data tidak berjaya dikemaskini"]);
+        // direct user to view page with error messasge
+        return redirect('/viewapplication')->withErrors(['message' => "Data tidak berjaya dikemaskini"]);
     }
 
     // Function to export offer info
@@ -979,4 +964,6 @@ class ApplicationController extends Controller
         
         return redirect()->back()->withErrors(["message" => "Eksport Excel tidak berjaya"]);
     }
+
+
 }

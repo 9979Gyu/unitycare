@@ -325,7 +325,9 @@ $(document).ready(function() {
 
                                 }
                                 else if(enrolledOffer.approval_status == 2){
-                                    approvalText = "Permohonan Diterima. Sila Membuat Keputusan";
+                                    if(enrolledOffer.is_selected == 1){
+                                        approvalText = "Permohonan Diterima. Sila Membuat Keputusan di Halaman Permohonan";
+                                    }
                                     approvalColor = "text-success";
                                 }
                                 else {
@@ -428,6 +430,7 @@ $(document).ready(function() {
     });
 
     $('#approve').click(function() {
+
         $.ajax({
             type: 'POST',
             dataType: 'html',

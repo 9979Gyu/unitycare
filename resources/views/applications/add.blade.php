@@ -41,10 +41,12 @@
                 <th scope="row">Syif</th>
                 <td colspan="3">{{ $offer->shiftType->name }}</td>
             </tr>
+            @if($offer->jobType->job_type_id != 1)
             <tr>
                 <th scope="row">Tarikh</th>
                 <td colspan="3">{{ $offer->start_date }} Hingga {{ $offer->end_date }}</td>
             </tr>
+            @endif
             <tr>
                 <th scope="row">Masa</th>
                 <td colspan="3">{{ $offer->start_time }} Hingga {{ $offer->end_time }}</td>
@@ -78,9 +80,9 @@
                 <th scope="row">Pilihan</th>
                 <td colspan="3">
                 @if(Auth::user()->roleID == 5)
-                    @if($offer->user_id != Auth::user()->id && $applicationExist == 0 && $alreadyApply == 0)
+                    @if($offer->user_id != Auth::user()->id && $alreadyApply == 0)
                         <button type="button" class="btn btn-success" name="apply" id="apply" value="mohon"><b>Mohon</b></button>
-                    @elseif($applicationExist > 0 && $alreadyApply > 0)
+                    @elseif($applicationExist > 0 && $alreadyApply > 0 && $approval == 2)
                         <button type="button" class="btn btn-success" name="approve" id="approve" value="terima"><b>Terima</b></button>
                         <button type="button" class="btn btn-danger" name="decline" id="decline" value="tolak"><b>Tolak</b></button>
                     @endif
@@ -119,7 +121,7 @@
     </form>
 
     <!-- Confirm job -->
-    <form method="POST" action="/confirmapplication" id="confirmForm">
+    <form method="POST" action="/confirmOffer" id="confirmForm">
         @csrf
         <div class="modal fade" id="approveModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -130,7 +132,8 @@
                     </div>
                     <div class="modal-body">
                         <p>Adakah anda pasti untuk menerima perkerjaan ini? </p>
-                        <input type="number" name="offerId" id="offerId" value="{{ $offer->offer_id }}" hidden>  
+                        <input type="number" name="offerID" value="{{ $offer->offer_id }}" hidden>  
+                        <input type="number" name="approval_status" value="2" hidden>  
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-danger" id="submitApprove">Terima</button>
@@ -142,7 +145,7 @@
     </form>
 
     <!-- Reject job -->
-    <form method="POST" action="/rejectapplication" id="rejectForm">
+    <form method="POST" action="/confirmOffer" id="rejectForm">
         @csrf
         <div class="modal fade" id="declineModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -153,7 +156,8 @@
                     </div>
                     <div class="modal-body">
                         <p>Adakah anda pasti untuk menolak perkerjaan ini? </p>
-                        <input type="number" name="offerId" id="offerId" value="{{ $offer->offer_id }}" hidden>  
+                        <input type="number" name="offerID" value="{{ $offer->offer_id }}" hidden>  
+                        <input type="number" name="approval_status" value="0" hidden>
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-danger" id="submitReject">Tolak</button>

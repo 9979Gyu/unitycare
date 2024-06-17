@@ -222,8 +222,11 @@ $(document).ready(function() {
         $.ajax({
             type: 'POST',
             dataType: 'html',
-            url: "/approveapplication",
-            data: {selectedID : selectedID },
+            data: {
+                approval_status : 2,
+                offerID : selectedID
+            },
+            url: "/updateApproval",
             success: function(data) {
                 $('#approveModal').modal('hide');
                 $('.condition-message').html(data);
@@ -289,10 +292,11 @@ $(document).ready(function() {
         $.ajax({
             type: 'POST',
             dataType: 'html',
-            url: "/declineapplication",
+            url: "/updateApproval",
             data: {
+                approval_status : 0,
                 reason: declineReason,
-                selectedID: selectedID
+                offerID: selectedID
             },
             success: function(data) {
                 $('#declineModal').modal('hide');

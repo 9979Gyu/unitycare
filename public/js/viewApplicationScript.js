@@ -1,10 +1,5 @@
 $(document).ready(function() {
 
-    // Disabled the Tolak button in modal
-    $("#decline").prop("disabled", true);
-    // Hide the explaination input field
-    $("#more").hide();
-
     // Initialize select2
     $('#organization').select2({
         placeholder: 'Pilih Pengurus',
@@ -240,8 +235,8 @@ $(document).ready(function() {
             $.ajax({
                 type: 'POST',
                 dataType: 'html',
-                url: "/deleteoffer",
-                data: { offerID : selectedID },
+                url: "/deleteApplication",
+                data: { applicationID : selectedID },
                 success: function(response) {
                     $('#deleteModal').modal('hide');
                     $('.condition-message').html(response);
@@ -269,7 +264,7 @@ $(document).ready(function() {
                 approval_status : 2,
                 offerID : selectedID
             },
-            url: "/approval",
+            url: "/confirmOffer",
             success: function(data) {
                 $('#approveModal').modal('hide');
                 $('.condition-message').html(data);
@@ -286,59 +281,14 @@ $(document).ready(function() {
         selectedID = $(this).attr('id');
     });
 
-    var declineReason = "";
-    
-    $("#reason").change(function() {
-
-        // Disabled the Tolak button in modal
-        $("#decline").prop("disabled", true);
-        // Hide the explaination input field
-        $("#explain").val("");
-        $("#more").hide();
-
-        // If select "lain-lain"
-        if($(this).val() == "others"){
-            $("#more").show();
-            declineReason = "";
-        }
-        else{
-            if($(this).val() !== "0"){
-                // Enable button
-                $("#decline").prop("disabled", false); 
-                
-                declineReason = "";
-                
-                if($(this).val() == "missing")
-                    declineReason = "Kekurangan maklumat"; 
-                else if($(this).val() == "unclear")
-                    declineReason = "Penerangan tidak jelas"; 
-                
-            }
-        }
-    });
-
-    $("#explain").change(function(){
-        // Check if the field has any value
-        if ($(this).val().trim() !== "") {
-            // Enable button
-            $("#decline").prop("disabled", false); 
-            declineReason += $(this).val();
-        } 
-        else {
-            // Disable button
-            $("#decline").prop("disabled", true); 
-        }
-    });
-
     $('#decline').click(function() {
 
         $.ajax({
             type: 'POST',
             dataType: 'html',
-            url: "/approval",
+            url: "/confirmOffer",
             data: {
                 approval_status : 0,
-                reason: declineReason,
                 offerID: selectedID
             },
             success: function(data) {
@@ -351,31 +301,6 @@ $(document).ready(function() {
                 $('.condition-message').html(data);
             }
         });
-    });
-
-    $(document).on('click', '.dismissAnchor', function() {
-        selectedID = $(this).attr('id');
-    });
-
-    $('#dismiss').click(function() {
-        if (selectedID) {
-            $.ajax({
-                type: 'POST',
-                dataType: 'html',
-                url: "/dismissoffer",
-                data: { offerID : selectedID },
-                success: function(data) {
-                    $('#dismissModal').modal('hide');
-                    $('.condition-message').html(data);
-                    
-                    requestTable.ajax.reload();
-
-                },
-                error: function (data) {
-                    $('.condition-message').html(data);
-                }
-            })
-        }
     });
 
 });

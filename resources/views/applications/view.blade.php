@@ -140,50 +140,35 @@
         </table>
     </div>
 
-    <!-- Approve Modal -->
+    <!-- Confirm job -->
     <div class="modal fade" id="approveModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="approveModalLabel">Lulus Permohonan</h5>
+                    <h5 class="modal-title" id="approveModalLabel">Terima Pekerjaan</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    Adakah anda pasti untuk meluluskan permohonan?
-
+                    <p>Adakah anda pasti untuk menerima perkerjaan ini? </p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" id="approve">Lulus</button>
+                    <button type="button" class="btn btn-danger" id="approve">Terima</button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Decline Modal -->
+    <!-- Reject job -->
     <div class="modal fade" id="declineModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="declineModalLabel">Tolak Permohonan</h5>
+                    <h5 class="modal-title" id="declineModalLabel">Tolak Pekerjaan</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Adakah anda pasti untuk menolakkan permohonan? </p>
-                    <div>
-                        <label for="reason" class="required">Sebab</label>
-                        <select name="reason" id="reason" class="form-select">
-                            <option value="0" selected>Pilih Sebab</option>
-                            <option value="unclear">Penerangan tidak jelas</option>
-                            <option value="others">Lain-lain</option>
-                        </select>
-                        <br>
-                        <div id="more">
-                            <label for="explain" class="required">Penerangan</label>
-                            <input type="text" name="explain" class="form-control" id="explain" placeholder="Tidak sesuai untuk pemohon" required>
-                        </div>
-                    </div>      
-
+                    <p>Adakah anda pasti untuk menolak perkerjaan ini? </p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger" id="decline">Tolak</button>

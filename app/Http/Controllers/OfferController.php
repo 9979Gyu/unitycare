@@ -579,7 +579,7 @@ class OfferController extends Controller
             $roleID = Auth::user()->roleID;
             $userID = Auth::user()->id;
 
-            if($roleID == 1 || $roleID == 2){
+            if($roleID == 1 || $roleID == 2 || $roleID == 3){
 
                 // Get the current description
                 $currentDesc = Job_Offer::where('offer_id', $offerID)
