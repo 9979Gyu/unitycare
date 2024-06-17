@@ -16,6 +16,9 @@ use Illuminate\Support\Facades\DB;
 use App\Exports\ExportOffer;
 use Maatwebsite\Excel\Facades\Excel;
 
+use Illuminate\Support\Facades\Mail;
+use App\Mail\NotifyJoinEmail;
+
 class OfferController extends Controller
 {
     // Function to display the view for list of offer
@@ -392,7 +395,7 @@ class OfferController extends Controller
             $result = $job_offer->save();
 
             if($result){
-                // $this->notifyUser($id);
+                $this->notifyUser($job_offer->offer_id);
 
                 return redirect('/viewoffer')->with('success', 'Data berjaya disimpan');
             }
@@ -555,7 +558,7 @@ class OfferController extends Controller
             ]);
 
             if($result){
-                // $this->notifyUser($id);
+                $this->notifyUser($id);
 
                 return redirect('/viewoffer')->with('success', 'Data berjaya dikemaskini');
             }
@@ -626,6 +629,9 @@ class OfferController extends Controller
                 }
 
                 if($result){
+
+                    $this->notifyUser($offerID);
+
                     return redirect('/viewoffer')->with('success', 'Data berjaya dikemaskini');
                 }
             }
@@ -877,6 +883,66 @@ class OfferController extends Controller
 
         return redirect('/viewoffer')->withErrors(["message" => "Eksport Excel tidak berjaya"]);
 
+    }
+
+    // Email to notify user about the creation of job
+    public function notifyUser($offerID){
+
+        $offer = Job_Offer::where('job_offers.offer_id', $offerID)
+        ->join('jobs', 'jobs.job_id', '=', 'job_offers.job_id')
+        ->first();
+        $user = User::where('id', $offer->user_id)->select('username', 'email')->first();
+
+        if($offer->approved_at == null){
+            $offer->approved_at = $offer->updated_at;
+        }
+
+        $approved_at = explode(' ', $offer->approved_at);
+        $offer->approved_at = DateController::parseDate($approved_at[0]) . ' ' . $approved_at[1];
+
+        Mail::to($user->email)->send(new NotifyJoinEmail([
+            'name' => $user->username,
+            'subject' => 'pekerjaan',
+            'approval' => $offer->approval_status,
+            'offer' => $offer->position,
+            'datetime' => $offer->approved_at,
+        ]));
+    }
+
+    // Email to notify all user about the deletion of job
+    public function notifyAllUser($offerID){
+
+        $users = Application::where([
+            ['applications.offer_id', $offerID],
+        ])
+        ->join('poors', 'poors.poor_id', '=', 'applications.poor_id')
+        ->join('users', 'users.id', '=', 'poors.user_id')
+        ->select(
+            'users.email',
+            'users.username',
+        )
+        ->get();
+
+        $offer = Job_Offer::where('job_offers.offer_id', $offerID)
+        ->join('jobs', 'jobs.job_id', '=', 'job_offers.job_id')
+        ->first();
+
+        if($offer->approved_at == null){
+            $offer->approved_at = $offer->updated_at;
+        }
+
+        $approved_at = explode(' ', $offer->approved_at);
+        $offer->approved_at = DateController::parseDate($approved_at[0]) . ' ' . $approved_at[1];
+
+        foreach($users as $user){
+            Mail::to($user->email)->send(new NotifyJoinEmail([
+                'name' => $user->username,
+                'subject' => 'pekerjaan',
+                'approval' => $offer->approval_status,
+                'offer' => $offer->position,
+                'datetime' => $offer->approved_at,
+            ]));
+        }
     }
 
 }
