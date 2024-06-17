@@ -31,11 +31,6 @@ class OfferController extends Controller
             $roleID = Auth::user()->roleID;
             $userID = Auth::user()->id;
 
-            // Get the list of user created offer
-            $query = User::where('users.status', 1)
-            ->join('job_offers as jo', 'jo.user_id', 'users.id')
-            ->where('jo.status', 1);
-
             // if is B40 / OKU
             if($roleID == 5){
 
@@ -47,10 +42,16 @@ class OfferController extends Controller
             else if($roleID < 4){
 
                 if($roleID == 3){
-                    $users = $query->where('users.id', $userID)
+                    $users = User::where('users.id', $userID)
                     ->get();
                 }
                 else{
+
+                    // Get the list of user created offer
+                    $query = User::where('users.status', 1)
+                    ->join('job_offers as jo', 'jo.user_id', 'users.id')
+                    ->where('jo.status', 1);
+
                     $users = $query
                     ->get();
                 }
@@ -200,15 +201,13 @@ class OfferController extends Controller
                 // Transform the data but keep it as a collection of objects
                 $selectedOffers->transform(function ($offer) {
 
-                    if($offer->approved_at == null){
-                        $offer->approved_at = $offer->updated_at;
+                    if($offer->approved_at != null){
+                        $approved_at = explode(' ', $offer->approved_at);
+                        $offer->approved_at = DateController::parseDate($approved_at[0]) . ' ' . $approved_at[1];
                     }
 
-                    $approved_at = explode(' ', $offer->approved_at);
-                    $offer->approved_at = DateController::parseDate($approved_at[0]) . ' ' . $approved_at[1];
-
                     if($offer->approval_status == 0){
-                        $approval = "Ditolak";
+                        $approval = "Ditolak: " . $offer->reason;
                     }
                     elseif($offer->approval_status == 1){
                         $approval = "Belum Diproses";
@@ -652,10 +651,12 @@ class OfferController extends Controller
         if(Auth::check()){
             
             if($offerID != null){
+                $userID = Auth::user()->id;
 
                 $result = Job_Offer::where([
                     ['status', 1],
                     ['offer_id', $offerID],
+                    ['user_id', $userID],
                 ])
                 ->update([
                     'status' => 0,
@@ -683,6 +684,8 @@ class OfferController extends Controller
                         'approval_status' => 0,
                         'status' => 0,
                     ]);
+
+                    $this->notifyAllUser($offerID);
 
                     return redirect('/viewoffer')->with('success', 'Data berjaya dikemaskini');
                 }
@@ -914,6 +917,8 @@ class OfferController extends Controller
 
         $users = Application::where([
             ['applications.offer_id', $offerID],
+            ['applications.approval_status', '>', 0],
+            ['applications.status', 1],
         ])
         ->join('poors', 'poors.poor_id', '=', 'applications.poor_id')
         ->join('users', 'users.id', '=', 'poors.user_id')
@@ -927,6 +932,8 @@ class OfferController extends Controller
         ->join('jobs', 'jobs.job_id', '=', 'job_offers.job_id')
         ->first();
 
+        dd($offer, $users);
+
         if($offer->approved_at == null){
             $offer->approved_at = $offer->updated_at;
         }
@@ -938,7 +945,7 @@ class OfferController extends Controller
             Mail::to($user->email)->send(new NotifyJoinEmail([
                 'name' => $user->username,
                 'subject' => 'pekerjaan',
-                'approval' => $offer->approval_status,
+                'approval' => 0,
                 'offer' => $offer->position,
                 'datetime' => $offer->approved_at,
             ]));

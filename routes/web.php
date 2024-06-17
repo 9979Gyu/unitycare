@@ -59,6 +59,7 @@ Route::post('/export-offers', [OfferController::class, 'exportOffers']);
 Route::post('/export-applications', [ApplicationController::class, 'exportApplications']);
 Route::post('/export-participants', [ParticipantController::class, 'exportParticipants']);
 Route::post('/export-specs', [ReportController::class, 'exportProgramsWithSpecs']);
+Route::post('/export-applies', [ApplicationController::class, 'exportApplied']);
 
 
 Route::get('/create', [UserController::class, 'create']);
@@ -132,12 +133,13 @@ Route::get('/getUpdatedOffers', [OfferController::class, 'getUpdatedOffers']);
 Route::get('/joinoffer/{id}', [ApplicationController::class, 'create']);
 Route::post('/dismissoffer', [ApplicationController::class, 'dismiss']);
 Route::post('/storeapplication', [ApplicationController::class, 'store']);
-Route::get('/getapplications', [ApplicationController::class, 'getApplicationsDatatable']);
+Route::get('/getApplications', [ApplicationController::class, 'getApplicationsDatatable']);
 Route::get('/viewapplication', [ApplicationController::class, 'index']);
 Route::post('/approveapplication', [ApplicationController::class, 'updateApproval']);
 Route::post('/declineapplication', [ApplicationController::class, 'declineApproval']);
 Route::post('/confirmapplication', [ApplicationController::class, 'confirmOffer']);
 Route::post('/rejectapplication', [ApplicationController::class, 'rejectOffer']);
+Route::get('/getApplicationsByCondition', [ApplicationController::class, 'getApplicationsByCondition']);
 
 Route::get('/getPrograms', [LandingController::class, 'getPrograms']);
 Route::get('/search', [LandingController::class, 'search']);

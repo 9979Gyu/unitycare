@@ -1,7 +1,7 @@
 $(document).ready(function() {
 
     $('#organization').select2({
-        placeholder: 'Pilih Penganjur',
+        placeholder: 'Pilih Pengurus',
     });
 
     $('#job').select2({
@@ -14,63 +14,23 @@ $(document).ready(function() {
 
     var requestTable;
     var selectedState = 3;
-    var selectedUser;
-    var selectedJob;
-    var selectedPosition;
+    var selectedUser = "all";
+    var selectedJob = "all";
+    var selectedPosition = "all";
     var status = 1;
-
-    $("#organization").prop('selectedIndex', 0);
 
     $("#organization").on('change', function(){
         // set value
         selectedUser = $("#organization option:selected").val();
         // get job list for dropdown
-       // To get list of job name
-        $.ajax({
-            url: '/getJobsByUser',
-            type: 'GET',
-            data: { selectedUser: selectedUser },
-            success: function(data){
-                
-                $('#job').empty();
-                $("#job").append('<option value="0">Pilih Pekerjaan</option>');
-
-                // append 'name' to the option
-                data.forEach(function(job){
-                    // Append each job as an option to the job select element
-                    $("#job").append('<option value="' + job.name + '">' + job.name + '</option>');
-                });
-
-            }
-        });
+        getJob(selectedUser, "#job");
     });
 
     $("#job").on('change', function(){
-        var jobName = $("#job option:selected").text();
+        selectedJob = $("#job option:selected").val();
 
-        if(jobName){
-            $.ajax({
-                url: '/getPositions',
-                type: 'GET',
-                data: { 
-                    jobName: jobName,
-                    userID: selectedUser 
-                },
-                success: function(data){
-                    $('#position').empty();
-                    $("#position").append('<option value="0">Pilih Jawatan</option>');
-
-                    data.forEach(function(item){
-                        $("#position").append('<option value="' + item.job_id + '">' + 
-                        item.position + '</option>');
-                    });
-                }
-            });
-        }
-        else{
-            $('#position').empty();
-            $("#position").append('<option selected>Pilih Jawatan</option>');
-        }
+        getPosition(selectedJob, selectedUser, "#position");
+        
     });
 
     $("#position").on('change', function(){
@@ -78,10 +38,12 @@ $(document).ready(function() {
         selectedPosition = $(this).val();
 
         // Call fetch_data() with the selected position
-        fetch_data(selectedState, selectedPosition); 
+        fetch_data(selectedUser, selectedPosition, selectedState, status);
     });
 
-    $('#allRadio, #pendingRadio, #approveRadio, #declineRadio').change(function() {
+    // Function to handle radio button value
+    $('#allRadio, #pendingRadio, #approveRadio, #declineRadio, #deleteRadio').change(function() {
+        status = 1;
         if ($('#allRadio').is(':checked')) {
             selectedState = 3;
         }
@@ -94,14 +56,20 @@ $(document).ready(function() {
         else if ($('#declineRadio').is(':checked')) {
             selectedState = 0;
         }
-        
+        else if ($('#deleteRadio').is(':checked')) {
+            status = 0
+        }
+
         // Fetch data based on the selected position
-        fetch_data(selectedState, selectedPosition);
+        fetch_data(selectedUser, selectedPosition, selectedState, status);
     });
 
-    function fetch_data(selectedState, selectedPosition) {
+    $("#organization").prop('selectedIndex', 0).trigger('change');
+    $("#job").prop('selectedIndex', 0).trigger('change');
+    $("#position").prop('selectedIndex', 0);
+    fetch_data(selectedUser, selectedPosition, selectedState, status);
 
-        console.log("this is state: " + selectedState + " this is position: " + selectedPosition);
+    function fetch_data(selectedUser, selectedPosition, selectedState, status) {
 
         // Make AJAX request to fetch data based on the selected position
         if ($.fn.DataTable.isDataTable('#requestTable')) {
@@ -136,11 +104,12 @@ $(document).ready(function() {
             processing: true,
             serverSide: true,
             ajax: {
-                url: "/getapplications",
+                url: "/getApplications",
                 data: {
-                    rid: $("#roleID").val(),
                     selectedState: selectedState,
-                    positionID: selectedPosition
+                    positionID: selectedPosition,
+                    userID: selectedUser,
+                    status: status,
                 },
                 type: 'GET',
 
@@ -150,7 +119,7 @@ $(document).ready(function() {
                 "className": "text-center",
                 "width": "2%"
             }, {
-                "targets": [1, 2, 3, 4, 5, 6],
+                "targets": [1, 2, 3, 4, 5, 6, 7],
                 "className": "text-center",
             },], 
             columns: [{
@@ -168,6 +137,11 @@ $(document).ready(function() {
                 orderable: true,
                 searchable: true,
             }, {
+                data: "address",
+                name: 'address',
+                orderable: true,
+                searchable: true,
+            }, {
                 data: "edu_level",
                 name: 'edu_level',
                 orderable: true,
@@ -178,14 +152,7 @@ $(document).ready(function() {
                 orderable: true,
                 searchable: true,
             }, {
-                data: function(row) {
-                    if(row.reason != "" && row.description != "")
-                        return row.description + ' <br><b class="text-danger">Ditolak: ' + row.reason + '</b>';
-                    else if(row.reason != "" && row.description == "")
-                        return '<b>Ditolak: ' + row.reason + '</b>';
-                    else
-                        return row.description;
-                },
+                data: "approval",
                 name: 'description',
                 orderable: false,
                 searchable: true,

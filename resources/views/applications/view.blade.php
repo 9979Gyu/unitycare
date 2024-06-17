@@ -26,15 +26,12 @@
 
     <br>
 
-    <form method="POST" action="/export-applications" class="container" id="excel">
+    <form method="POST" action="/export-applies" class="container" id="excel">
         @csrf
         <input type="number" name="roleID" id="roleID" value="{{ $roleNo }}" hidden>
         <div class="row mb-3">
             <div class="col-sm-12">
                 <select name="organization" id="organization" class="form-control select2 ">
-                    @if($roleNo == 1 || $roleNo == 2)
-                        <option value="all">Semua Organisasi</option>
-                    @endif
                     @foreach($users as $user)
                         <option value="{{ $user->id }}">{{ $user->name }}</option>
                     @endforeach
@@ -44,8 +41,11 @@
 
         <div class="row mb-3">
             <div class="col-sm-6">
-                <select name="job" id="job" class="form-control select2 ">
+                <select name="jobname" id="jobname" class="form-control select2 ">
                     <option value="all">Semua Pekerjaan</option>
+                    @foreach($applications as $apps)
+                        <option value="{{ $apps->name }}">{{ $apps->name }}</option>
+                    @endforeach
                 </select>
             </div>
             <div class="col-sm-6">
@@ -119,13 +119,18 @@
             <thead>
                 <tr style="text-align:center">
                     <th> No. </th>
-                    <th>Pemohon</th>
-                    <th>Alamat</th>
-                    <th>Peringkat Pendidikan</th>
-                    <th>Kategori</th>
+                    <th>Pekerjaan</th>
+                    <th>Jenis</th>
+                    <th>Syif</th>
+                    <th>Lokasi</th>
+                    <th>Tarikh</th>
+                    <th>Masa</th>
+                    <th>Purata Gaji</th>
                     <th>Sebab Mohon</th>
                     <th>Tarikh Mohon</th>
-                    <th>Jawatan</th>
+                    <th>Pengurus</th>
+                    <th>Status</th>
+                    <th>Diproses Pada</th>
                     <th>Tindakan</th>
                 </tr>
             </thead>
@@ -188,8 +193,9 @@
         </div>
     </div>
 
+    <script src="{{ asset('js/dateScript.js') }}"></script>
     <script src="{{ asset('js/general/offerScript.js') }}"></script>
-    <script src="{{ asset('js/indexApplicationScript.js') }}"></script>
+    <script src="{{ asset('js/viewApplicationScript.js') }}"></script>
     <script src="{{ asset('js/modalScript.js') }}"></script>
 
 

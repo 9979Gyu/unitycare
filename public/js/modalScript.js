@@ -4,13 +4,29 @@ $(document).ready(function(){
         $("#dateModal").modal('show');
     });
 
-    $('#applyDates').on('click', function(event) {
-        var startDate = new Date($('#startData').val());
-        var endDate = new Date($('#endDate').val());
+    $('#startDate').on('change', function(){
+        var startDate = $('#startDate').val();
+        var endDate = $('#endDate').val();
 
         if (startDate > endDate) {
-            alert('End date must be greater than start date.');
-            event.preventDefault();
+            $('#endDate').attr('min', startDate);
+            $('#endDate').val(startDate);
+        }
+        else{
+            $('#endDate').attr('min', '');
+        }
+    });
+
+    $('#endDate').on('change', function(){
+        var startDate = $('#startDate').val();
+        var endDate = $('#endDate').val();
+  
+        if (startDate > endDate) {
+            $('#endDate').attr('min', startDate);
+            $('#endDate').val(startDate);
+        }
+        else{
+            $('#endDate').attr('min', '');
         }
     });
 

@@ -75,6 +75,8 @@
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                                 
                                 <li><a class="dropdown-item" href="/viewoffer"><b>Lihat</b></a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="/viewapplication"><b>Permohonan</b></a></li>
                                 <!-- Is admin and staff -->
                                 @if(Auth::user()->roleID <= 2)
                                     <li><hr class="dropdown-divider"></li>  
@@ -87,8 +89,6 @@
                                 @if(Auth::user()->roleID == 3)
                                     <li><hr class="dropdown-divider"></li>
                                     <li><a class="dropdown-item" href="/createoffer"><b>Tambah</b></a></li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" href="/viewapplication"><b>Permohonan</b></a></li>
                                     <li><hr class="dropdown-divider"></li>
                                     <li><a class="dropdown-item" href="/index-offers"><b>Laporan</b></a></li>
                                 @endif

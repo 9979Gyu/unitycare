@@ -2,55 +2,49 @@
 
 namespace App\Exports;
 
-use App\Models\Job_Offer;
-use App\Models\Job;
-use App\Models\Shift_Type;
-use App\Models\Job_Type;
-use App\Models\User;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
-use DB;
 
-class ExportOffer implements FromCollection, WithHeadings, ShouldAutoSize
+class ExportApplied implements FromCollection, WithHeadings, ShouldAutoSize
 {
-    private $selectedOffers;
-
+    private $selectedApplication;
     /**
     * @return \Illuminate\Support\Collection
     */
-    public function __construct($selectedOffers){
-        $this->selectedOffers = $selectedOffers;
+
+    public function __construct($selectedApplication)
+    {
+        $this->selectedApplication = $selectedApplication;
     }
 
     public function collection()
     {
-        if(isset($this->selectedOffers)){
+        //
+        if(isset($this->selectedApplication)){
 
-            $selectedOffers = $this->selectedOffers->map(function ($item) {
+            $selectedApplication = $this->selectedApplication->map(function ($item) {
 
                 return[
                     'Pekerjaan' => $item->jobname . ' - ' . $item->jobposition,
                     'Jenis' => $item->typename,
                     'Syif' => $item->shiftname,
                     'Lokasi'  => $item->address,
-                    'Tarikh' => $item->date,
-                    'Masa' => $item->time,
+                    'Tarikh' => $item->start,
+                    'Masa' => $item->end,
                     'Purata Gaji' => 'RM ' . $item->min_salary . ' - RM ' . $item->max_salary,
-                    'Pekerja Diperlukan' => $item->quantity,
-                    'Penerangan' => $item->description,
+                    'Sebab Mohon' => $item->description,
+                    'Tarikh Mohon' => $item->applied_date,
                     'Nama Pengurus' => $item->username,
                     'Emel Pengurus' => $item->useremail,
                     'Telefon Pengurus' => '(+60)' . $item->usercontact,
                     'Status' => $item->approval,
-                    'Diproses Oleh' => $item->processedname . ' (' . $item->processedemail . ')',
                     'Diproses Pada' => $item->approved_at,
                 ];
             });
     
-            return $selectedOffers;
+            return $selectedApplication;
         }
-
     }
 
     public function headings(): array{
@@ -62,13 +56,12 @@ class ExportOffer implements FromCollection, WithHeadings, ShouldAutoSize
             'Tarikh',
             'Masa',
             'Purata Gaji',
-            'Pekerja Diperlukan',
-            'Penerangan',
+            'Sebab Mohon',
+            'Tarikh Mohon',
             'Nama Pengurus',
             'Emel Pengurus',
             'Telefon Pengurus',
             'Status',
-            'Diproses Oleh',
             'Diproses Pada'
         ];
     }
