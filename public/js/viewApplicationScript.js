@@ -21,13 +21,14 @@ $(document).ready(function() {
     var selectedPosition = "all";
     var status = 1;
     var roleID = $("#roleID").val();
+    var isSelected = 1;
 
     $("#organization").change(function(){
         // set value
         selectedUser = $("#organization option:selected").val();
         // get job list for dropdown
         getJob(selectedUser, "#jobname");
-        fetch_data(selectedUser, selectedPosition, selectedState, status);
+        fetch_data(selectedUser, selectedPosition, selectedState, status, isSelected);
     });
 
     $("#jobname").on('change', function(){
@@ -42,16 +43,16 @@ $(document).ready(function() {
         selectedPosition = $("#position option:selected").val();
 
         // get job list for dropdown
-        fetch_data(selectedUser, selectedPosition, selectedState, status);
+        fetch_data(selectedUser, selectedPosition, selectedState, status, isSelected);
     });
 
     $("#organization").prop('selectedIndex', 0).trigger('change');
     $("#jobname").prop('selectedIndex', 0).trigger('change');
     $("#position").prop('selectedIndex', 0);
-    fetch_data(selectedUser, selectedPosition, selectedState, status);
+    fetch_data(selectedUser, selectedPosition, selectedState, status, isSelected);
     
     // Function to handle radio button value
-    $('#allRadio, #pendingRadio, #approveRadio, #declineRadio, #deleteRadio').change(function() {
+    $('#allRadio, #pendingRadio, #approveRadio, #declineRadio, #deleteRadio, #confirmRadio').change(function() {
         status = 1;
         if ($('#allRadio').is(':checked')) {
             selectedState = 3;
@@ -65,15 +66,18 @@ $(document).ready(function() {
         else if ($('#declineRadio').is(':checked')) {
             selectedState = 0;
         }
+        else if ($('#confirmRadio').is(':checked')) {
+            isSelected = 2;
+        }
         else if ($('#deleteRadio').is(':checked')) {
             status = 0
         }
 
         // Fetch data based on the selected position
-        fetch_data(selectedUser, selectedPosition, selectedState, status);
+        fetch_data(selectedUser, selectedPosition, selectedState, status, isSelected);
     });
     
-    function fetch_data(selectedUser, selectedPosition, selectedState, status) {
+    function fetch_data(selectedUser, selectedPosition, selectedState, status, isSelected) {
 
         // Make AJAX request to fetch data based on the selected position
         if ($.fn.DataTable.isDataTable('#requestTable')) {
@@ -113,7 +117,8 @@ $(document).ready(function() {
                     selectedUser : selectedUser, 
                     selectedPosition : selectedPosition, 
                     selectedState : selectedState, 
-                    status : status
+                    status : status,
+                    isSelected: isSelected
                 },
                 type: 'GET',
 

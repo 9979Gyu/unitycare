@@ -73,6 +73,10 @@
                     <input class="form-check-input" type="radio" name="statusFilter" id="declineRadio" value="0">
                     <label class="form-check-label" for="decline">Ditolak</label>
                 </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="statusFilter" id="confirmRadio" value="is_selected">
+                    <label class="form-check-label" for="confirm">Telah Terima</label>
+                </div>
                 @if(Auth::user()->roleID == 1)
                     <div class="form-check form-check-inline">
                         <input class="form-check-input" type="radio" name="statusFilter" id="deleteRadio" value="4">

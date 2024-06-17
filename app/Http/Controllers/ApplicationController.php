@@ -132,6 +132,7 @@ class ApplicationController extends Controller
             $jobID = $request->get('selectedPosition');
             $state = $request->get('selectedState');
             $status = $request->get('status');
+            $isSelected = $request->get('isSelected');
 
             // Handling for retrieve offers based on conditions
             if(isset($userID) && isset($jobID) && isset($state) && isset($status)){
@@ -161,6 +162,10 @@ class ApplicationController extends Controller
                 // If user choose to view by approval_status
                 if($state != 3){
                     $query = $query->where('applications.approval_status', $state);
+                }
+
+                if($isSelected == 2){
+                    $query = $query->where('applications.is_selected', 2);
                 }
 
                 $selectedOffers = $query->select(
@@ -444,6 +449,7 @@ class ApplicationController extends Controller
             $userID = $request->get("userID");
             $status = $request->get("status");
             $selectedPosition = $request->get("positionID");
+            $isSelected = $request->get("isSelected");
 
             if(isset($selectedPosition)){
 
@@ -469,6 +475,10 @@ class ApplicationController extends Controller
 
                 if($selectedPosition != "all"){
                     $query = $query->where('j.job_id', $selectedPosition);
+                }
+
+                if($isSelected == 2){
+                    $query = $query->where('applications.is_selected', 2);
                 }
 
                 $selectedApplication = $query->select(
@@ -739,6 +749,11 @@ class ApplicationController extends Controller
                 $status = 0;
             }
 
+            if($state == "is_selected"){
+                $state = 3;
+                $is_selected = 2;
+            }
+
             if(isset($selectedPosition)){
 
                 $query = Application::where([
@@ -767,6 +782,10 @@ class ApplicationController extends Controller
 
                 if($selectedPosition != "all"){
                     $query = $query->where('j.job_id', $selectedPosition);
+                }
+
+                if($is_selected == 2){
+                    $query = $query->where('applications.is_selected', 2);
                 }
 
                 $selectedApplication = $query->select(
@@ -852,6 +871,11 @@ class ApplicationController extends Controller
 
             // Handling for retrieve offers based on conditions
             if(isset($userID) && isset($jobID) && isset($state)){
+
+                if($state == "is_selected"){
+                    $isSelected = 2;
+                    $state = 3;
+                }
                 
                 $query = Application::where([
                     ['applications.status', 1],
@@ -882,6 +906,10 @@ class ApplicationController extends Controller
                 // If user choose to view by approval_status
                 if($state != 3 && $state != 4){
                     $query = $query->where('applications.approval_status', $state);
+                }
+
+                if($isSelected == 2){
+                    $query = $query->where('applications.is_selected', 2);
                 }
 
                 $selectedApplications = $query->select(
