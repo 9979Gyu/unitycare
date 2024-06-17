@@ -328,8 +328,11 @@ $(document).ready(function() {
         $.ajax({
             type: 'POST',
             dataType: 'html',
-            data: {selectedID : selectedID},
-            url: "/approveoffer",
+            data: {
+                approval_status : 2,
+                offerID : selectedID
+            },
+            url: "/approval",
             success: function(data) {
                 $('#approveModal').modal('hide');
                 $('.condition-message').html(data);
@@ -395,10 +398,11 @@ $(document).ready(function() {
         $.ajax({
             type: 'POST',
             dataType: 'html',
-            url: "/declineoffer",
+            url: "/approval",
             data: {
+                approval_status : 0,
                 reason: declineReason,
-                selectedID: selectedID
+                offerID: selectedID
             },
             success: function(data) {
                 $('#declineModal').modal('hide');
@@ -422,7 +426,7 @@ $(document).ready(function() {
                 type: 'POST',
                 dataType: 'html',
                 url: "/dismissoffer",
-                data: { selectedID : selectedID },
+                data: { offerID : selectedID },
                 success: function(data) {
                     $('#dismissModal').modal('hide');
                     $('.condition-message').html(data);

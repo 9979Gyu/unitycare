@@ -122,17 +122,15 @@ Route::get('/getAllPositions', [OfferController::class, 'getAllPositions']);
 Route::post('/storeoffer', [OfferController::class, 'store']);
 
 Route::get('/editoffer/{id}', [OfferController::class, 'edit']);
+Route::post('/updateoffer', [OfferController::class, 'update']);
 
+Route::post('/approval', [OfferController::class, 'updateApproval']);
+Route::post('/deleteoffer', [OfferController::class, 'destroy']);
 
 
 Route::get('/getoffers', [OfferController::class, 'getOffersDatatable']);
-
-Route::post('/deleteoffer', [OfferController::class, 'destroy']);
 Route::get('/getUpdatedOffers', [OfferController::class, 'getUpdatedOffers']);
-Route::post('/deleteoffer', [OfferController::class, 'destroy']);
-Route::post('/updateoffer', [OfferController::class, 'update']);
-Route::post('/approveoffer', [OfferController::class, 'updateApproval']);
-Route::post('/declineoffer', [OfferController::class, 'declineApproval']);
+
 
 Route::get('/joinoffer/{id}', [ApplicationController::class, 'create']);
 Route::post('/dismissoffer', [ApplicationController::class, 'dismiss']);

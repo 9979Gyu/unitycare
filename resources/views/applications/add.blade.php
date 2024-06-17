@@ -34,20 +34,20 @@
                 <td colspan="3" id="address">{{ $offer->venue }}, {{ $offer->postal_code }}, {{ $offer->city }}, {{ $offer->state }}</td>
             </tr>
             <tr>
-                <th scope="row">Mula</th>
-                <td colspan="3">{{ $offer->start_date }} {{ $offer->start_time }}</td>
-            </tr>
-            <tr>
-                <th scope="row">Tamat</th>
-                <td colspan="3">{{ $offer->end_date }} {{ $offer->end_time }}</td>
-            </tr>
-            <tr>
                 <th scope="row">Jenis</th>
                 <td colspan="3">{{ $offer->jobType->name }}</td>
             </tr>
             <tr>
                 <th scope="row">Syif</th>
                 <td colspan="3">{{ $offer->shiftType->name }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Tarikh</th>
+                <td colspan="3">{{ $offer->start_date }} Hingga {{ $offer->end_date }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Masa</th>
+                <td colspan="3">{{ $offer->start_time }} Hingga {{ $offer->end_time }}</td>
             </tr>
             <tr>
                 <th scope="row">Purata Gaji</th>
@@ -170,6 +170,6 @@
      crossorigin=""></script>
     <script src="{{ asset('js/mapScript.js') }}"></script>
     <script src="{{ asset('js/processApplicationScript.js') }}"></script>
-    
+    <script src="{{ asset('js/dateScript.js') }}"></script>
 
 @endsection

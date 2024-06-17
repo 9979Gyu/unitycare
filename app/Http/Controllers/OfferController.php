@@ -78,7 +78,6 @@ class OfferController extends Controller
         }
 
         $jobs = $jobs->select(
-            // 'jobs.job_id',
             'jobs.name', 
         )
         ->groupBy('jobs.name')
@@ -139,8 +138,7 @@ class OfferController extends Controller
         return response()->json($positions);
     }
 
-    public function getOffersByPositionDatatable(Request $request)
-    {
+    public function getOffersByPositionDatatable(Request $request){
         if(request()->ajax()){
             $userID = $request->get('selectedUser');
             $jobID = $request->get('selectedPosition');
@@ -565,4 +563,131 @@ class OfferController extends Controller
         return redirect('/viewoffer')->withErrors(['message' => 'Kemaskini data tidak berjaya']);
 
     }
+
+    // Function to update approval of offer
+    public function updateApproval(Request $request){
+
+        if(Auth::check()){
+
+            // get the approval status
+            $approval = $request->get('approval_status');
+            $offerID = $request->get('offerID');
+            
+            $roleID = Auth::user()->roleID;
+            $userID = Auth::user()->id;
+
+            if($roleID == 1 || $roleID == 2){
+
+                // Get the current description
+                $currentDesc = Job_Offer::where('offer_id', $offerID)
+                ->value('description');
+
+                // Decode the JSON to an associative array
+                $descArray = json_decode($currentDesc, true);
+
+                // Update the 'reason' field
+                $descArray['reason'] = $request->get('reason');
+
+                // Encode the array back to JSON
+                $newDesc = json_encode($descArray);
+                $result = 0;
+
+                // Approve offer
+                if($approval == 2){
+
+                    $result = Job_Offer::where([
+                        ['job_offers.offer_id', $offerID],
+                        ['job_offers.status', 1],
+                    ])
+                    ->update([
+                        'approval_status' => 2,
+                        'approved_by' => $userID,
+                        'approved_at' => date('Y-m-d H:i:s'),
+                        'updated_at' => date('Y-m-d H:i:s'),
+                    ]);
+
+                }
+                // Decline offer
+                else{
+
+                    $result = Job_Offer::where([
+                        ['job_offers.offer_id', $offerID],
+                        ['job_offers.status', 1],
+                    ])
+                    ->update([
+                        'description' => $newDesc,
+                        'approval_status' => 0,
+                        'approved_by' => $userID,
+                        'approved_at' => date('Y-m-d H:i:s'),
+                        'updated_at' => date('Y-m-d H:i:s'),
+                    ]);
+
+                }
+
+                if($result){
+                    return redirect('/viewoffer')->with('success', 'Data berjaya dikemaskini');
+                }
+            }
+
+            return redirect('/viewoffer')->withErrors(['message' => 'Kemaskini data tidak berjaya ']);
+
+        }
+
+        return redirect('/login')->withErrors(['message' => 'Sila log masuk']);
+
+    }
+
+    // Functin to delete offer
+    public function destroy(Request $request){
+
+        $offerID = $request->get('offerID');
+
+        if(Auth::check()){
+            
+            if($offerID != null){
+
+                $result = Job_Offer::where([
+                    ['status', 1],
+                    ['offer_id', $offerID],
+                ])
+                ->update([
+                    'status' => 0,
+                    'updated_at' => date('Y-m-d H:i:s'),
+                ]);
+
+                if($result){
+
+                    // Get the current description
+                    $currentDesc = Application::where('offer_id', $offerID)
+                    ->value('description');
+
+                    // Decode the JSON to an associative array
+                    $descArray = json_decode($currentDesc, true);
+
+                    // Update the 'reason' field
+                    $descArray['reason'] = "Permohonan ditolak secara automatik kerana pekerjaan telah dipadam";
+
+                    // Encode the array back to JSON
+                    $newDesc = json_encode($descArray);
+
+                    $update = Application::where('offer_id', $offerID)
+                    ->update([
+                        'description' => $newDesc,
+                        'approval_status' => 0,
+                        'status' => 0,
+                    ]);
+
+                    return redirect('/viewoffer')->with('success', 'Data berjaya dikemaskini');
+                }
+            
+            }
+
+            return redirect('/viewoffer')->withErrors(['message' => 'Kemaskini data tidak berjaya ']);
+
+        }
+
+        return redirect('/login')->withErrors(['message' => 'Sila log masuk']);
+
+    }
+
 }
