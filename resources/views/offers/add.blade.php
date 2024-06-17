@@ -6,7 +6,7 @@
 
 @section('content')
     
-    <h2>Pekerjaan</h2>
+    <h2>Pekerjaan - Tambah</h2>
     <br>
 
     @if (session()->has('success'))

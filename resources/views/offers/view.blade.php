@@ -29,8 +29,8 @@
         </div>
     @endif
 
-    <input type="number" id="roleID" value="{{ $roleNo }}" hidden>
-    <input type="number" id="uid" value="{{ $uid }}" hidden>
+    <input type="number" id="roleID" value="{{ $roleID }}" hidden>
+    <input type="number" id="uid" value="{{ $userID }}" hidden>
 
     <div class="container mt-4">
         <div class="row justify-content-center">
@@ -67,25 +67,6 @@
 
     </div>
 
-    <!-- Delete Modal -->
-    <div class="modal fade" id="deleteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteModalLabel">Padam Data</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    Adakah anda pasti untuk memadam data?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" id="delete">Padam</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Dismiss Modal -->
     <div class="modal fade" id="dismissModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -105,7 +86,7 @@
         </div>
     </div>
 
-    <script src="{{ asset('js/indexOfferScript.js') }}"></script>
+    <script src="{{ asset('js/reports/indexOfferScript.js') }}"></script>
     <script src="{{ asset('js/dateScript.js') }}"></script>
 
 @endsection

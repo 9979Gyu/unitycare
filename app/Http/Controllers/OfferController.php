@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Application;
 use App\Models\Job;
 use App\Models\Job_Offer;
 use App\Models\Job_Type;
@@ -10,6 +11,7 @@ use App\Models\User;
 use DataTables;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class OfferController extends Controller
 {
@@ -32,7 +34,7 @@ class OfferController extends Controller
             if($roleID == 5){
 
                 // Display view offer in card container
-               
+                return view('offers.view', compact('userID', 'roleID'));
 
             }
             // is admin, staff or enterprise
@@ -688,6 +690,59 @@ class OfferController extends Controller
 
         return redirect('/login')->withErrors(['message' => 'Sila log masuk']);
 
+    }
+
+    // Function to get list of job offers
+    public function getUpdatedOffers(){
+
+        $uid = 0;
+
+        if(Auth::check()){
+            $uid = Auth::user()->id;
+        }
+
+        $allOffers = Job_Offer::where([
+            ['job_offers.status', 1],
+        ])
+        ->join('users as u', 'u.id', '=', 'job_offers.user_id')
+        ->join('job_types as jt', 'jt.job_type_id', '=', 'job_offers.job_type_id')
+        ->join('shift_types as st', 'st.shift_type_id', '=', 'job_offers.shift_type_id')
+        ->join('jobs as j', 'j.job_id', '=', 'job_offers.job_id')
+        ->select(
+            'job_offers.*',
+            'u.name as username', 
+            'u.contactNo as usercontact', 
+            'u.email as useremail',
+            'j.name as jobname',
+            'j.position as jobposition',
+            'jt.name as typename',
+            'st.name as shiftname',
+            DB::raw("DATE(job_offers.updated_at) as updateDate"),
+            'job_offers.description->description as description',
+            'job_offers.description->reason as reason',
+        )
+        ->orderBy('job_offers.updated_at', 'desc')
+        ->get();
+
+        $enrolledOffers = Application::join('poors as p', 'p.poor_id', '=', 'applications.poor_id')
+        ->join('users as u', 'u.id', '=', 'p.user_id')
+        ->where([
+            ["u.id", $uid],
+            ['applications.status', 1],
+        ])
+        ->select(
+            'applications.approval_status',
+            'applications.description->reason as reason',
+            'applications.description->description as description',
+            'applications.offer_id as oid',
+            'u.id as user_id'
+        )
+        ->get();
+
+        return response()->json([
+            'allOffers' => $allOffers,
+            'enrolledOffers' => $enrolledOffers
+        ]);        
     }
 
 }
