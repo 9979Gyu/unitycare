@@ -5,6 +5,7 @@ $(document).ready(function() {
     // Hide the explaination input field
     $("#more").hide();
 
+    // Initialize select2
     $('#organization').select2({
         placeholder: 'Pilih Penganjur',
     });
@@ -17,20 +18,21 @@ $(document).ready(function() {
         placeholder: 'Pilih Jawatan',
     });
     
+    // Define and declare variables
     var requestTable;
     var selectedState = 3;
-    var selectedUser;
-    var selectedJob;
-    var selectedPosition;
+    var selectedUser = "all";
+    var selectedJob = "all";
+    var selectedPosition = "all";
     var status = 1;
+    var roleID = $("#roleID").val();
 
-    $("#organization").prop('selectedIndex', 0);
-
-    $("#organization").on('change', function(){
+    $("#organization").change(function(){
         // set value
         selectedUser = $("#organization option:selected").val();
         // get job list for dropdown
         getJob(selectedUser);
+        fetch_data(selectedUser, selectedPosition, selectedState, status);
     });
 
     function getJob(selectedUser){
@@ -40,7 +42,7 @@ $(document).ready(function() {
             data: { selectedUser: selectedUser },
             success: function(data) {
                 $("#jobname").empty();
-                $("#jobname").append('<option value="0" selected>Pilih Pekerjaan</option>');
+                $("#jobname").append('<option value="all" selected>Semua Pekerjaan</option>');
                 data.forEach(function(item){
                     $("#jobname").append('<option value="' + item.name + '">' + item.name + '</option>');
 
@@ -70,10 +72,20 @@ $(document).ready(function() {
             },
             success: function(data) {
                 $("#position").empty();
-                $("#position").append('<option value="0" selected>Pilih Jawatan</option>');
+                
+                if(selectedJob == "all"){
+                    $("#position").append('<option value="all" selected>Semua Jawatan</option>');
+                }
+                else{
+                    $("#position").append('<option value="0" selected>Pilih Jawatan</option>');
+                }
+
                 data.forEach(function(item){
                     $("#position").append('<option value="' + item.job_id + '">' + item.position + '</option>');
                 });
+
+                $("#position").trigger('change');
+
             },
             error: function (data) {
                 $('.condition-message').html(data);
@@ -85,10 +97,14 @@ $(document).ready(function() {
         // set value
         selectedPosition = $("#position option:selected").val();
 
-        console.log(selectedUser, selectedPosition, selectedState, status);
         // get job list for dropdown
         fetch_data(selectedUser, selectedPosition, selectedState, status);
     });
+
+    $("#organization").prop('selectedIndex', 0).trigger('change');
+    $("#jobname").prop('selectedIndex', 0).trigger('change');
+    $("#position").prop('selectedIndex', 0);
+    fetch_data(selectedUser, selectedPosition, selectedState, status);
     
     // Function to handle radio button value
     $('#allRadio, #pendingRadio, #approveRadio, #declineRadio, #deleteRadio').change(function() {
@@ -150,7 +166,6 @@ $(document).ready(function() {
             ajax: {
                 url: "/getoffersbyposition",
                 data: {
-                    rid: $("#roleID").val(),
                     selectedUser : selectedUser, 
                     selectedPosition : selectedPosition, 
                     selectedState : selectedState, 

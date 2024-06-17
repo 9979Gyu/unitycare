@@ -111,19 +111,25 @@ Route::get('/getjob', [JobController::class, 'getJobsDatatable']);
 Route::post('/storejob', [JobController::class, 'store']);
 
 // Offers
-Route::get('/createoffer', [OfferController::class, 'create']);
-Route::get('/getJobsFromDB', [OfferController::class, 'getJobs']);
-Route::get('/getPositions', [OfferController::class, 'getPositions']);
-Route::get('/getAllPositions', [OfferController::class, 'getAllPositions']);
-Route::get('/getJobsByUser', [OfferController::class, 'getJobsByUser']);
-Route::post('/storeoffer', [OfferController::class, 'store']);
 Route::get('/viewoffer', [OfferController::class, 'index']);
-Route::get('/getoffers', [OfferController::class, 'getOffersDatatable']);
+Route::get('/getJobsByUser', [OfferController::class, 'getJobsByUser']);
+Route::get('/getPositions', [OfferController::class, 'getPositions']);
 Route::get('/getoffersbyposition', [OfferController::class, 'getOffersByPositionDatatable']);
+
+Route::get('/createoffer', [OfferController::class, 'create']);
+Route::get('/getAllJobs', [OfferController::class, 'getAllJobs']);
+Route::get('/getAllPositions', [OfferController::class, 'getAllPositions']);
+Route::post('/storeoffer', [OfferController::class, 'store']);
+
+Route::get('/editoffer/{id}', [OfferController::class, 'edit']);
+
+
+
+Route::get('/getoffers', [OfferController::class, 'getOffersDatatable']);
+
 Route::post('/deleteoffer', [OfferController::class, 'destroy']);
 Route::get('/getUpdatedOffers', [OfferController::class, 'getUpdatedOffers']);
 Route::post('/deleteoffer', [OfferController::class, 'destroy']);
-Route::get('/editoffer/{id}', [OfferController::class, 'edit']);
 Route::post('/updateoffer', [OfferController::class, 'update']);
 Route::post('/approveoffer', [OfferController::class, 'updateApproval']);
 Route::post('/declineoffer', [OfferController::class, 'declineApproval']);

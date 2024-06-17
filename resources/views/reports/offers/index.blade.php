@@ -28,11 +28,14 @@
 
     <form method="POST" action="/export-offers" class="container" id="excel">
         @csrf
-        <input type="number" name="roleID" id="roleID" value="{{ $roleNo }}" hidden>
+
+        <input type="text" id="roleID" name="roleID" value="{{ $roleID }}" hidden>
         <div class="row mb-3">
             <div class="col-sm-12">
                 <select name="organization" id="organization" class="form-control select2 ">
-                    <option value="0" selected>Pilih Pengurus</option>
+                    @if($roleID == 1 || $roleID == 2)
+                        <option value="all">Semua Organisasi</option>
+                    @endif
                     @foreach($users as $user)
                         <option value="{{ $user->id }}">{{ $user->name }}</option>
                     @endforeach
@@ -43,12 +46,12 @@
         <div class="row mb-3">
             <div class="col-sm-6">
                 <select name="jobname" id="jobname" class="form-control select2 ">
- 
+                    <option value="all">Semua Pekerjaan</option>
                 </select>
             </div>
             <div class="col-sm-6">
                 <select name="position" id="position" class="form-control select2">
-
+                    <option value="all">Semua Jawatan</option>
                 </select>
             </div> 
         </div>

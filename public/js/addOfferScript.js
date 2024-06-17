@@ -7,6 +7,9 @@ $(document).ready(function(){
     $("#start_date").attr("min", today);
     $("#end_date").attr("min", today);
 
+    var jobID = $("#jobID").val();
+    var jobName = $("#jobName").val();
+
     $('#start_date').on('change', function() {
         var startDate = $('#start_date').val();
         $("#end_date").attr("min", startDate);
@@ -54,32 +57,44 @@ $(document).ready(function(){
 
     // To get list of job name
     $.ajax({
-        url: '/getJobsFromDB',
+        url: '/getAllJobs',
         type: 'GET',
-        success: function(data){
+        success: function(response) {
             $('#job').empty();
-
-            data.forEach(function(item){
-                $("#job").append('<option value="' + item.job_id + '">' + item.name + '</option>');
-            });
-
-            $('#job').trigger("change");
-            $("#jobType").trigger('change');
-            $("#shiftType").trigger('change');
+    
+            if (response && response.jobs) {
+                response.jobs.forEach(function(item) {
+                    if (jobName != null && jobName == item.name) {
+                        $("#job").append('<option value="' + item.name + '" selected>' + item.name + '</option>');
+                    } else {
+                        $("#job").append('<option value="' + item.name + '">' + item.name + '</option>');
+                    }
+                });
+                $("#job").trigger('change');
+            } 
+            else {
+                console.error('No jobs found in response:', response);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Error fetching jobs:', error);
         }
     });
 
+    // Function to handle visibility of start and end date
     $('#jobType').on('change', function() {
+        
         var selectedValue = $('#jobType option:selected').val();
+
+        console.log(selectedValue , "!");
+
         $('[data-toggle="tooltip' + selectedValue + '"]').tooltip();
 
-        if(selectedValue == 1){
-            $("#start").hide();
-            $("#end").hide();
-        }
-        else{
-            $("#start").show();
-            $("#end").show();
+        if (selectedValue == 1) {
+            $("#date").hide();
+        } 
+        else {
+            $("#date").show();
         }
     });
 
@@ -90,11 +105,18 @@ $(document).ready(function(){
             $.ajax({
                 url: '/getAllPositions',
                 type: 'GET',
-                data: {jobName: jobName},
+                data: {
+                    jobName: jobName,
+                },
                 success: function(data){
                     $('#position').empty();
                     data.forEach(function(item){
-                        $("#position").append('<option value="' + item.job_id + '">' + item.position + '</option>');
+                        if(jobID != null && jobID == item.job_id){
+                            $("#position").append('<option value="' + item.job_id + '" selected>' + item.position + '</option>');
+                        }
+                        else{
+                            $("#position").append('<option value="' + item.job_id + '">' + item.position + '</option>');
+                        }
                     });
                 }
             });
@@ -105,6 +127,7 @@ $(document).ready(function(){
         }
     });
 
+    // Function to pre-set time based on shift
     $("#shiftType").on('change', function(){
         selectedShift = $("#shiftType option:selected").val();
 
@@ -130,5 +153,10 @@ $(document).ready(function(){
 
         $('[data-toggle="tooltip' + selectedShift + '"]').tooltip();
     });
+   
+        
+    // Trigger change events for jobType, and shiftType
+    $("#jobType").trigger('change');
+    $("#shiftType").trigger('change');
     
 });

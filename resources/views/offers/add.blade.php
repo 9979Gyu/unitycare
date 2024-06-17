@@ -30,7 +30,6 @@
         <div class="mb-3">
             <h5>Maklumat Pekerjaan</h5>
         </div>
-        <input type="text" name="roleID" id="roleID" value="{{ $roleNo }}" hidden>
         
         <!-- Select name and position for the offer -->
         <div class="row mb-3">
@@ -78,9 +77,9 @@
         <br>
 
         <div class="row mb-3">
-            <label for="address" class="col-sm-2 col-form-label required">Tempat</label>
+            <label for="address" class="col-sm-2 col-form-label required">Alamat</label>
             <div class="col-sm-10">
-                <input type="text" value="{{ old('address') }}" name="address" class="form-control" id="address" required>
+                <input type="text" value="{{ old('address') }}" name="address" class="form-control" id="address" placeholder="Alamat tempat kerja" required>
             </div>
         </div>
 
@@ -88,7 +87,7 @@
         <div class="row mb-3">
             <label for="postalCode" class="col-sm-2 col-form-label required">Poskod</label>
             <div class="col-sm-4">
-                <input type="number" name="postalCode" class="form-control" id="postalCode" required>
+                <input type="number" name="postalCode" class="form-control" id="postalCode" placeholder="Poskod" required>
             </div>
             <label for="state" class="col-sm-2 col-form-label required">Negeri</label>
             <div class="col-sm-4">
@@ -109,22 +108,23 @@
 
         <br>
 
-        <div class="row mb-3" id="start">
+        <div class="row mb-3" id="date">
             <label for="start_date" class="col-sm-2 col-form-label required">Tarikh Bermula</label>
             <div class="col-sm-4">
                 <input type="date" value="{{ old('start_date') }}" name="start_date" class="form-control" id="start_date">
             </div>
 
-            <label for="start_time" class="col-sm-2 col-form-label required">Masa Bermula</label>
-            <div class="col-sm-4">
-                <input type="time" value="{{ old('start_time') }}" name="start_time" class="form-control" id="start_time">
-            </div>
-        </div>
-
-        <div class="row mb-3" id="end">
             <label for="end_date" class="col-sm-2 col-form-label required">Tarikh Tamat</label>
             <div class="col-sm-4">
                 <input type="date" value="{{ old('end_date') }}" name="end_date" class="form-control" id="end_date">
+            </div>
+        </div>
+
+        <div class="row mb-3" id="time">
+            
+            <label for="start_time" class="col-sm-2 col-form-label required">Masa Bermula</label>
+            <div class="col-sm-4">
+                <input type="time" value="{{ old('start_time') }}" name="start_time" class="form-control" id="start_time">
             </div>
 
             <label for="end_time" class="col-sm-2 col-form-label required">Masa Tamat</label>
@@ -146,7 +146,7 @@
         <div class="row mb-3">
             <label for="quantity" class="col-sm-2 col-form-label required">Bilangan Pekerja Diperlukan</label>
             <div class="col-sm-10">
-                <input type="number" value="{{ old('quantity') }}" min="1" name="quantity" class="form-control" id="quantity" required>
+                <input type="number" value="{{ old('quantity') }}" min="1" name="quantity" class="form-control" id="quantity" placeholder="Bilangan pekerja diperlukan untuk jawatan ini" required>
             </div>
         </div>
         
@@ -160,12 +160,12 @@
         <div class="row mb-3">
             <label for="salaryStart" class="col-sm-2 col-form-label required">Minimum</label>
             <div class="col-sm-4">
-                <input type="number" value="{{ old('salaryStart') }}" name="salaryStart" class="form-control" id="salaryStart" required>
+                <input type="number" value="{{ old('salaryStart') }}" name="salaryStart" class="form-control" id="salaryStart" placeholder="Minimum gaji sebulan" required>
             </div>
 
             <label for="salaryEnd" class="col-sm-2 col-form-label required">Maksimum</label>
             <div class="col-sm-4">
-                <input type="number" value="{{ old('salaryEnd') }}" name="salaryEnd" class="form-control" id="salaryEnd" required>
+                <input type="number" value="{{ old('salaryEnd') }}" name="salaryEnd" class="form-control" id="salaryEnd" placeholder="Maximum gaji sebulan" required>
             </div>
         </div>
 

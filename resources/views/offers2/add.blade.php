@@ -6,7 +6,7 @@
 
 @section('content')
     
-    <h2>Pekerjaan - Kemaskini</h2>
+    <h2>Pekerjaan</h2>
     <br>
 
     @if (session()->has('success'))
@@ -25,27 +25,29 @@
         </div>
     @endif
 
-    <form action="/updateoffer" method="post" class="container" id="editForm">
+    <form action="/storeoffer" method="post" class="container" id="addForm">
         @csrf
         <div class="mb-3">
             <h5>Maklumat Pekerjaan</h5>
         </div>
+        <input type="text" name="roleID" id="roleID" value="{{ $roleNo }}" hidden>
         
         <!-- Select name and position for the offer -->
         <div class="row mb-3">
-            <input type="text" id="jobID" value="{{ $offer->job_id }}" hidden>
-            <input type="text" id="jobName" value="{{ $offer->jobname }}" hidden>
             <label for="job" class="col-sm-2 col-form-label required">Pekerjaan</label>
             <div class="col-sm-4">
                 <select name="job" id="job" class="form-control select2">
-                    <option value="{{ $offer->job_id }}" selected>{{ $offer->jobname }}</option>
+                    <option value="0" selected>Pilih Perkerjaan</option>
                 </select>
             </div>
             <label for="position" class="col-sm-2 col-form-label required">Jawatan</label>
             <div class="col-sm-4">
                 <select name="position" id="position" class="form-control select2">
-                    <option value="{{ $offer->job_id }}" selected>{{ $offer->jobposition }}</option>
+                    <option value="0" selected>Pilih Jawatan</option>
                 </select>
+            </div>
+            <div class="col-sm-10">
+            (Tiada jenis pekerjaan dan jawatan yang berkaitan? Tekan <a href="/createjob">sini</a> untuk tambah.)
             </div>
         </div>
 
@@ -57,11 +59,7 @@
             <div class="col-sm-4">
                 <select name="jobType" id="jobType" class="form-control select2">
                     @foreach($jobTypes as $jobType)
-                        @if($jobType->job_type_id == $offer->job_type_id)
-                            <option value="{{ $jobType->job_type_id }}" data-toggle="tooltip{{ $jobType->job_type_id }}" data-placement="top" title="{{ $jobType->description }}" selected>{{ $jobType->name }}</option>
-                        @else
-                            <option value="{{ $jobType->job_type_id }}" data-toggle="tooltip{{ $jobType->job_type_id }}" data-placement="top" title="{{ $jobType->description }}">{{ $jobType->name }}</option>
-                        @endif
+                        <option value="{{ $jobType->job_type_id }}" data-toggle="tooltip{{ $jobType->job_type_id }}" data-placement="top" title="{{ $jobType->description }}">{{ $jobType->name }}</option>
                     @endforeach
                 </select>
             </div>
@@ -70,11 +68,7 @@
             <div class="col-sm-4">
                 <select name="shiftType" id="shiftType" class="form-control select2">
                     @foreach($shiftTypes as $shiftType)
-                        @if($shiftType->shift_type_id == $offer->shift_type_id)        
-                            <option value="{{ $shiftType->shift_type_id }}" data-toggle="tooltip{{ $shiftType->shift_type_id }}" data-placement="top" title="{{ $shiftType->description }}" selected>{{ $shiftType->name }}</option>
-                        @else
-                            <option value="{{ $shiftType->shift_type_id }}" data-toggle="tooltip{{ $shiftType->shift_type_id }}" data-placement="top" title="{{ $shiftType->description }}">{{ $shiftType->name }}</option>
-                        @endif
+                        <option value="{{ $shiftType->shift_type_id }}" data-toggle="tooltip{{ $shiftType->shift_type_id }}" data-placement="top" title="{{ $shiftType->description }}">{{ $shiftType->name }}</option>
                     @endforeach
                 </select>
             </div>
@@ -83,23 +77,23 @@
 
         <br>
 
-        <!-- Working Location -->
         <div class="row mb-3">
-            <label for="address" class="col-sm-2 col-form-label required">Alamat</label>
+            <label for="address" class="col-sm-2 col-form-label required">Tempat</label>
             <div class="col-sm-10">
-                <input type="text" value="{{ $offer->venue }}" name="address" class="form-control" id="address" placeholder="Alamat tempat kerja" required>
+                <input type="text" value="{{ old('address') }}" name="address" class="form-control" id="address" required>
             </div>
         </div>
+
+        <!-- Working Location -->
         <div class="row mb-3">
             <label for="postalCode" class="col-sm-2 col-form-label required">Poskod</label>
             <div class="col-sm-4">
-                <input type="number" name="postalCode" class="form-control" id="postalCode" value="{{ $offer->postal_code }}" placeholder="Poskod" required>
-                <input type="number" name="offerID" class="form-control" id="offerID" value="{{ $offer->offer_id }}" required hidden>
+                <input type="number" name="postalCode" class="form-control" id="postalCode" required>
             </div>
             <label for="state" class="col-sm-2 col-form-label required">Negeri</label>
             <div class="col-sm-4">
                 <select name="state" id="state" class="form-select">
-                    <option value="{{ $offer->state }}" selected>{{ $offer->state }}</option>
+                    <option selected>Pilih Negeri</option>
                 </select>
             </div>
         </div>
@@ -108,34 +102,34 @@
             <label for="city" class="col-sm-2 col-form-label required">Bandar</label>
             <div class="col-sm-10">
                 <select name="city" id="city" class="form-select">
-                    <option value=" {{ $offer->city }} " selected>{{ $offer->city }}</option>
+                    <option selected>Pilih Bandar</option>
                 </select>
             </div>
         </div>
-        
+
         <br>
 
-        <div class="row mb-3" id="date">
+        <div class="row mb-3" id="start">
             <label for="start_date" class="col-sm-2 col-form-label required">Tarikh Bermula</label>
             <div class="col-sm-4">
-                <input type="date" value="{{ $offer->start_date }}" name="start_date" class="form-control" id="start_date">
+                <input type="date" value="{{ old('start_date') }}" name="start_date" class="form-control" id="start_date">
             </div>
 
-            <label for="end_date" class="col-sm-2 col-form-label required">Tarikh Tamat</label>
+            <label for="start_time" class="col-sm-2 col-form-label required">Masa Bermula</label>
             <div class="col-sm-4">
-                <input type="date" value="{{$offer->end_date }}" name="end_date" class="form-control" id="end_date">
+                <input type="time" value="{{ old('start_time') }}" name="start_time" class="form-control" id="start_time">
             </div>
         </div>
 
-        <div class="row mb-3" id="time">
-            <label for="start_time" class="col-sm-2 col-form-label required">Masa Bermula</label>
+        <div class="row mb-3" id="end">
+            <label for="end_date" class="col-sm-2 col-form-label required">Tarikh Tamat</label>
             <div class="col-sm-4">
-                <input type="time" value="{{ $offer->start_time }}" name="start_time" class="form-control" id="start_time">
+                <input type="date" value="{{ old('end_date') }}" name="end_date" class="form-control" id="end_date">
             </div>
 
             <label for="end_time" class="col-sm-2 col-form-label required">Masa Tamat</label>
             <div class="col-sm-4">
-                <input type="time" value="{{ $offer->end_time }}" name="end_time" class="form-control" id="end_time">
+                <input type="time" value="{{ old('end_time') }}" name="end_time" class="form-control" id="end_time">
             </div>
         </div>
         
@@ -145,14 +139,14 @@
         <div class="row mb-3">
             <label for="description" class="col-sm-2 col-form-label required">Penerangan Penuh Pekerjaan</label>
             <div class="col-sm-10">
-                <textarea name="description" class="form-control" id="description" placeholder="Kemahiran diperlukan, Peringkat pendidikan" required>{{ $offer->description }}</textarea>
+                <textarea value="{{ old('description') }}" name="description" class="form-control" id="description" placeholder="Kemahiran diperlukan, Peringkat pendidikan" required></textarea>
             </div>
         </div>
 
         <div class="row mb-3">
             <label for="quantity" class="col-sm-2 col-form-label required">Bilangan Pekerja Diperlukan</label>
             <div class="col-sm-10">
-                <input type="number" value="{{ $offer->quantity }}" min="1" name="quantity" class="form-control" id="quantity" placeholder="Bilangan pekerja diperlukan untuk jawatan ini" required>
+                <input type="number" value="{{ old('quantity') }}" min="1" name="quantity" class="form-control" id="quantity" required>
             </div>
         </div>
         
@@ -166,12 +160,12 @@
         <div class="row mb-3">
             <label for="salaryStart" class="col-sm-2 col-form-label required">Minimum</label>
             <div class="col-sm-4">
-                <input type="number" value="{{ $offer->min_salary }}" name="salaryStart" class="form-control" id="salaryStart" placeholder="Minimum gaji sebulan" required>
+                <input type="number" value="{{ old('salaryStart') }}" name="salaryStart" class="form-control" id="salaryStart" required>
             </div>
 
             <label for="salaryEnd" class="col-sm-2 col-form-label required">Maksimum</label>
             <div class="col-sm-4">
-                <input type="number" value="{{ $offer->max_salary }}" name="salaryEnd" class="form-control" id="salaryEnd" placeholder="Maximum gaji sebulan" required>
+                <input type="number" value="{{ old('salaryEnd') }}" name="salaryEnd" class="form-control" id="salaryEnd" required>
             </div>
         </div>
 
@@ -187,8 +181,8 @@
     </form>
 
     <script src="{{ asset('js/addOfferScript.js') }}"></script>
-    <script src="{{ asset('js/dateScript.js') }}"></script>
     <script src="{{ asset('js/postcodeScript.js') }}"></script>
+    <script src="{{ asset('js/dateScript.js') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 
 @endsection
