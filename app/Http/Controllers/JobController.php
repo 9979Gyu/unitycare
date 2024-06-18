@@ -72,13 +72,56 @@ class JobController extends Controller
             return redirect('/viewoffer')->with('error', 'Pendaftaran tidak berjaya');
     }
 
-    // Function to remove the job from the display list in index
-    public function destroy(Request $request)
+    // Function to update the status
+    public function update(Request $request)
     {
+        $jobID = $request->get('selectedID');
+        $type = $request->get('selectedType');
+
+        if($type == "job"){
+            $type == "jobs";
+        }
+        else if($type == "shift"){
+            $type == "shift_types";
+        }
+        else{
+            $type == "job_types";
+        }
+
         //
-        $update = DB::table('jobs')
+        $update = DB::table($type)
         ->where([
-            ['job_id', $request->selectedID],
+            ['job_id', $jobID],
+        ])
+        ->update([
+            'status' => 1,
+        ]);  
+
+        if($result)
+            return redirect()->back()->with('success', 'Berjaya dikemaskini');
+
+        return redirect()->back()->withErrors(["message" => "Tidak berjaya dikemaskini"]);
+    }
+
+    // Function to remove the job from the display list in index
+    public function destroy(Request $request){
+
+        $jobID = $request->get('selectedID');
+        $type = $request->get('selectedType');
+
+        if($type == "job"){
+            $type == "jobs";
+        }
+        else if($type == "shift"){
+            $type == "shift_types";
+        }
+        else{
+            $type == "job_types";
+        }
+
+        $update = DB::table($type)
+        ->where([
+            ['job_id', $jobID],
             ['status', 1],
         ])
         ->update([
@@ -105,11 +148,11 @@ class JobController extends Controller
                     $selectedItem = Job::select(
                         'job_id as id',
                         DB::raw('CONCAT(name, " - ", position) as name'),
-                        'description'
+                        'description',
+                        'status'
                     )
                     ->withCount('jobOffers')
-                    ->where('status', 1)
-                    ->groupBy('job_id', 'name', 'description', 'position')
+                    ->groupBy('job_id', 'name', 'description', 'position', 'status')
                     ->orderBy('name')
                     ->get();
 
@@ -119,10 +162,10 @@ class JobController extends Controller
                         'shift_type_id as id',
                         'name',
                         'description',
+                        'status'
                     )
                     ->withCount('jobOffers')
-                    ->where('status', 1)
-                    ->groupBy('shift_type_id', 'name', 'description')
+                    ->groupBy('shift_type_id', 'name', 'description', 'status')
                     ->orderBy('name')
                     ->get();
                 }
@@ -131,10 +174,10 @@ class JobController extends Controller
                         'job_type_id as id',
                         'name',
                         'description',
+                        'status'
                     )
                     ->withCount('jobOffers')
-                    ->where('status', 1)
-                    ->groupBy('job_type_id', 'name', 'description')
+                    ->groupBy('job_type_id', 'name', 'description', 'status')
                     ->orderBy('name')
                     ->get();
                 }   
@@ -148,8 +191,18 @@ class JobController extends Controller
                 $table->addColumn('action', function ($row) {
                     $token = csrf_token();
                     $btn = '<div class="d-flex justify-content-center">';
-                    // $btn = $btn . '<a href="/editprogram/' . $row->id . '"><span class="badge badge-warning"> Kemaskini </span></a></div>';
-                    $btn = $btn . '<a class="deleteAnchor" href="#" id="' . $row->id . '"><span class="badge badge-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"> Padam </span></a></div>';
+                    
+                    if($row->status == 1){
+                        $btn .= '<div>';
+                        $btn .= '<a class="deleteAnchor" href="#" id="' . $row->id . '"><span class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"> Padam </span></a>';
+                        $btn .= '</div>';
+                    }
+                    else{
+                        $btn .= '<div>';
+                        $btn .= '<a class="updateAnchor" href="#" id="' . $row->id . '"><span class="btn btn-warning"> Aktif </span></a>';
+                        $btn .= '</div>';
+                    }
+
                     return $btn;
                 });
     

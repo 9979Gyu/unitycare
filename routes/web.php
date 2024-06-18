@@ -151,7 +151,6 @@ Route::get('/search', [LandingController::class, 'search']);
 // Report
 Route::get('/getProgramsWithSpecs', [ReportController::class, 'getAllProgramsDetailsDatatable']);
 Route::get('/index-programs', [ReportController::class, 'indexPrograms']);
-Route::get('/index-offers', [ReportController::class, 'indexOffers']);
 
 Route::get('/bar-chart', [ChartController::class, 'barChart']);
 Route::get('/user-pie-chart', [ChartController::class, 'peoplePieChart']);

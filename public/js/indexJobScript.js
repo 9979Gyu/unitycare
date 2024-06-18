@@ -113,9 +113,39 @@ $(document).ready(function() {
                 type: 'POST',
                 dataType: 'html',
                 url: "/deleteprogram",
-                data: { selectedID : selectedID },
+                data: { 
+                    selectedID : selectedID,
+                    selectedType: selectedType,
+                },
                 success: function(data) {
                     $('#deleteModal').modal('hide');
+                    $('.condition-message').html(data);
+
+                    requestTable.ajax.reload();
+                },
+                error: function (data) {
+                    $('.condition-message').html(data);
+                }
+            })
+        }
+    });
+
+    $(document).on('click', '.updateAnchor', function() {
+        selectedID = $(this).attr('id');
+    });
+
+    $('#submit').click(function() {
+        if (selectedID) {
+            $.ajax({
+                type: 'POST',
+                dataType: 'html',
+                url: "/update",
+                data: { 
+                    selectedID : selectedID,
+                    selectedType: selectedType,
+                },
+                success: function(data) {
+                    $('#updateModal').modal('hide');
                     $('.condition-message').html(data);
 
                     requestTable.ajax.reload();

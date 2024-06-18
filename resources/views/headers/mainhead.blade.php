@@ -75,23 +75,19 @@
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                                 
                                 <li><a class="dropdown-item" href="/viewoffer"><b>Lihat</b></a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="/viewapplication"><b>Permohonan</b></a></li>
                                 <!-- Is admin and staff -->
                                 @if(Auth::user()->roleID <= 2)
                                     <li><hr class="dropdown-divider"></li>  
                                     <li><a class="dropdown-item" href="/viewjob"><b>Jenis Pekerjaan</b></a></li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" href="/index-offers"><b>Laporan</b></a></li>
                                 @endif
 
                                 <!-- Is enterprise -->
                                 @if(Auth::user()->roleID == 3)
                                     <li><hr class="dropdown-divider"></li>
                                     <li><a class="dropdown-item" href="/createoffer"><b>Tambah</b></a></li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" href="/index-offers"><b>Laporan</b></a></li>
                                 @endif
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="/viewapplication"><b>Permohonan</b></a></li>
                             </ul>
                         </li>
                     @endif

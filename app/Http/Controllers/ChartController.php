@@ -9,16 +9,7 @@ use Illuminate\Http\Request;
 
 class ChartController extends Controller
 {
-    //
-    public function barChart(){
-        // Replace this with your actual data retrieval logic
-        $data = [
-            'labels' => ['January', 'February', 'March', 'April', 'May'],
-            'data' => [65, 59, 80, 81, 56],
-        ];
-        return view('charts.people', compact('data'));
-    }
-
+    // Function to display number of offer for each job in bar chart
     public function offerBarChart(Request $request){
 
         $userID = $request->get('selectedUser');
@@ -55,6 +46,7 @@ class ChartController extends Controller
         ]);
     }
 
+    // function to display num of application made for each offer in bar chart
     public function appBarChart(Request $request){
         
         $selectedState = $request->get("selectedState");
@@ -97,6 +89,7 @@ class ChartController extends Controller
         }
     }
 
+    // function to display number of user by role
     public function peoplePieChart(){
         // Get the value of each type of users
         $num = User::where([
