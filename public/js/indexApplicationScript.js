@@ -25,21 +25,29 @@ $(document).ready(function() {
         selectedUser = $("#organization option:selected").val();
         // get job list for dropdown
         getJob(selectedUser, "#job");
+
+        fetch_data(selectedUser, selectedPosition, selectedState, status, isSelected);
+        updateParticipantBarChart(selectedUser, selectedPosition, selectedState, status, isSelected);
+
     });
+
+    $("#organization").prop('selectedIndex', 0).trigger('change');
+    $("#job").prop('selectedIndex', 0);
+    $("#position").prop('selectedIndex', 0);
 
     $("#job").on('change', function(){
         selectedJob = $("#job option:selected").val();
 
         getPosition(selectedJob, selectedUser, "#position");
-        
+
     });
 
     $("#position").on('change', function(){
         // Get the selected position
         selectedPosition = $(this).val();
-
-        // Call fetch_data() with the selected position
         fetch_data(selectedUser, selectedPosition, selectedState, status, isSelected);
+        updateParticipantBarChart(selectedUser, selectedPosition, selectedState, status, isSelected)
+
     });
 
     // Function to handle radio button value
@@ -66,14 +74,12 @@ $(document).ready(function() {
 
         // Fetch data based on the selected position
         fetch_data(selectedUser, selectedPosition, selectedState, status, isSelected);
+        updateParticipantBarChart(selectedUser, selectedPosition, selectedState, status, isSelected)
     });
 
-    $("#organization").prop('selectedIndex', 0).trigger('change');
-    $("#job").prop('selectedIndex', 0).trigger('change');
-    $("#position").prop('selectedIndex', 0);
-    fetch_data(selectedUser, selectedPosition, selectedState, status, isSelected);
-
     function fetch_data(selectedUser, selectedPosition, selectedState, status, isSelected) {
+
+        console.log("1");
 
         // Make AJAX request to fetch data based on the selected position
         if ($.fn.DataTable.isDataTable('#requestTable')) {

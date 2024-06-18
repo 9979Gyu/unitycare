@@ -156,3 +156,4 @@ Route::get('/index-offers', [ReportController::class, 'indexOffers']);
 Route::get('/bar-chart', [ChartController::class, 'barChart']);
 Route::get('/user-pie-chart', [ChartController::class, 'peoplePieChart']);
 Route::get('/offer-bar-chart', [ChartController::class, 'offerBarChart']);
+Route::get('/app-bar-chart', [ChartController::class, 'appBarChart']);

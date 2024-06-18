@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Application;
 use App\Models\User;
 use App\Models\Job_Offer;
 use Illuminate\Http\Request;
@@ -52,6 +53,48 @@ class ChartController extends Controller
             'labels' => $num->pluck('labels'),
             'data' => $num->pluck('data'),
         ]);
+    }
+
+    public function appBarChart(Request $request){
+        
+        $selectedState = $request->get("selectedState");
+        $userID = $request->get("selectedUser");
+        $status = $request->get("status");
+        $selectedPosition = $request->get("selectedPosition");
+        $isSelected = $request->get("isSelected");
+
+        if(isset($selectedPosition)){
+
+            $query = Application::where('applications.status', $status)
+            ->join('job_offers as jo', 'jo.offer_id', 'applications.offer_id')
+            ->join('jobs as j', 'j.job_id', '=', 'jo.job_id');
+
+            if($userID != "all"){
+                $query = $query->where('jo.user_id', $userID);
+            }
+
+            if($selectedState != 3){
+                $query = $query->where('applications.approval_status', $selectedState);
+            }
+
+            if($selectedPosition != "all"){
+                $query = $query->where('j.job_id', $selectedPosition);
+            }
+
+            if($isSelected == 2){
+                $query = $query->where('applications.is_selected', 2);
+            }
+
+            $num = $query->groupBy('j.position')
+            ->selectRaw('j.position as labels, COUNT(*) as data')
+            ->get();
+
+            return response()->json([
+                'labels' => $num->pluck('labels'),
+                'data' => $num->pluck('data'),
+            ]);
+
+        }
     }
 
     public function peoplePieChart(){

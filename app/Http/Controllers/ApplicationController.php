@@ -441,8 +441,7 @@ class ApplicationController extends Controller
     }
 
     // Function to get list of application
-    public function getApplicationsDatatable(Request $request)
-    {
+    public function getApplicationsDatatable(Request $request){
         if(request()->ajax()){
 
             $selectedState = $request->get("selectedState");

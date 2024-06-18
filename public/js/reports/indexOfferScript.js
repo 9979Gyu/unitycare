@@ -55,21 +55,6 @@ $(document).ready(function() {
     $("#organization").prop('selectedIndex', 0).trigger('change');
     $("#jobname").prop('selectedIndex', 0).trigger('change');
     $("#position").prop('selectedIndex', 0);
-    fetch_data(selectedUser, selectedPosition, selectedState, status);
-    
-    // // Re-render when tab is shown
-    // $('#program-tab').on('shown.bs.tab', function (event) {
-    //     calendar.render();
-    // });
-
-    // $('#tabContent a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-    //     var targetPane = $(e.target).attr("href"); // Get the target pane href
-   
-    //     // Handle chart initialization or updates when the chart tab is shown
-    //     if (targetPane === '#chart') {
-    //         updateBarChart(selectedUser, selectedPosition, selectedState, status)
-    //     }
-    // });
     
     // Function to handle radio button value
     $('#allRadio, #pendingRadio, #approveRadio, #declineRadio, #deleteRadio').change(function() {
