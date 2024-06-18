@@ -96,3 +96,7 @@ body{
     height: 38px;
     right: 8px;
 }
+
+.charts {
+    width: 100%;
+}

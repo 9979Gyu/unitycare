@@ -28,6 +28,9 @@
     <script src="https://cdn.datatables.net/2.0.4/js/dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/2.0.4/js/dataTables.bootstrap5.min.js"></script>
 
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <!-- FullCalendar Script -->
     @stack('scripts')
 

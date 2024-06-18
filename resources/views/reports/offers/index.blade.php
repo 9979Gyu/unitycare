@@ -114,30 +114,57 @@
 
     </form>
 
-    <div class="table-responsive">
-        <table id="requestTable" class="table table-bordered table-striped dt-responsive" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
-            <thead>
-                <tr style="text-align:center">
-                    <th> No. </th>
-                    <th>Pekerjaan</th>
-                    <th>Jenis</th>
-                    <th>Syif</th>
-                    <th>Lokasi</th>
-                    <th>Tarikh</th>
-                    <th>Masa</th>
-                    <th>Purata Gaji</th>
-                    <th>Pekerja Diperlukan</th>
-                    <th>Penerangan</th>
-                    <th>Pengurus</th>
-                    <th>Status</th>
-                    <th>Diproses</th>
-                    <th>Tindakan</th>
-                </tr>
-            </thead>
-            <tbody>
+    <div>
+        <!-- Tab for program and job -->
+        <ul class="nav nav-tabs" id="tab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="offer-tab" data-bs-toggle="tab" data-bs-target="#offer" type="button" role="tab" aria-controls="offer" aria-selected="true">Jadual</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="chart-tab" data-bs-toggle="tab" data-bs-target="#chart" type="button" role="tab" aria-controls="chart" aria-selected="false">Carta</button>
+            </li>
+        </ul>
 
-            </tbody>
-        </table>
+        <!-- Content for tab -->
+        <div class="tab-content m-3" id="tabContent">
+            <!-- request -->
+            <div class="tab-pane fade show active" id="offer" role="tabpanel" aria-labelledby="offer-tab">
+                <div class="table-responsive">
+                    <table id="requestTable" class="table table-bordered table-striped dt-responsive" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                        <thead>
+                            <tr style="text-align:center">
+                                <th> No. </th>
+                                <th>Pekerjaan</th>
+                                <th>Jenis</th>
+                                <th>Syif</th>
+                                <th>Lokasi</th>
+                                <th>Tarikh</th>
+                                <th>Masa</th>
+                                <th>Purata Gaji</th>
+                                <th>Pekerja Diperlukan</th>
+                                <th>Penerangan</th>
+                                <th>Pengurus</th>
+                                <th>Status</th>
+                                <th>Diproses</th>
+                                <th>Tindakan</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- chart -->
+            <div class="tab-pane fade" id="chart" role="tabpanel" aria-labelledby="chart-tab">
+                <div class="justify-content-center d-flex m-2">
+                    <div class="charts">
+                        <canvas id="barChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Approve Modal -->

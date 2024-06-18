@@ -10,6 +10,7 @@ use App\Http\Controllers\OfferController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\ChartController;
 
 /*
 |--------------------------------------------------------------------------
@@ -152,3 +153,6 @@ Route::get('/getProgramsWithSpecs', [ReportController::class, 'getAllProgramsDet
 Route::get('/index-programs', [ReportController::class, 'indexPrograms']);
 Route::get('/index-offers', [ReportController::class, 'indexOffers']);
 
+Route::get('/bar-chart', [ChartController::class, 'barChart']);
+Route::get('/user-pie-chart', [ChartController::class, 'peoplePieChart']);
+Route::get('/offer-bar-chart', [ChartController::class, 'offerBarChart']);

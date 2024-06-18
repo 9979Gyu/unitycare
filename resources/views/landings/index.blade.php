@@ -126,9 +126,10 @@
                                                             <script>
                                                                 $(document).ready(function() {
                                                                     const list = $('#organizationList{{ $job->job_id }}');
+                                                                    var listItem = '';
                                                                     @foreach($jobOffers as $offer)
 
-                                                                        const listItem = '<hr><div><a class="viewAnchor text-black" href="/joinoffer/{{$offer->offer_id}}">' +
+                                                                        listItem = '<hr><div><a class="viewAnchor text-black" href="/joinoffer/{{$offer->offer_id}}">' +
                                                                                         '<h5 class="card-text">{{ $offer->organization->username }}</h5></a>' +
                                                                                         '<span class="card-text badge badge-primary"> RM {{ $offer->min_salary }}  - RM {{ $offer->max_salary }} sebulan</span>' +
                                                                                         ' <span class="card-text badge badge-primary"> {{ $offer->jobType->name }} </span>' +
@@ -184,8 +185,15 @@
 
         <br>
 
-        <div>
-            <object data="https://data.gov.my/ms-MY/data-catalogue/embed/hies_district?visual=poverty" width="100%" height="400px"></object>
+        <br>
+
+        <div class="justify-content-center d-flex">
+            <div style="width: 40%">
+                @include('charts.people')
+            </div>
+            <div class="flex-grow-1">
+                <object data="https://data.gov.my/ms-MY/data-catalogue/embed/hies_district?visual=poverty" width="100%" height="400px"></object>
+            </div>
         </div>
 
         <br>
