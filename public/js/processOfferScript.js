@@ -1,3 +1,4 @@
+// not using
 $(document).ready(function() {
 
     // Disabled the Tolak button in modal

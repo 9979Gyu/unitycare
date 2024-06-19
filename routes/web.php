@@ -108,7 +108,7 @@ Route::get('/joinprogram/{id}', [ParticipantController::class, 'create']);
 Route::post('/dismissprogram', [ParticipantController::class, 'dismiss']);
 Route::post('/storeparticipant', [ParticipantController::class, 'store']);
 Route::get('/indexparticipant', [ParticipantController::class, 'index']);
-Route::get('/getparticipants', [ParticipantController::class, 'getParticipantsDatatable']);
+Route::get('/getParticipantsDatatable', [ParticipantController::class, 'getParticipantsDatatable']);
 
 // Jobs
 Route::get('/createjob', [JobController::class, 'create']);

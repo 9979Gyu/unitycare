@@ -368,7 +368,7 @@ class ProgramController extends Controller
             ['user_id', $userID],
             ['status', 1]
         ])
-        ->select('program_id as pid')
+        ->select('program_id as pid', 'participant_id')
         ->get();
 
         return response()->json([

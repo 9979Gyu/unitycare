@@ -1,37 +1,40 @@
+// Using
 $(document).ready(function() {
 
-    $('.select2').select2();
+    // Initialize select2
+    $('#organization').select2({
+        placeholder: 'Pilih Penganjur',
+    });
 
-    var requestTable;
+    $('#program').select2({
+        placeholder: 'Pilih Program',
+    });
+
+    var requestParticipantTable;
+    var requestParticipatedTable;
     var selectedState = 1;
-    var selectedOrg = $('#organization').val();
-    var selectedProgram = $("#program").val();
-    fetch_data(selectedState, selectedOrg, selectedProgram); 
+    var selectedUser = "all";
+    var selectedProgram = "all";
+    var startDate = '';
+    var endDate = '';
 
     $("#organization").on('change', function(){
 
-        selectedOrg = $(this).val();
+        selectedUser = $(this).val();
 
         $.ajax({
             method: 'GET',
             dataType: 'json',
-            url: "/getUpdatedPrograms",
+            data: {selectedUser : selectedUser},
+            url: "/getProgramsByUserID",
             success: function(response) {
 
-                var allPrograms = response.allPrograms;
-
                 $("#program").empty();
-                $("#program").append('<option value="0">Pilih Program</option>');
-
-                $.each(allPrograms, function(index, program) {
-                    
-                    if(program.userid == selectedOrg){
-                        $("#program").append('<option value="' + program.program_id + '">' + program.name + '</option>');
-                    }
-
+    
+                response.forEach(function(item){
+                    $("#program").append('<option value="' + item.program_id + '">' + item.name + '</option>');
                 });
-
-                $("#program").prop('selectedIndex', 0).trigger('change');
+    
 
             },
             error: function (data) {
@@ -40,12 +43,27 @@ $(document).ready(function() {
         });
     });
 
+    $("#startDate1, #endDate1").change(function(){
+        startDate = $("#startDate1").val();
+        endDate = $("#endDate1").val();
+        if(endDate == ""){
+            endDate = startDate;
+        }
+
+        // Fetch data based on the selected position
+        fetch_data(selectedState, selectedUser, selectedProgram, startDate, endDate); 
+    });
+
+    $("#organization").prop('selectedIndex', 0).trigger('change');
+    $("#program").prop('selectedIndex', 0);
+    
+
     $("#program").on('change', function(){
         // Get the selected program
         selectedProgram = $(this).val();
 
         // Call fetch_data() with the selected program
-        fetch_data(selectedState, selectedOrg, selectedProgram); 
+        fetch_data(selectedState, selectedUser, selectedProgram, startDate, endDate); 
     });
 
     $('#allRadio, #volunteerRadio, #poorRadio, #deleteRadio').change(function() {
@@ -63,11 +81,11 @@ $(document).ready(function() {
         }
         
         // Fetch data based on the selected position
-        fetch_data(selectedState, selectedOrg, selectedProgram); 
+        fetch_data(selectedState, selectedUser, selectedProgram, startDate, endDate); 
 
     });
 
-    function fetch_data(selectedState, selectedOrg, selectedProgram) {
+    function fetch_data(selectedState, selectedUser, selectedProgram, startDate, endDate) {
 
         // Make AJAX request to fetch data based on the selected program
         if ($.fn.DataTable.isDataTable('#requestTable')) {
@@ -75,7 +93,7 @@ $(document).ready(function() {
             $('#requestTable').DataTable().destroy();
         }
 
-        requestTable = $('#requestTable').DataTable({
+        requestParticipantTable = $('#requestParticipantTable').DataTable({
             language: {
                 "sEmptyTable":     "Tiada data tersedia dalam jadual",
                 "sInfo":           "Memaparkan _START_ hingga _END_ daripada _TOTAL_ rekod",
@@ -102,12 +120,11 @@ $(document).ready(function() {
             processing: true,
             serverSide: true,
             ajax: {
-                url: "/getparticipants",
+                url: "/getParticipantsDatatable",
                 data: {
-                    rid: $("#roleID").val(),
                     programID: selectedProgram,
-                    userID : selectedOrg,
-                    selectedState: selectedState
+                    userID : selectedUser,
+                    state: selectedState
                 },
                 type: 'GET',
 
@@ -167,6 +184,32 @@ $(document).ready(function() {
             
         });
     }
+
+    var selectedID;
+    $(document).on('click', '.dismissAnchor', function() {
+        selectedID = $(this).attr('id');
+    });
+
+    $('#dismiss').click(function() {
+        if (selectedID) {
+            $.ajax({
+                type: 'POST',
+                dataType: 'html',
+                url: "/dismissprogram",
+                data: { 
+                    selectedID : selectedID,
+                },
+                success: function(data) {
+                    $('#dismissModal').modal('hide');
+                    $('.condition-message').html("Berjaya tarik diri");
+                    updateCardContainer(selectedCityState, keyword);
+                },
+                error: function (data) {
+                    $('.condition-message').html(data);
+                }
+            })
+        }
+    });
 
     // csrf token for ajax
     $.ajaxSetup({
