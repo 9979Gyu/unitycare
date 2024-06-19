@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\NotifyJoinEmail;
 use App\Models\Program;
 use App\Models\Program_Spec;
 use App\Models\Participant;
@@ -11,6 +12,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Exports\ExportProgramReport;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Mail;
+
 
 
 class ProgramController extends Controller
@@ -385,7 +388,21 @@ class ProgramController extends Controller
             ]);
 
         if($result){
-            return response()->json(['message' => 'Berjaya dipadam']);
+
+            // destroy relative participants
+            $update = Participant::where('program_id', $programID)
+            ->update([
+                'status' => 0,
+            ]);
+
+            if($update){
+
+                // Notify participants
+                $this->notifyJoin($programID);
+
+                return response()->json(['message' => 'Berjaya dipadam']);
+            }
+
         }
         else{
             return redirect()->back()->withErrors(["message" => "Tidak berjaya dipadam"]);
@@ -442,7 +459,7 @@ class ProgramController extends Controller
         // If successfully update the program
         if($update){
 
-            // $this->notifyUser($id);
+            $this->notifyUser($programID);
 
             // direct user to view program page with success messasge
             return redirect('/viewprogram')->with('success', 'Data berjaya dikemaskini');
@@ -571,8 +588,8 @@ class ProgramController extends Controller
                 ->update([
                     'qty_limit' => $request->get('poor'),
                 ]);
-                
-                // $this->notifyUser($programID);
+
+                $this->notifyUser($programID);
 
                 return redirect('/viewprogram')->with('success', 'Data berjaya dikemaskini');
             }
@@ -674,8 +691,8 @@ class ProgramController extends Controller
             ]);
 
             $addPoor->save();
-            
-            // $this->notifyUser($program->program_id);
+
+            $this->notifyUser($program->program_id);
 
             return redirect('/viewprogram')->with('success', 'Program berjaya didaftarkan');
         }
@@ -689,6 +706,69 @@ class ProgramController extends Controller
                     ->withErrors(['message' => $errors->all]);
 
             }
+        }
+    }
+
+    // Email user after approval
+    public function notifyUser($programID){
+
+        $program = Program::where('programs.program_id', $programID)
+        ->join('users as u', 'u.id', '=', 'programs.user_id')
+        ->select(
+            'programs.approved_at',
+            'programs.approved_status',
+            'programs.name',
+            'programs.description->reason as reason',
+            'u.email', 
+            'u.username'
+        )
+        ->first();
+
+        if($program->approved_at != null){
+            $date = explode(" ", $program->approved_at);
+            $program->approved_at = DateController::parseDate($date[0]) . ' ' . DateController::formatTime($date[1]);
+        }
+
+        Mail::to($program->email)->send(new NotifyJoinEmail([
+            'name' => $program->username,
+            'subject' => 'program',
+            'approval' => $program->approved_status,
+            'offer' => $program->name,
+            'datetime' => $program->approved_at,
+            'reason' => $program->reason ? $program->reason : "",
+        ]));
+    }
+
+    public function notifyJoin($programID){
+
+        $programs = Participant::where('participants.program_id', $programID)
+        ->join('programs as p', 'p.program_id', '=', 'participants.program_id')
+        ->join('users as u', 'u.id', '=', 'participants.user_id')
+        ->select(
+            'programs.approved_at',
+            'programs.approved_status',
+            'programs.name',
+            'programs.description->reason as reason',
+            'u.email', 
+            'u.username'
+        )
+        ->get();
+
+        foreach($programs as $program){
+
+            if($program->approved_at != null){
+                $date = explode(" ", $program->approved_at);
+                $program->approved_at = DateController::parseDate($date[0]) . ' ' . DateController::formatTime($date[1]);
+            }
+
+            Mail::to($program->email)->send(new NotifyJoinEmail([
+                'name' => $program->username,
+                'subject' => 'program',
+                'approval' => $program->approved_status,
+                'offer' => $program->name,
+                'datetime' => $program->approved_at,
+                'reason' => $program->reason ? $program->reason : "",
+            ]));
         }
     }
 }

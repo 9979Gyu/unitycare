@@ -91,23 +91,23 @@
                 </tr>
                 <tr>
                     <th scope="row">Pilihan</th>
-                    <input type="number" name="program_id" value="{{ $program->program_id }}" hidden>
+                    <input type="number" name="programID" value="{{ $program->program_id }}" hidden>
                     <td colspan="3">
-                    @if($participantExist == 0 && $program->close_date >= today() && $program->user_id != Auth::user()->id && Auth::user()->roleID != 3)
-                        @if(Auth::user()->roleID == 5)
-                            @if($poorRemain > 0)
+                        <!-- Did not apply, close date not reach, is not creator, is not enterprise -->
+                        @if($participantExist == 0 && $program->close_date >= today() && $program->user_id != $userID && $roleID != 3)
+
+                            <!-- is poor, can be perserta -->
+                            @if($poorRemain > 0 && $roleID == 5)
                                 <button type="submit" class="btn btn-success" name="button_id" value="3"><b>Jadi Peserta</b></button>
                             @endif
+
                             @if($volRemain > 0)
                                 <button type="submit" class="btn btn-info" name="button_id" value="2"><b>Jadi Sukarelawan</b></button>
                             @endif
-                        @else
-                            @if($volRemain > 0)
-                                <button type="submit" class="btn btn-info" name="button_id" value="2"><b>Jadi Sukarelawan</b></button>
-                            @endif
+
                         @endif
-                    @endif
-                    <button type="button" class="btn btn-secondary" onclick="window.location='/viewprogram'"><b>Tutup</b></button>
+
+                        <button type="button" class="btn btn-secondary" onclick="window.location='/viewallprograms'"><b>Tutup</b></button>
                     </td>
                 </tr>
             </table>

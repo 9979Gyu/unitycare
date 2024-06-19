@@ -81,13 +81,14 @@
             <p>Terima kasih mengguna sistem kami. </p>
             <br>
             <p>
-                @if($mailData['approval'] == 1)
-                    Permohonan anda terhadap {{ $mailData['subject'] }} <b>{{ $mailData['offer'] }}</b> telah dihantar untuk kelulusan. 
-                @elseif($mailData['approval'] == 2)
-                    Tahniah. Permohonan anda terhadap {{ $mailData['subject'] }} <b>{{ $mailData['offer'] }}</b> telah <b>Dilulus</b> pada {{ $mailData['datetime'] }}. 
-                @elseif($mailData['approval'] == 0)
-                    Maaf. Permohonan anda terhadap {{ $mailData['subject'] }} <b>{{ $mailData['offer'] }}</b> telah <b>Ditolak</b> pada {{ $mailData['datetime'] }}.
-                    <p>Sebab: <b>{{ $mailData['reason'] }}</b><p>
+                @if($mailData['status'] == 1)
+
+                Pendaftaran anda terhadap program <b>{{ $mailData['program'] }}</b> berjaya disimpan pada {{ $mailData['datetime'] }}.
+
+                @else
+
+                Membuat keputusan untuk tarik diri daripada program? Pendaftaran anda terhadap program <b>{{ $mailData['program'] }}</b> berjaya dipadam pada {{ $mailData['datetime'] }}.
+                
                 @endif
             </p>
             <div class="button-container">
