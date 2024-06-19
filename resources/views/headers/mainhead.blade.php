@@ -97,15 +97,15 @@
                             <b>Program</b>
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item" href="/viewprogram"><b>Lihat</b></a></li>
+                            <li><a class="dropdown-item" href="/viewallprograms"><b>Lihat</b></a></li>
                             <!-- Is not B40 / OKU -->
                             @if(Auth::user()->roleID != 5)
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="/createprogram/{{ Auth::user()->roleID }}"><b>Tambah</b></a></li>
+                                <li><a class="dropdown-item" href="/createprogram"><b>Tambah</b></a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="/viewprogram"><b>Permohonan</b></a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="/indexparticipant"><b>Peserta</b></a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="/index-programs"><b>Laporan</b></a></li>
                             @endif
                         </ul>
                     </li>

@@ -30,4 +30,30 @@ $(document).ready(function(){
         }
     });
 
+    $('#startDate1').on('change', function(){
+        var startDate = $('#startDate1').val();
+        var endDate = $('#endDate1').val();
+
+        if (startDate > endDate) {
+            $('#endDate1').attr('min', startDate);
+            $('#endDate1').val(startDate);
+        }
+        else{
+            $('#endDate1').attr('min', '');
+        }
+    });
+
+    $('#endDate1').on('change', function(){
+        var startDate = $('#startDate1').val();
+        var endDate = $('#endDate1').val();
+  
+        if (startDate > endDate) {
+            $('#endDate1').attr('min', startDate);
+            $('#endDate1').val(startDate);
+        }
+        else{
+            $('#endDate1').attr('min', '');
+        }
+    });
+
 });

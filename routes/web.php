@@ -59,7 +59,6 @@ Route::post('/export-jobs', [JobController::class, 'exportJobs']);
 Route::post('/export-offers', [OfferController::class, 'exportOffers']);
 Route::post('/export-applications', [ApplicationController::class, 'exportApplications']);
 Route::post('/export-participants', [ParticipantController::class, 'exportParticipants']);
-Route::post('/export-specs', [ReportController::class, 'exportProgramsWithSpecs']);
 Route::post('/export-applies', [ApplicationController::class, 'exportApplied']);
 
 
@@ -89,15 +88,20 @@ Route::get('/viewprofile', [UserController::class, 'indexProfile']);
 
 // Activity / Program
 Route::get('/viewprogram', [ProgramController::class, 'index']);
-Route::get('/createprogram/{roleNo}', [ProgramController::class, 'create']);
+Route::get('/viewallprograms', [ProgramController::class, 'view']);
+Route::get('/getProgramsByUserID', [ProgramController::class, 'geProgramsByUser']);
+Route::get('/getProgramsDatatable', [ProgramController::class, 'getProgramsDatatable']);
+Route::post('/boostprogram', [ProgramController::class, 'boostProgram']);
+Route::post('/deleteprogram', [ProgramController::class, 'destroy']);
+Route::post('/updateapproval', [ProgramController::class, 'updateApproval']);
+Route::get('/createprogram', [ProgramController::class, 'create']);
 Route::post('/storeprogram', [ProgramController::class, 'store']);
-Route::get('/getprogram', [ProgramController::class, 'getProgramsDatatable']);
+
+
 Route::get('/getProgramById', [ProgramController::class, 'getProgramById']);
 Route::get('/editprogram/{id}', [ProgramController::class, 'edit']);
 Route::post('/updateprogram', [ProgramController::class, 'update']);
-Route::post('/approveprogram', [ProgramController::class, 'updateApproval']);
 Route::post('/declineprogram', [ProgramController::class, 'declineApproval']);
-Route::post('/deleteprogram', [ProgramController::class, 'destroy']);
 Route::get('/getUpdatedPrograms', [ProgramController::class, 'getUpdatedPrograms']);
 
 Route::get('/joinprogram/{id}', [ParticipantController::class, 'create']);
@@ -149,7 +153,6 @@ Route::get('/search', [LandingController::class, 'search']);
 // Route::get('/getCountOffer', [LandingController::class, 'getCountOffer']);
 
 // Report
-Route::get('/getProgramsWithSpecs', [ReportController::class, 'getAllProgramsDetailsDatatable']);
 Route::get('/index-programs', [ReportController::class, 'indexPrograms']);
 
 Route::get('/bar-chart', [ChartController::class, 'barChart']);

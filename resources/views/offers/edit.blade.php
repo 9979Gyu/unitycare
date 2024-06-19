@@ -187,8 +187,8 @@
     </form>
 
     <script src="{{ asset('js/addOfferScript.js') }}"></script>
-    <script src="{{ asset('js/dateScript.js') }}"></script>
-    <script src="{{ asset('js/postcodeScript.js') }}"></script>
+    <script src="{{ asset('js/general/dateScript.js') }}"></script>
+    <script src="{{ asset('js/general/postcodeScript.js') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 
 @endsection

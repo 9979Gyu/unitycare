@@ -182,10 +182,10 @@
         </div>
     </div>
 
-    <script src="{{ asset('js/dateScript.js') }}"></script>
+    <script src="{{ asset('js/general/dateScript.js') }}"></script>
     <script src="{{ asset('js/general/offerScript.js') }}"></script>
     <script src="{{ asset('js/viewApplicationScript.js') }}"></script>
-    <script src="{{ asset('js/modalScript.js') }}"></script>
+    <script src="{{ asset('js/general/modalScript.js') }}"></script>
 
 
 @endsection

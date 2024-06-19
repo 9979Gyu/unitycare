@@ -87,6 +87,6 @@
     </div>
 
     <script src="{{ asset('js/reports/indexOfferScript.js') }}"></script>
-    <script src="{{ asset('js/dateScript.js') }}"></script>
+    <script src="{{ asset('js/general/dateScript.js') }}"></script>
 
 @endsection

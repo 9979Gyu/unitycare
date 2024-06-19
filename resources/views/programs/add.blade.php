@@ -25,11 +25,11 @@
         <div class="mb-3">
             <h5>Maklumat Program</h5>
         </div>
-        <input type="text" name="roleID" id="roleID" value="{{ $roleNo }}" hidden>
+        <input type="text" name="roleID" id="roleID" value="{{ $roleID }}" hidden>
         <div class="row mb-3">
             <label for="name" class="col-sm-2 col-form-label required">Nama</label>
             <div class="col-sm-10">
-                <input type="text" name="name" class="form-control touppercase" id="name" value="{{ old('name') }}" required>
+                <input type="text" name="name" class="form-control" id="name" value="{{ old('name') }}" required>
             </div>
         </div>
 
@@ -57,7 +57,7 @@
         <div class="row mb-3">
             <label for="address" class="col-sm-2 col-form-label required">Tempat</label>
             <div class="col-sm-10">
-                <input type="text" value="{{ old('address') }}" name="address" class="form-control touppercase" id="address" required>
+                <input type="text" value="{{ old('address') }}" name="address" class="form-control" id="address" required>
             </div>
         </div>
 
@@ -113,18 +113,18 @@
         <div class="row mb-3">
             <label for="description" class="col-sm-2 col-form-label required">Penerangan</label>
             <div class="col-sm-10">
-                <input type="text" value="{{ old('description') }}" name="description" class="form-control" id="description" placeholder="Syarat-syarat" required>
+                <textarea name="description" class="form-control" id="description" placeholder="Syarat-syarat" required>{{ old('description') }}</textarea>
             </div>
         </div>
 
         <div class="row mb-3">
             <label for="volunteer" class="col-sm-2 col-form-label required">Bilangan Sukarelawan</label>
             <div class="col-sm-4">
-                <input type="number" name="volunteer" value="0" min="0" class="form-control touppercase" id="volunteer" value="{{ old('volunteer') }}" required>
+                <input type="number" name="volunteer" value="0" min="0" class="form-control" id="volunteer" value="{{ old('volunteer') }}" required>
             </div>
             <label for="poor" class="col-sm-2 col-form-label required">Bilangan B40/OKU</label>
             <div class="col-sm-4">
-                <input type="number" name="poor" value="0" min="0" class="form-control touppercase" id="poor" value="{{ old('poor') }}" required>
+                <input type="number" name="poor" value="1" min="1" class="form-control" id="poor" value="{{ old('poor') }}" required>
             </div>
         </div>
 
@@ -146,53 +146,8 @@
 
     <br>
 
-    <script src="{{ asset('js/postcodeScript.js') }}"></script>
-    <script>
-        $(document).ready(function(){
-            today = new Date();
-            day = String(today.getDate()).padStart(2, '0');
-            month = String(today.getMonth() + 1).padStart(2, '0');
-
-            year = today.getFullYear();
-
-            today = year + '-' + month + '-' + day;
-            $("#start_date").attr("min", today);
-            $("#end_date").attr("min", today);
-            $("#close_date").attr("min", today);
-
-            // To ensure end date always after start date
-            $("#start_date").change(function(){
-                start = $(this).val();
-                end = $("#end_date").val();
-                $("#end_date").attr("min", start);
-
-                if(end){
-                    if(end < start){
-                        $("#end_date").val($(this).val());
-                    }
-                }
-
-                startT = $("#start_time").val();
-                endT = $("#end_time").val();
-
-                if(start == end && startT > endT){
-                    alert("Masa mula tidak boleh melebihi masa tamat");
-                    $("#end_time").val("");
-                }
-            });
-
-            // To ensure end time always after start time if the date is same
-            $("#end_time").change(function(){
-                start = $("#start_time").val();
-                end = $("#end_time").val();
-
-                if(start > end){
-                    alert("Masa mula tidak boleh melebihi masa tamat");
-                    $("#end_time").val("");
-                }
-            });
-
-        });
-    </script>
+    <script src="{{ asset('js/general/postcodeScript.js') }}"></script>
+    <script src="{{ asset('js/programs/controlScript.js') }}"></script>
+    <script src="{{ asset('js/general/dateScript.js') }}"></script>
 
 @endsection

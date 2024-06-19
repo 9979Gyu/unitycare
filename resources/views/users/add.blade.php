@@ -114,6 +114,6 @@
 
     <br>
 
-    <script src="{{ asset('js/postcodeScript.js') }}"></script>
+    <script src="{{ asset('js/general/postcodeScript.js') }}"></script>
 
 @endsection

@@ -9,13 +9,7 @@ $(document).ready(function() {
     // Initialize Bootstrap tooltip
     $('[data-bs-toggle="tooltip"]').tooltip();
 
-    var toolTipContent = '<ul><li>Nama Program atau Pekerjaan (Contoh: Kerjaya)</li>' +
-        '<li>Tarikh Mula (Contoh: 24-06-2023)</li>' +
-        '</ul>';
-
-    // Set tooltip content for the info circle icon
-    $(".bi-info-circle-fill").attr('title', toolTipContent);
-
+    // Call function to list option for available city and state
     getCityState();
 
     var selectedCityState = $("#citystate").val();
@@ -59,17 +53,21 @@ $(document).ready(function() {
         });
     }
 
+    // Function to display list of open program in card
     function updateCardContainer(selectedCityState, keyword){
 
-        $uid = $("#uid").val();
+        var userID = $("#uid").val();
+        var roleID = $("#roleID").val();
+
         $.ajax({
             type: 'GET',
             url: "/getUpdatedPrograms",
+            data: { userID : userID, },
             success: function(data) {
                                 
                 $(".card-container").empty();
 
-                if (data.allPrograms.length == 0) {
+                if (data.activePrograms.length == 0) {
                     $(".card-container").append("<div class='m-2'>Tiada rekod berkenaan</div>");
                 }
 
@@ -79,7 +77,7 @@ $(document).ready(function() {
 
                 var enrolledPrograms = $.map(data.enrolled, function(el) { return el.pid; });
 
-                $.each(data.allPrograms, function(index, program){
+                $.each(data.activePrograms, function(index, program){
 
                     keyword = keyword ? keyword.toLowerCase() : null;
 
@@ -103,7 +101,7 @@ $(document).ready(function() {
                             '</svg> Tarik Diri</a>';
                         }
                         else{
-                            if(program.close_date >= todayDate() && program.user_id != $uid && $("#roleID").val() != 3){
+                            if(program.close_date >= todayDate() && program.user_id != userID && roleID != 3){
                                 button += '<a class="applyAnchor btn btn-success" href="/joinprogram/' + program.program_id + '">' +
                                 '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-person-plus-fill" viewBox="0 0 16 16">' +
                                 '<path d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>' +
@@ -113,7 +111,7 @@ $(document).ready(function() {
                         }
 
                         if((volChecked && program.type_id == 1) || (skillDevChecked && program.type_id == 2) || (!volChecked && !skillDevChecked)){
-                            if(program.approved_status == 2){
+                            if(program.approved_status == 2 && program.status == 1){
                                 $(".card-container").append(
                                     '<div class="card" id="' + program.program_id + '">' +
                                         '<div class="card-header bg-primary text-white">' + program.typename + '</div>' +
@@ -129,50 +127,6 @@ $(document).ready(function() {
                                     '</div>' + 
                                     '<br>'
                                 );
-                                
-                            }
-                            else if(program.approved_status <= 1 && program.user_id == $("#uid").val()){
-                                
-                                if(program.reason == ""){
-                                    $(".card-container").append(
-                                        '<div class="card" id="' + program.program_id + '">' +
-                                            '<div class="card-header bg-primary text-white">' + program.typename + '</div>' +
-                                            '<div class="card-body d-flex justify-content-between">' +
-                                                '<div><h5 class="card-title">' + program.name + '</h5>' +
-                                                    '<p class="card-text">' + program.venue + ', ' + program.postal_code + 
-                                                    ', ' + program.city + ', ' + program.state + '</p>' +
-                                                    '<p class="card-text">' + program.description + '</p>' +
-                                                    '<p class="card-text text-secondary">kemaskini ' + parseDate(program.updated_at) + '</p>' +
-                                                '</div>' +
-                                                '<div>' +
-                                                    '<p><a href="/editprogram/' + program.program_id + '" class="btn btn-warning">Kemaskini</a></p>' +
-                                                    '<p><a class="deleteAnchor btn btn-danger" href="#" id="' + program.program_id + '" data-bs-toggle="modal" data-bs-target="#deleteModal">Padam</a></p>' +
-                                                '</div>' +
-                                            '</div>' +
-                                        '</div><br>'
-                                    );
-                                }
-                                else{
-                                    $(".card-container").append(
-                                        '<div class="card" id="' + program.program_id + '">' +
-                                            '<div class="card-header bg-primary text-white">' + program.typename + '</div>' +
-                                            '<div class="card-body d-flex justify-content-between">' +
-                                                '<div><h5 class="card-title">' + program.name + '</h5>' +
-                                                    '<p class="card-text">' + program.venue + ', ' + program.postal_code + 
-                                                    ', ' + program.city + ', ' + program.state + '</p>' +
-                                                    '<p class="card-text">' + program.description + '</p>' +
-                                                    '<p class="card-text"> <b>Ditolak: ' + program.reason + '</b></p>' +
-                                                    '<p class="card-text text-secondary">kemaskini ' + parseDate(program.updated_at) + '</p>' +
-                                                '</div>' +
-                                                '<div>' +
-                                                    '<p><a href="/editprogram/' + program.program_id + '" class="btn btn-warning">Kemaskini</a></p>' +
-                                                    '<p><a class="deleteAnchor btn btn-danger" href="#" id="' + program.program_id + '" data-bs-toggle="modal" data-bs-target="#deleteModal">Padam</a></p>' +
-                                                '</div>' +
-                                            '</div>' +
-                                        '</div><br>'
-                                    );
-                                }
-                                
                             }
                         }
 
@@ -201,29 +155,6 @@ $(document).ready(function() {
     }
 
     var selectedID;
-    $(document).on('click', '.deleteAnchor', function() {
-        selectedID = $(this).attr('id');
-    });
-
-    $('#delete').click(function() {
-        if (selectedID) {
-            $.ajax({
-                type: 'POST',
-                dataType: 'html',
-                url: "/deleteprogram",
-                data: { selectedID : selectedID },
-                success: function(data) {
-                    $('#deleteModal').modal('hide');
-                    $('.condition-message').html(data);
-                    updateCardContainer(selectedCityState, keyword);
-                },
-                error: function (data) {
-                    $('.condition-message').html(data);
-                }
-            })
-        }
-    });
-
     $(document).on('click', '.dismissAnchor', function() {
         selectedID = $(this).attr('id');
     });
@@ -237,7 +168,7 @@ $(document).ready(function() {
                 data: { selectedID : selectedID },
                 success: function(data) {
                     $('#dismissModal').modal('hide');
-                    $('.condition-message').html(data);
+                    $('.condition-message').html("Berjaya tarik diri");
                     updateCardContainer(selectedCityState, keyword);
                 },
                 error: function (data) {

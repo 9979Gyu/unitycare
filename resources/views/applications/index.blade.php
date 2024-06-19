@@ -220,7 +220,7 @@
 
     <script src="{{ asset('js/general/offerScript.js') }}"></script>
     <script src="{{ asset('js/indexApplicationScript.js') }}"></script>
-    <script src="{{ asset('js/modalScript.js') }}"></script>
+    <script src="{{ asset('js/general/modalScript.js') }}"></script>
 
 
 @endsection

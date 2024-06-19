@@ -6,60 +6,52 @@ $(document).ready(function(){
     $("#more").hide();
 
     // Initialize select2
-    $('.select2').select2();
+    $('#organization').select2({
+        placeholder: 'Pilih Pengurus',
+    });
+
+    $('#type').select2({
+        placeholder: 'Pilih Program',
+    });
 
     // Declare variables
     var requestTable;
     var selectedState = 3;
-    var selectedUser;
-    var selectedType = $("#type option:selected").val();
+    var selectedUser = "all";
+    var selectedType = "all"
     var status = 1;
+    var startDate = "";
+    var endDate = "";
 
-    $("#organization").change(function(){
+    $("#organization").on('change', function(){
         selectedUser = $("#organization option:selected").val();
-
-        $.ajax({
-            method: 'GET',
-            dataType: 'json',
-            url: "/getUpdatedPrograms",
-            success: function(response) {
-
-                var allPrograms = response.allPrograms;
-
-                $("#type").empty();
-                $("#type").append(
-                    '<option value="all" selected>Semua Jenis</option>' +
-                    '<option value="vol">Sukarelawan</option>' +
-                    '<option value="skill">Pembangunan Kemahiran</option>'
-                );
-
-                $.each(allPrograms, function(index, program) {
-
-                    if(program.userid == selectedUser){
-                        $("#type").append('<option value="' + program.program_id + '">' + program.name + '</option>');
-                    }
-
-                });
-
-            },
-            error: function (data) {
-                $('.condition-message').html(data);
-            }
-        });
-
+        getPrograms("#type", selectedUser);
         // Fetch data based on the selected position
-        fetch_data(selectedUser, selectedState, selectedType, status);
+        fetch_data(selectedUser, selectedState, selectedType, startDate, endDate);
     });
 
     $("#type").change(function(){
         selectedType = $("#type option:selected").val();
 
         // Fetch data based on the selected position
-        fetch_data(selectedUser, selectedState, selectedType, status);
+        fetch_data(selectedUser, selectedState, selectedType, startDate, endDate);
     });
 
+    $("#startDate1, #endDate1").change(function(){
+        startDate = $("#startDate1").val();
+        endDate = $("#endDate1").val();
+        if(endDate == ""){
+            endDate = startDate;
+        }
+
+        // Fetch data based on the selected position
+        fetch_data(selectedUser, selectedState, selectedType, startDate, endDate);
+    });
+
+    $('#organization').prop('selectedIndex', 0).trigger('change');
+    $('#type').prop('selectedIndex', 0);
+
     $('#allRadio, #pendingRadio, #approveRadio, #declineRadio, #deleteRadio').change(function() {
-        status = 1;
 
         if ($('#allRadio').is(':checked')) {
             selectedState = 3;
@@ -74,14 +66,23 @@ $(document).ready(function(){
             selectedState = 0;
         }
         else if ($('#deleteRadio').is(':checked')) {
-            status = 0
+            selectedState = 4;
         }
         
         // Fetch data based on the selected position
-        fetch_data(selectedUser, selectedState, selectedType, status);
+        fetch_data(selectedUser, selectedState, selectedType, startDate, endDate);
     });
 
-    function fetch_data(selectedUser, selectedState, selectedType, status){
+    $("#resetBtn").click(function(){
+        $("#organization").prop('selectedIndex', 0).trigger('change');
+
+        $("#type").prop('selectedIndex', 0).trigger('change');
+
+        $('#startDate1').val('');
+        $('#endDate1').val('').trigger('change');
+    });
+
+    function fetch_data(selectedUser, selectedState, selectedType, startDate, endDate){
 
         // Make AJAX request to fetch data based on the selected position
         if ($.fn.DataTable.isDataTable('#requestTable')) {
@@ -89,10 +90,7 @@ $(document).ready(function(){
             $('#requestTable').DataTable().destroy();
         }
 
-        if(selectedUser == null){
-            alert('Sila pilih penganjur');
-        }
-        else{
+        if(selectedUser != null && selectedState != null && selectedType != null && status != null){
             requestTable = $('#requestTable').DataTable({
                 language: {
                     "sEmptyTable":     "Tiada data tersedia dalam jadual",
@@ -120,12 +118,13 @@ $(document).ready(function(){
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: "/getProgramsWithSpecs",
+                    url: "/getProgramsDatatable",
                     data: {
                         selectedUser: selectedUser,
                         selectedState: selectedState,
                         selectedType: selectedType,
-                        status: status
+                        startDate: startDate,
+                        endDate: endDate,
                     },
                     type: 'GET',
                 },
@@ -134,7 +133,7 @@ $(document).ready(function(){
                     "className": "text-center",
                     "width": "2%"
                 }, {
-                    "targets": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                    "targets": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
                     "className": "text-center",
                 },], 
                 columns: [{
@@ -175,11 +174,13 @@ $(document).ready(function(){
                     orderable: true,
                     searchable: true
                 }, {
-                    data: function(row) {
-                        return row.vol + 
-                        '<br>' + row.poor;
-                    },
-                    name: 'participants',
+                    data: 'vol',
+                    name: 'volunteer',
+                    orderable: true,
+                    searchable: true
+                }, {
+                    data: 'poor',
+                    name: 'poor',
                     orderable: true,
                     searchable: true
                 }, {
@@ -199,7 +200,7 @@ $(document).ready(function(){
                 }, {
                     data: function(row) {
                         if(row.approved_status == 0){
-                            return '<span class="text-danger"><b>' + row.approval + ': ' + row.reason + '</b></span>';
+                            return '<span class="text-danger"><b>' + row.approval + '</b></span>';
                         }
                         else if(row.approved_status == 2){
                             return '<span class="text-success"><b>' + row.approval + '</b></span>';
@@ -234,7 +235,9 @@ $(document).ready(function(){
     
             });
         }
-
+        else{
+            alert('Data tidak lengkap');
+        }
     }
 
     // Function to remove program
@@ -250,9 +253,9 @@ $(document).ready(function(){
                 dataType: 'html',
                 url: "/deleteprogram",
                 data: { selectedID : selectedID },
-                success: function(data) {
+                success: function(response) {
                     $('#deleteModal').modal('hide');
-                    $('.condition-message').html(data);
+                    $('.condition-message').text(response.message);
 
                     requestTable.ajax.reload();
                 },
@@ -261,6 +264,30 @@ $(document).ready(function(){
                 }
             })
         }
+    });
+
+    // Function to approve program
+    $(document).on('click', '.boostAnchor', function() {
+        selectedID = $(this).attr('id');
+    });
+
+    $('#boost').click(function() {
+        
+        $.ajax({
+            type: 'POST',
+            dataType: 'html',
+            url: "/boostprogram",
+            data: { selectedID : selectedID },
+            success: function(data) {
+                $('#boostModal').modal('hide');
+                $('.condition-message').html(data);
+
+                requestTable.ajax.reload();
+            },
+            error: function (data) {
+                $('.condition-message').html(data);
+            }
+        });
     });
 
     // Function to approve program
@@ -273,7 +300,11 @@ $(document).ready(function(){
         $.ajax({
             type: 'POST',
             dataType: 'html',
-            url: "/approveprogram/" + selectedID,
+            url: "/updateapproval",
+            data: { 
+                selectedID : selectedID,
+                approval : 2,
+            },
             success: function(data) {
                 $('#approveModal').modal('hide');
                 $('.condition-message').html(data);
@@ -340,10 +371,11 @@ $(document).ready(function(){
         $.ajax({
             type: 'POST',
             dataType: 'html',
-            url: "/declineprogram",
+            url: "/updateapproval",
             data: {
                 reason: declineReason,
-                selectedID: selectedID
+                selectedID: selectedID,
+                approval: 0,
             },
             success: function(data) {
                 $('#declineModal').modal('hide');

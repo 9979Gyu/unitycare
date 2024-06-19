@@ -29,8 +29,6 @@ class ExportProgramReport implements FromCollection, withHeadings, ShouldAutoSiz
 
                 $usercontact = '(+60)' . $item->usercontact;
 
-                $participant = $item->vol . ', ' . $item->poor;
-
                 if($item->approved_status == 0){
                     $approval = "Ditolak";
                 }
@@ -41,6 +39,13 @@ class ExportProgramReport implements FromCollection, withHeadings, ShouldAutoSiz
                     $approval = "Telah Diluluskan";
                 }
 
+                if($item->processedname == null){
+                    $processed = " ";
+                }
+                else{
+                    $processed = $item->processedname . ' (' . $item->processedemail . ")";
+                }
+
                 return[
                     'Program' => $item->name,
                     'Jenis' => $item->typename,
@@ -48,15 +53,15 @@ class ExportProgramReport implements FromCollection, withHeadings, ShouldAutoSiz
                     "Tempat" => $item->address,
                     "Tarikh Mula" => $item->start,
                     "Tarikh Tamat" => $item->end,
-                    "Peserta" => $participant,
+                    "Sukarelawan" => $item->vol,
+                    "B40 / OKU" => $item->poor,
                     "Tarikh Tutup Permohonan" => $item->close_date,
                     'Nama Penganjur' => $item->username,
                     'Emel Penganjur' => $item->useremail,
                     'Telefon Nombor Penganjur' => $usercontact,
                     "Status" => $approval,
-                    "Diproses oleh" => $item->processedemail,
+                    "Diproses oleh" => $processed,
                     "Diproses pada" => $item->approved_at
-                    
                 ];
 
             });
@@ -75,7 +80,8 @@ class ExportProgramReport implements FromCollection, withHeadings, ShouldAutoSiz
             "Tempat",
             "Tarikh Mula",
             "Tarikh Tamat",
-            "Peserta",
+            "Sukarelawan",
+            "B40 / OKU",
             "Tarikh Tutup Permohonan",
             'Nama Penganjur',
             'Emel Penganjur',

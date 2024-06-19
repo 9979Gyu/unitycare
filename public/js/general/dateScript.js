@@ -19,12 +19,15 @@ function parseDate(date){
 
     // Define the day names array
     var days = ['Ahad', 'Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu'];
+    var months = ['Januari', 'Februari', 'Mac', 'April', 'Mei', 'Jun', 'Julai', 'Ogos', 'September', 'Oktober', 'November', 'Disember'];
 
     // Get the day name using the day number of the week
     var dayName = days[newDate.getDay()];
+    var monthName = months[newDate.getMonth() + 1];
 
     // Format the date as "Day, dd-mm-yyyy"
-    var formattedDate = dayName + ', ' + ('0' + newDate.getDate()).slice(-2) + '-' + ('0' + (newDate.getMonth() + 1)).slice(-2) + '-' + newDate.getFullYear();
+    // var formattedDate = dayName + ', ' + ('0' + newDate.getDate()).slice(-2) + '-' + ('0' + (newDate.getMonth() + 1)).slice(-2) + '-' + newDate.getFullYear();
+    var formattedDate = dayName + ', ' + ('0' + newDate.getDate()).slice(-2) + ' ' + monthName + ' ' + newDate.getFullYear();
 
     return formattedDate;
 

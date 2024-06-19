@@ -55,7 +55,6 @@ class ParticipantController extends Controller
             ->where([
                 ['program_id', $id],
                 ['status', 1],
-                ['approved_status', 2]
             ])
             ->select(
                 '*',
@@ -65,13 +64,13 @@ class ParticipantController extends Controller
             ->first();
 
             $program->start_date = DateController::parseDate($program->start_date);
+            $program->start_time = DateController::formatTime($program->start_time);
             $program->end_date = DateController::parseDate($program->end_date);
+            $program->end_time = DateController::formatTime($program->end_time);
             $program->close_date = DateController::parseDate($program->close_date);
 
             $volLimit = Program::where([
                 ['program_id', $id],
-                ['status', 1],
-                ['approved_status', 2],
             ])
             ->with(['programSpecs' => function ($query) {
                 $query->where('user_type_id', 2);
@@ -80,8 +79,6 @@ class ParticipantController extends Controller
 
             $poorLimit = Program::where([
                 ['program_id', $id],
-                ['status', 1],
-                ['approved_status', 2],
             ])
             ->with(['programSpecs' => function ($query) {
                 $query->where('user_type_id', 3);
@@ -89,7 +86,6 @@ class ParticipantController extends Controller
             ->first();
 
             $participantExist = Participant::where([
-                ['status', 1],
                 ['user_id', Auth::user()->id]
             ])
             ->with(['programs' => function ($query) {

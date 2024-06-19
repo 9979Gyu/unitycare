@@ -17,7 +17,7 @@ class DateController extends Controller
             $date->locale('ms');
 
             // Format the date to 'dddd, DD-MM-YYYY' (without time since it's not provided)
-            $formattedDate = $date->isoFormat('dddd, DD-MM-YYYY');
+            $formattedDate = $date->isoFormat('dddd, DD MMMM YYYY');
 
             return $formattedDate;
 
@@ -25,5 +25,12 @@ class DateController extends Controller
         catch (Exception $e) {
             return $date;
         }
+    }
+
+    public static function formatTime($oldtime){
+        $time = explode(':', $oldtime);
+
+        return $time[0] . ':' . $time[1];
+
     }
 }

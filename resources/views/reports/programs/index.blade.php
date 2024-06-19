@@ -26,46 +26,74 @@
 
     <br>
 
-    <form method="POST" action="/export-programs" id="excel">
+    <form method="POST" action="/export-programs" class="container" id="excel">
         @csrf
-        <input type="number" name="roleID" id="roleID" value="{{ Auth::user()->roleID }}" hidden>
-        <input type="text" id="actionName" name="actionName" value="/export-programs" hidden>
+        <input type="number" name="roleID" id="roleID" value="{{ $roleID }}" hidden>
+
         <div class="row mb-3">
-            <div class="col">
-                <select name="type" name="type" id="type" class="form-control">
-                    <option value="3" selected>Semua Programs</option>
-                    <option value="1">Sukarelawan</option>
-                    <option value="2">Pembangunan Kemahiran</option>
+            <div class="col-sm-6">
+                <select name="organization" id="organization" class="form-control select2 ">
+                    @if($roleID == 1 || $roleID == 2)
+                        <option value="all">Semua Penganjur</option>
+                    @endif
+                    @foreach($users as $user)
+                        <option value="{{ $user->id }}">{{ $user->name }}</option>
+                    @endforeach
                 </select>
             </div>
-            <div class="col">
-                <button class="btn btn-outline-primary float-end" type="button" id="excelBtn">Excel</button>
-            </div>
+            <div class="col-sm-6">
+                <select name="type" name="type" id="type" class="form-control select2">
+                    <option value="all" selected>Semua Jenis</option>
+                    <option value="vol">Sukarelawan</option>
+                    <option value="skill">Pembangunan Kemahiran</option>
+                </select>
+            </div> 
         </div>
 
-        <div class="pb-2">
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="statusFilter" id="allRadio" value="3" checked>
-                <label class="form-check-label" for="all">Aktif</label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="statusFilter" id="pendingRadio" value="1">
-                <label class="form-check-label" for="pending">Belum selesai</label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="statusFilter" id="approveRadio" value="2">
-                <label class="form-check-label" for="approve">Diterima</label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="statusFilter" id="declineRadio" value="0">
-                <label class="form-check-label" for="decline">Ditolak</label>
-            </div>
-            @if(Auth::user()->roleID == 1)
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="statusFilter" id="deleteRadio" value="4">
-                    <label class="form-check-label" for="decline">Dipadam</label>
+        <div class="row mb-3">
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label for="startDate">Dari</label>
+                    <input type="date" class="form-control" id="startDate1" name="startDate" placeholder="Dari">
                 </div>
-            @endif
+            </div>
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label for="endDate">Hingga</label>
+                    <input type="date" class="form-control" id="endDate1" name="endDate" placeholder="Hingga">
+                </div>
+            </div> 
+        </div>
+
+        <div class="row mb-3">
+            <div class="col">
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="statusFilter" id="allRadio" value="3" checked>
+                    <label class="form-check-label" for="all">Aktif</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="statusFilter" id="pendingRadio" value="1">
+                    <label class="form-check-label" for="pending">Belum selesai</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="statusFilter" id="approveRadio" value="2">
+                    <label class="form-check-label" for="approve">Diterima</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="statusFilter" id="declineRadio" value="0">
+                    <label class="form-check-label" for="decline">Ditolak</label>
+                </div>
+                @if($roleID == 1 || $roleID == 2)
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="statusFilter" id="deleteRadio" value="4">
+                        <label class="form-check-label" for="decline">Dipadam</label>
+                    </div>
+                @endif
+            </div>
+            <div class="col">
+                <button class="btn btn-outline-secondary float-end ml-2" type="button" id="resetBtn">Padam</button>
+                <button class="btn btn-outline-primary float-end" type="button" id="excelBtn">Excel</button>
+            </div>
         </div>
 
         <div class="modal fade" id="dateModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
@@ -84,6 +112,7 @@
                             <label for="endDate required">Hingga</label>
                             <input type="date" class="form-control" id="endDate" name="endDate" required>
                         </div>
+                        
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-danger" id="applyDates">Eksport</button>
@@ -106,9 +135,12 @@
                     <th>Lokasi</th>
                     <th>Tarikh Mula</th>
                     <th>Tarikh Tamat</th>
-                    <th>Peserta</th>
+                    <th>Sukarelawan Diperlukan</th>
+                    <th>B40 / OKU Diperlukan</th>
                     <th>Tarikh Tutup Permohonan</th>
                     <th>Penganjur</th>
+                    <th>Status</th>
+                    <th>Diproses</th>
                     <th>Tindakan</th>
                 </tr>
             </thead>
@@ -116,6 +148,25 @@
 
             </tbody>
         </table>
+    </div>
+
+    <!-- Delete Modal -->
+    <div class="modal fade" id="deleteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Padam Program</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Adakah anda pasti untuk memadam program?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="delete">Padam</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Approve Modal -->
@@ -172,27 +223,29 @@
         </div>
     </div>
 
-    <!-- Delete Modal -->
-    <div class="modal fade" id="deleteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <!-- Boost Modal -->
+    <div class="modal fade" id="boostModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="deleteModalLabel">Padam Program</h5>
+                    <h5 class="modal-title" id="boostModalLabel">Meningkatkan Program</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    Adakah anda pasti untuk memadam program?
+                    Adakah anda pasti untuk meningkatkan program?
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" id="delete">Padam</button>
+                    <button type="button" class="btn btn-danger" id="boost">Galak</button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="{{ asset('js/indexProgramScript.js') }}"></script>
-    <script src="{{ asset('js/modalScript.js') }}"></script>
+    <script src="{{ asset('js/general/programScript.js') }}"></script>
+    <script src="{{ asset('js/reports/indexProgramScript.js') }}"></script>
+    <script src="{{ asset('js/general/dateScript.js') }}"></script>
+    <script src="{{ asset('js/general/modalScript.js') }}"></script>
 
 
 @endsection

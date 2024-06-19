@@ -12,10 +12,8 @@ use DataTables;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-
 use App\Exports\ExportOffer;
 use Maatwebsite\Excel\Facades\Excel;
-
 use Illuminate\Support\Facades\Mail;
 use App\Mail\NotifyJoinEmail;
 
@@ -43,21 +41,19 @@ class OfferController extends Controller
 
                 if($roleID == 3){
                     $users = User::where('users.id', $userID)
+                    ->select('users.id', 'users.name')
+                    ->groupBy('users.id', 'users.name')
                     ->get();
                 }
                 else{
 
                     // Get the list of user created offer
-                    $query = User::where('users.status', 1)
+                    $users = User::where('users.status', 1)
                     ->join('job_offers as jo', 'jo.user_id', 'users.id')
-                    ->where('jo.status', 1);
-
-                    $users = $query
+                    ->select('users.id', 'users.name')
+                    ->groupBy('users.id', 'users.name')
                     ->get();
                 }
-
-                // Get unique only
-                $users = $users->unique()->all();
 
                 // Display view offer in datatable
                 return view('reports.offers.index', compact('users', 'roleID'));

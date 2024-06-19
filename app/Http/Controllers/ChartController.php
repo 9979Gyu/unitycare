@@ -106,4 +106,15 @@ class ChartController extends Controller
             'data' => $num->pluck('data'),
         ]);
     }
+
+    // Function to display number of program by month
+    public function programPieChart(Request $request){
+
+        $selectedState = $request->get("selectedState");
+        $userID = $request->get("selectedUser");
+        $status = $request->get("status");
+        $selectedPosition = $request->get("selectedPosition");
+        $isSelected = $request->get("isSelected");
+
+    }
 }
