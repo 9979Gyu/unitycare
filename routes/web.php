@@ -23,9 +23,6 @@ use App\Http\Controllers\ChartController;
 |
 */
 
-Route::get('/', [LandingController::class, 'index']);
-Route::get('/info', [LandingController::class, 'info']);
-
 Route::get('/db-check', function () {
     try {
         DB::connection()->getPdo();
@@ -45,6 +42,13 @@ Route::get('/db2-check', function(){
     }
 });
 
+// Landing
+Route::get('/', [LandingController::class, 'index']);
+Route::get('/info', [LandingController::class, 'info']);
+Route::get('/getPrograms', [LandingController::class, 'getPrograms']);
+Route::get('/search', [LandingController::class, 'search']);
+
+// Authentication
 Route::get('/login', function () {
     return view('/auths/login');
 });
@@ -62,7 +66,7 @@ Route::post('/export-participants', [ParticipantController::class, 'exportPartic
 Route::post('/export-participated', [ParticipantController::class, 'exportParticipated']);
 Route::post('/export-applies', [ApplicationController::class, 'exportApplied']);
 
-
+// User
 Route::get('/create', [UserController::class, 'create']);
 Route::post('/store', [UserController::class, 'store']);
 Route::get('/verifyEmail', [UserController::class, 'confirmEmail']);
@@ -76,16 +80,14 @@ Route::post('/change-password', [UserController::class, 'changePassword']);
 Route::post('/reset', [UserController::class, 'changePasswordEmail']);
 Route::get('/login-reset', [UserController::class, 'resetPassword']);
 
-Route::get('/register', [UserController::class, 'register']);
-
-// Postcode - search state and cities
-Route::get('/searchPostcode', [PostcodeController::class, 'search']);
-Route::get('/getCityState', [PostcodeController::class, 'getCityState']);
-
 // Poor people
 Route::get('/createspecial', [UserController::class, 'createPoorPeople']);
 Route::post('/check-user', [UserController::class, 'checkUser']);
 Route::get('/viewprofile', [UserController::class, 'indexProfile']);
+
+// Postcode - search state and cities
+Route::get('/searchPostcode', [PostcodeController::class, 'search']);
+Route::get('/getCityState', [PostcodeController::class, 'getCityState']);
 
 // Activity / Program
 Route::get('/viewprogram', [ProgramController::class, 'index']);
@@ -98,13 +100,11 @@ Route::post('/deleteprogram', [ProgramController::class, 'destroy']);
 Route::post('/updateapproval', [ProgramController::class, 'updateApproval']);
 Route::get('/createprogram', [ProgramController::class, 'create']);
 Route::post('/storeprogram', [ProgramController::class, 'store']);
-
-Route::get('/getProgramById', [ProgramController::class, 'getProgramById']);
 Route::get('/editprogram/{id}', [ProgramController::class, 'edit']);
 Route::post('/updateprogram', [ProgramController::class, 'update']);
-Route::post('/declineprogram', [ProgramController::class, 'declineApproval']);
 Route::get('/getUpdatedPrograms', [ProgramController::class, 'getUpdatedPrograms']);
 
+// Participants
 Route::get('/joinprogram/{id}', [ParticipantController::class, 'create']);
 Route::post('/dismissprogram', [ParticipantController::class, 'dismiss']);
 Route::post('/storeparticipant', [ParticipantController::class, 'store']);
@@ -137,7 +137,7 @@ Route::post('/approval', [OfferController::class, 'updateApproval']);
 Route::post('/deleteoffer', [OfferController::class, 'destroy']);
 Route::get('/getUpdatedOffers', [OfferController::class, 'getUpdatedOffers']);
 
-
+// Application
 Route::get('/joinoffer/{id}', [ApplicationController::class, 'create']);
 Route::post('/dismissoffer', [ApplicationController::class, 'dismiss']);
 Route::post('/storeapplication', [ApplicationController::class, 'store']);
@@ -148,17 +148,9 @@ Route::get('/getApplicationsByCondition', [ApplicationController::class, 'getApp
 Route::post('/updateApproval', [ApplicationController::class, 'updateApproval']);
 Route::post('/confirmOffer', [ApplicationController::class, 'confirmOffer']);
 
-
-Route::get('/getPrograms', [LandingController::class, 'getPrograms']);
-Route::get('/search', [LandingController::class, 'search']);
-// Route::get('/getJobs', [LandingController::class, 'getJobs']);
-// Route::get('/getCountPosition', [LandingController::class, 'getCountPosition']);
-// Route::get('/getCountOffer', [LandingController::class, 'getCountOffer']);
-
 // Chart
-Route::get('/bar-chart', [ChartController::class, 'barChart']);
-Route::get('/user-pie-chart', [ChartController::class, 'peoplePieChart']);
 Route::get('/offer-bar-chart', [ChartController::class, 'offerBarChart']);
-Route::get('/app-bar-chart', [ChartController::class, 'appBarChart']);
+Route::get('/app-bar-chart', [ApplicationController::class, 'appBarChart']);
+Route::get('/user-pie-chart', [LandingController::class, 'peoplePieChart']);
 Route::get('/program-bar-chart', [ParticipantController::class, 'programBarChart']);
 Route::get('/participant_type_pie_chart', [ParticipantController::class, 'participantTypePieChart']);

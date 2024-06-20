@@ -948,4 +948,41 @@ class OfferController extends Controller
         }
     }
 
+    // Function to display number of offer for each job in bar chart
+    public function offerBarChart(Request $request){
+
+        $userID = $request->get('selectedUser');
+        $jobID = $request->get('selectedPosition');
+        $state = $request->get('selectedState');
+        $status = $request->get('status');
+
+        $query = Job_Offer::where('job_offers.status', $status)
+        ->join('users as u', 'u.id', '=', 'job_offers.user_id')
+        ->join('jobs as j', 'j.job_id', '=', 'job_offers.job_id');
+
+        // If user choose Semua
+        if($userID != "all"){
+            $query->where('job_offers.user_id', $userID);
+        }
+
+        if($jobID != "all"){
+            $query->where('job_offers.job_id', $jobID);
+        }
+
+        // If user choose to view by approval_status
+        if($state != 3){
+            $query = $query->where('job_offers.approval_status', $state);
+        }
+
+        $num = $query
+        ->groupBy('j.position')
+        ->selectRaw('j.position as labels, COUNT(*) as data')
+        ->get();
+
+        return response()->json([
+            'labels' => $num->pluck('labels'),
+            'data' => $num->pluck('data'),
+        ]);
+    }
+
 }

@@ -992,5 +992,47 @@ class ApplicationController extends Controller
         return redirect()->back()->withErrors(["message" => "Eksport Excel tidak berjaya"]);
     }
 
+    // function to display num of application made for each offer in bar chart
+    public function appBarChart(Request $request){
+        
+        $selectedState = $request->get("selectedState");
+        $userID = $request->get("selectedUser");
+        $status = $request->get("status");
+        $selectedPosition = $request->get("selectedPosition");
+        $isSelected = $request->get("isSelected");
+
+        if(isset($selectedPosition)){
+
+            $query = Application::where('applications.status', $status)
+            ->join('job_offers as jo', 'jo.offer_id', 'applications.offer_id')
+            ->join('jobs as j', 'j.job_id', '=', 'jo.job_id');
+
+            if($userID != "all"){
+                $query = $query->where('jo.user_id', $userID);
+            }
+
+            if($selectedState != 3){
+                $query = $query->where('applications.approval_status', $selectedState);
+            }
+
+            if($selectedPosition != "all"){
+                $query = $query->where('j.job_id', $selectedPosition);
+            }
+
+            if($isSelected == 2){
+                $query = $query->where('applications.is_selected', 2);
+            }
+
+            $num = $query->groupBy('j.position')
+            ->selectRaw('j.position as labels, COUNT(*) as data')
+            ->get();
+
+            return response()->json([
+                'labels' => $num->pluck('labels'),
+                'data' => $num->pluck('data'),
+            ]);
+
+        }
+    }
 
 }
