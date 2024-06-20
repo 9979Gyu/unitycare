@@ -94,7 +94,7 @@ $(document).ready(function(){
                     $('#programsList').append(
                         '<li class="list-group-item">' + programName + ' <br> ' + organizationName + '<br>' + 
                             parseDate(program.start_date) + ' ' + program.start_time + ' - ' + parseDate(program.end_date) + ' ' + program.end_time + 
-                        '</li>'
+                        '</li><br>'
                     );
                 });
             }

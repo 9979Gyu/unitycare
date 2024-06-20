@@ -210,26 +210,74 @@ class LandingController extends Controller{
         }
     }
 
+    public static function getProgramsByApprovedStatus(){
+
+        $query = Program::where([
+            ['programs.status', 1],
+            ['programs.approved_status', 2]
+        ])
+        ->select(
+            'programs.name',
+            'programs.start_date',
+            'programs.end_date',
+            'programs.program_id',
+        );
+
+        if(Auth::check()){
+            $roleNo = Auth::user()->roleID;
+            $userID = Auth::user()->id;
+
+            if($roleNo == 5){
+                $query = $query->join('participants as p', 'p.program_id', '=', 'programs.program_id')
+                ->where([
+                    ['p.status', 1],
+                    ['p.user_id', $userID],
+                ]);
+            }
+            elseif($roleNo == 4){
+                $query = $query->join('participants as p', 'p.program_id', '=', 'programs.program_id')
+                ->where([
+                    ['p.status', 1],
+                    ['p.user_id', $userID],
+                ])
+                ->orWhere([
+                    ['programs.user_id', $userID],
+                ])
+                ->distinct();
+            }
+            elseif($roleNo == 3){
+                $query = $query->where([
+                    ['programs.user_id', $userID],
+                ]);
+            }
+
+        }
+
+        $programs = $query->get();
+
+        // dd($programs);
+
+        return $programs;
+
+    }
+
     // Function to return list of programs display in landings page
     public function getPrograms(Request $request){
 
         $events = [];
         
         // Call function from ProgramController to get all programs
-        $programs = ProgramController::getProgramsByApprovedStatus();
+        $programs = $this->getProgramsByApprovedStatus();
 
         if(isset($programs)){
             // Loop to filter programs
             foreach ($programs as $program) {
-                // Program is approved by staff
-                if($program->approved_status == 2){
-                    $events[] = [
-                        'title' => $program->name, 
-                        'start' => $program->start_date,
-                        'end' => $program->end_date,
-                        'id' => $program->program_id,
-                    ];
-                }
+                $events[] = [
+                    'title' => $program->name, 
+                    'start' => $program->start_date,
+                    'end' => $program->end_date,
+                    'id' => $program->program_id,
+                ];
             } 
         }
 
