@@ -43,8 +43,6 @@ $(document).ready(function() {
         });
 
         fetch_data(selectedState, selectedUser, selectedProgram, startDate, endDate);
-        updateBarChart(selectedState, selectedUser, selectedProgram, startDate, endDate);
-        updatePieChart(selectedState, selectedUser, selectedProgram, startDate, endDate);
     });
 
     $("#startDate1, #endDate1").change(function(){
@@ -55,9 +53,7 @@ $(document).ready(function() {
         }
 
         // Fetch data based on the selected position
-        fetch_data(selectedState, selectedUser, selectedProgram, startDate, endDate); 
-        updateBarChart(selectedState, selectedUser, selectedProgram, startDate, endDate);
-        updatePieChart(selectedState, selectedUser, selectedProgram, startDate, endDate);
+        fetch_data(selectedState, selectedUser, selectedProgram, startDate, endDate);
     });
 
     $("#organization").prop('selectedIndex', 0).trigger('change');
@@ -69,8 +65,6 @@ $(document).ready(function() {
 
         // Call fetch_data() with the selected program
         fetch_data(selectedState, selectedUser, selectedProgram, startDate, endDate);
-        updateBarChart(selectedState, selectedUser, selectedProgram, startDate, endDate);
-        updatePieChart(selectedState, selectedUser, selectedProgram, startDate, endDate);
     });
 
     $('#allRadio, #volunteerRadio, #poorRadio, #deleteRadio').change(function() {
@@ -89,12 +83,12 @@ $(document).ready(function() {
         
         // Fetch data based on the selected position
         fetch_data(selectedState, selectedUser, selectedProgram, startDate, endDate);
-        updateBarChart(selectedState, selectedUser, selectedProgram, startDate, endDate);
-        updatePieChart(selectedState, selectedUser, selectedProgram, startDate, endDate); 
-
     });
 
     function fetch_data(selectedState, selectedUser, selectedProgram, startDate, endDate) {
+
+        updateProgramBarChart(selectedState, selectedUser, selectedProgram, startDate, endDate);
+        updateProgramPieChart(selectedState, selectedUser, selectedProgram, startDate, endDate); 
 
         // Make AJAX request to fetch data based on the selected program
         if ($.fn.DataTable.isDataTable('#requestParticipantTable')) {

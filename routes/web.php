@@ -153,4 +153,4 @@ Route::get('/offer-bar-chart', [ChartController::class, 'offerBarChart']);
 Route::get('/app-bar-chart', [ApplicationController::class, 'appBarChart']);
 Route::get('/user-pie-chart', [LandingController::class, 'peoplePieChart']);
 Route::get('/program-bar-chart', [ParticipantController::class, 'programBarChart']);
-Route::get('/participant_type_pie_chart', [ParticipantController::class, 'participantTypePieChart']);
+Route::get('/program_type_pie_chart', [ParticipantController::class, 'programTypePieChart']);

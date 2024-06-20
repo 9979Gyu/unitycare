@@ -460,8 +460,44 @@ class ParticipantController extends Controller
         }
     }
 
-    // Function to display number of participant for active program
-    public function programBarChart(Request $request){
+    // Reuse function for set query for get program participant count
+    public function retrievePartQuery($state, $programID, $userID, $startDate, $endDate){
+        $query = Participant::join('users as joined_users', 'joined_users.id', '=', 'participants.user_id')
+        ->join('user_types as ut', 'ut.user_type_id', '=', 'participants.user_type_id')
+        ->join('programs as p', 'p.program_id', '=', 'participants.program_id')
+        ->join('types as t', 't.type_id', '=', 'p.type_id')
+        ->join('users as program_creator', 'program_creator.id', '=', 'p.user_id')
+        ->where([
+            ['p.status', 1],
+            ['p.approved_status', 2],
+        ]);
+
+        if($startDate != null && $endDate != null){
+            $query->where([
+                ['participants.created_at', '>=', $startDate],
+                ['participants.created_at', '<=', $endDate],
+            ]);
+        }
+
+        if($programID != "all"){
+            $query = $query->where('participants.program_id', $programID);
+        }
+
+        if($state == 0 || $state == 1){
+            $query = $query->where('participants.status', $state);
+        }
+        else{
+            $query = $query->where([
+                ['participants.status', 1],
+                ['participants.user_type_id', $state], 
+            ]);
+        }
+
+        return $query;
+    }
+
+    // Function to display number of participant by user type for active program
+    public function programTypePieChart(Request $request){
 
         $state = $request->get('state');
         $programID = $request->get("programID");
@@ -471,43 +507,10 @@ class ParticipantController extends Controller
 
         if(isset($programID)){
 
-            $query = Participant::join('users as joined_users', 'joined_users.id', '=', 'participants.user_id')
-            ->join('user_types as ut', 'ut.user_type_id', '=', 'participants.user_type_id')
-            ->join('programs as p', 'p.program_id', '=', 'participants.program_id')
-            ->join('types as t', 't.type_id', '=', 'p.type_id')
-            ->join('users as program_creator', 'program_creator.id', '=', 'p.user_id')
-            ->where([
-                ['p.status', 1],
-                ['p.approved_status', 2],
-            ]);
+            $query = $this->retrievePartQuery($state, $programID, $userID, $startDate, $endDate);
 
-            if($startDate != null && $endDate != null){
-                $query->where([
-                    ['participants.created_at', '>=', $startDate],
-                    ['participants.created_at', '<=', $endDate],
-                ]);
-            }
-
-            if($userID != "all"){
-                $query = $query->where('participants.user_id', $userID);
-            }
-
-            if($programID != "all"){
-                $query = $query->where('participants.program_id', $programID);
-            }
-
-            if($state == 0 || $state == 1){
-                $query = $query->where('participants.status', $state);
-            }
-            else{
-                $query = $query->where([
-                    ['participants.status', 1],
-                    ['participants.user_type_id', $state], 
-                ]);
-            }
-
-            $num = $query->groupBy('p.name')
-            ->selectRaw('p.name as labels, COUNT(*) as data')
+            $num = $query->groupBy('ut.name')
+            ->selectRaw('ut.name as labels, COUNT(*) as data')
             ->get();
 
             return response()->json([
@@ -519,8 +522,8 @@ class ParticipantController extends Controller
 
     }
 
-    // Function to display number of participant by user type for active program
-    public function participantTypePieChart(Request $request){
+    // Function to display number of participant for active program
+    public function programBarChart(Request $request){
 
         $state = $request->get('state');
         $programID = $request->get("programID");
@@ -530,43 +533,10 @@ class ParticipantController extends Controller
 
         if(isset($programID)){
 
-            $query = Participant::join('users as joined_users', 'joined_users.id', '=', 'participants.user_id')
-            ->join('user_types as ut', 'ut.user_type_id', '=', 'participants.user_type_id')
-            ->join('programs as p', 'p.program_id', '=', 'participants.program_id')
-            ->join('types as t', 't.type_id', '=', 'p.type_id')
-            ->join('users as program_creator', 'program_creator.id', '=', 'p.user_id')
-            ->where([
-                ['p.status', 1],
-                ['p.approved_status', 2],
-            ]);
+            $query = $this->retrievePartQuery($state, $programID, $userID, $startDate, $endDate);
 
-            if($startDate != null && $endDate != null){
-                $query->where([
-                    ['participants.created_at', '>=', $startDate],
-                    ['participants.created_at', '<=', $endDate],
-                ]);
-            }
-
-            if($userID != "all"){
-                $query = $query->where('participants.user_id', $userID);
-            }
-
-            if($programID != "all"){
-                $query = $query->where('participants.program_id', $programID);
-            }
-
-            if($state == 0 || $state == 1){
-                $query = $query->where('participants.status', $state);
-            }
-            else{
-                $query = $query->where([
-                    ['participants.status', 1],
-                    ['participants.user_type_id', $state], 
-                ]);
-            }
-
-            $num = $query->groupBy('ut.name')
-            ->selectRaw('ut.name as labels, COUNT(*) as data')
+            $num = $query->groupBy('p.name')
+            ->selectRaw('p.name as labels, COUNT(*) as data')
             ->get();
 
             return response()->json([

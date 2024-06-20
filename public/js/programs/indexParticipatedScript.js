@@ -43,8 +43,6 @@ $(document).ready(function() {
         });
 
         fetch_data(selectedState, selectedUser, selectedProgram, startDate, endDate);
-        updateBarChart(selectedState, selectedUser, selectedProgram, startDate, endDate);
-        updatePieChart(selectedState, selectedUser, selectedProgram, startDate, endDate);
 
     });
 
@@ -57,8 +55,6 @@ $(document).ready(function() {
 
         // Fetch data based on the selected position
         fetch_data(selectedState, selectedUser, selectedProgram, startDate, endDate);
-        updateBarChart(selectedState, selectedUser, selectedProgram, startDate, endDate);
-        updatePieChart(selectedState, selectedUser, selectedProgram, startDate, endDate);
 
     });
 
@@ -71,8 +67,6 @@ $(document).ready(function() {
 
         // Call fetch_data() with the selected program
         fetch_data(selectedState, selectedUser, selectedProgram, startDate, endDate);
-        updateBarChart(selectedState, selectedUser, selectedProgram, startDate, endDate);
-        updatePieChart(selectedState, selectedUser, selectedProgram, startDate, endDate);
 
     });
 
@@ -92,12 +86,13 @@ $(document).ready(function() {
         
         // Fetch data based on the selected position
         fetch_data(selectedState, selectedUser, selectedProgram, startDate, endDate);
-        updateBarChart(selectedState, selectedUser, selectedProgram, startDate, endDate);
-        updatePieChart(selectedState, selectedUser, selectedProgram, startDate, endDate);
 
     });
 
     function fetch_data(selectedState, selectedUser, selectedProgram, startDate, endDate) {
+
+        updateProgramBarChart(selectedState, selectedUser, selectedProgram, startDate, endDate);
+        updateProgramPieChart(selectedState, selectedUser, selectedProgram, startDate, endDate); 
 
         // Make AJAX request to fetch data based on the selected program
         if ($.fn.DataTable.isDataTable('#requestParticipatedTable')) {

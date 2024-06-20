@@ -26,7 +26,7 @@ function getPrograms(component, selectedUser){
     }
 }
 
-function updateBarChart(selectedState, selectedUser, selectedProgram, startDate, endDate) {
+function updateProgramBarChart(selectedState, selectedUser, selectedProgram, startDate, endDate) {
     $.ajax({
         url: '/program-bar-chart', // URL to fetch data from
         type: 'GET',
@@ -105,9 +105,9 @@ function updateBarChart(selectedState, selectedUser, selectedProgram, startDate,
     });
 }
 
-function updatePieChart(selectedState, selectedUser, selectedProgram, startDate, endDate) {
+function updateProgramPieChart(selectedState, selectedUser, selectedProgram, startDate, endDate) {
     $.ajax({
-        url: '/participant_type_pie_chart', // URL to fetch data from
+        url: '/program_type_pie_chart', // URL to fetch data from
         type: 'GET',
         dataType: 'json',
         data: {
@@ -175,6 +175,7 @@ function updatePieChart(selectedState, selectedUser, selectedProgram, startDate,
         }
     });
 }
+
 
 $("#resetBtn").click(function(){
     $("#organization").prop('selectedIndex', 0).trigger('change');
