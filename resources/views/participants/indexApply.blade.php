@@ -5,7 +5,7 @@
 
 @section('content')
     
-    <h2>Program - Peserta</h2>
+    <h2>Program - Sertai</h2>
     <br>
 
     @if (session()->has('success'))
@@ -26,7 +26,7 @@
 
     <br>
 
-    <form method="POST" action="/export-participants" class="container" id="excel">
+    <form method="POST" action="/export-participated" class="container" id="excel">
         @csrf
         <input type="number" name="roleID" id="roleID" value="{{ $roleID }}" hidden>
 
@@ -121,8 +121,9 @@
     <div>
         <!-- Tab for program and job -->
         <ul class="nav nav-tabs" id="tab" role="tablist">
+            
             <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="participant-tab" data-bs-toggle="tab" data-bs-target="#participant" type="button" role="tab" aria-controls="participant" aria-selected="true">Jadual</button>
+                <button class="nav-link active" id="participate-tab" data-bs-toggle="tab" data-bs-target="#participate" type="button" role="tab" aria-controls="participate" aria-selected="true">Jadual</button>
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="chart-tab" data-bs-toggle="tab" data-bs-target="#chart" type="button" role="tab" aria-controls="chart" aria-selected="false">Carta</button>
@@ -131,20 +132,21 @@
 
         <!-- Content for tab -->
         <div class="tab-content m-3" id="tabContent">
-            <!-- view participants -->
-            <div class="tab-pane fade show active" id="participant" role="tabpanel" aria-labelledby="participant-tab">
+            <!-- view participated program -->
+            <div class="tab-pane fade show active" id="participate" role="tabpanel" aria-labelledby="participate-tab">
                 <div class="table-responsive">
-                    <table id="requestParticipantTable" class="table table-bordered table-striped dt-responsive" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                    <table id="requestParticipatedTable" class="table table-bordered table-striped dt-responsive" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
                             <tr style="text-align:center">
                                 <th> No. </th>
-                                <th>Pemohon</th>
-                                <th>Kategori</th>
+                                <th>Program</th>
                                 <th>Jenis</th>
-                                <th>Tarikh Mohon</th>
-                                <th>Nama Program</th>
-                                <th>Jenis Program</th>
+                                <th>Penerangan</th>
+                                <th>Lokasi</th>
+                                <th>Tarikh Mula</th>
+                                <th>Tarikh Tamat</th>
                                 <th>Penganjur</th>
+                                <th>Tarikh Mohon</th>
                                 <th>Tindakan</th>
                             </tr>
                         </thead>
@@ -174,21 +176,21 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="dismissModalLabel">Padam Peserta</h5>
+                    <h5 class="modal-title" id="dismissModalLabel">Tarik Diri Daripada Program</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    Adakah anda pasti untuk memadam peserta?
+                    Adakah anda pasti untuk berhenti menyertai program?
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" id="dismiss">Padam</button>
+                    <button type="button" class="btn btn-danger" id="dismiss">Tarik Diri</button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="{{ asset('js/programs/indexParticipantScript.js') }}"></script>
+    <script src="{{ asset('js/programs/indexParticipatedScript.js') }}"></script>
     <script src="{{ asset('js/general/dateScript.js') }}"></script>
     <script src="{{ asset('js/general/modalScript.js') }}"></script>
     <script src="{{ asset('js/general/programScript.js') }}"></script>

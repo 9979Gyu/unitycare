@@ -107,6 +107,10 @@
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="/indexparticipant"><b>Peserta</b></a></li>
                             @endif
+                            @if(Auth::user()->roleID != 3)
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="/indexparticipated"><b>Sertai</b></a></li>
+                            @endif
                         </ul>
                     </li>
                 @endif

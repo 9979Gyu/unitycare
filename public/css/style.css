@@ -97,6 +97,10 @@ body{
     right: 8px;
 }
 
-.charts {
+.barCharts {
     width: 100%;
+}
+
+.pieCharts {
+    width: 50%;
 }

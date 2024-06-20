@@ -94,7 +94,7 @@
                     <input type="number" name="programID" value="{{ $program->program_id }}" hidden>
                     <td colspan="3">
                         <!-- Did not apply, close date not reach, is not creator, is not enterprise -->
-                        @if($participantExist == 0 && $program->close_date >= today() && $program->user_id != $userID && $roleID != 3)
+                        @if($participantExist == 0 && $program->close_date >= today() && $program->user_id != $userID && $roleID != 3 && $type == 'true')
 
                             <!-- is poor, can be perserta -->
                             @if($poorRemain > 0 && $roleID == 5)
@@ -107,7 +107,15 @@
 
                         @endif
 
-                        <button type="button" class="btn btn-secondary" onclick="window.location='/viewallprograms'"><b>Tutup</b></button>
+                        @if($type == 'true')
+                            <button type="button" class="btn btn-secondary" onclick="window.location='/viewallprograms'"><b>Tutup</b></button>
+                        @elseif($type == 'sertai')
+                            <button type="button" class="btn btn-secondary" onclick="window.location='/indexparticipated'"><b>Tutup</b></button>
+                        @elseif($type == 'peserta')
+                            <button type="button" class="btn btn-secondary" onclick="window.location='/indexparticipant'"><b>Tutup</b></button>
+                        @elseif($type == 'permohonan')
+                            <button type="button" class="btn btn-secondary" onclick="window.location='/viewprogram'"><b>Tutup</b></button>
+                        @endif
                     </td>
                 </tr>
             </table>

@@ -5,7 +5,7 @@
 
 @section('content')
     
-    <h2>Program</h2>
+    <h2>Program - Permohonan</h2>
     <br>
 
     @if (session()->has('success'))

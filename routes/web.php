@@ -59,6 +59,7 @@ Route::post('/export-jobs', [JobController::class, 'exportJobs']);
 Route::post('/export-offers', [OfferController::class, 'exportOffers']);
 Route::post('/export-applications', [ApplicationController::class, 'exportApplications']);
 Route::post('/export-participants', [ParticipantController::class, 'exportParticipants']);
+Route::post('/export-participated', [ParticipantController::class, 'exportParticipated']);
 Route::post('/export-applies', [ApplicationController::class, 'exportApplied']);
 
 
@@ -90,6 +91,7 @@ Route::get('/viewprofile', [UserController::class, 'indexProfile']);
 Route::get('/viewprogram', [ProgramController::class, 'index']);
 Route::get('/viewallprograms', [ProgramController::class, 'view']);
 Route::get('/getProgramsByUserID', [ProgramController::class, 'geProgramsByUser']);
+Route::get('/geProgramsByParticipant', [ProgramController::class, 'geProgramsByParticipant']);
 Route::get('/getProgramsDatatable', [ProgramController::class, 'getProgramsDatatable']);
 Route::post('/boostprogram', [ProgramController::class, 'boostProgram']);
 Route::post('/deleteprogram', [ProgramController::class, 'destroy']);
@@ -103,12 +105,13 @@ Route::post('/updateprogram', [ProgramController::class, 'update']);
 Route::post('/declineprogram', [ProgramController::class, 'declineApproval']);
 Route::get('/getUpdatedPrograms', [ProgramController::class, 'getUpdatedPrograms']);
 
-
 Route::get('/joinprogram/{id}', [ParticipantController::class, 'create']);
 Route::post('/dismissprogram', [ParticipantController::class, 'dismiss']);
 Route::post('/storeparticipant', [ParticipantController::class, 'store']);
 Route::get('/indexparticipant', [ParticipantController::class, 'index']);
+Route::get('/indexparticipated', [ParticipantController::class, 'indexParticipated']);
 Route::get('/getParticipantsDatatable', [ParticipantController::class, 'getParticipantsDatatable']);
+Route::get('/getParticipatedDatatable', [ParticipantController::class, 'getParticipatedDatatable']);
 
 // Jobs
 Route::get('/createjob', [JobController::class, 'create']);
@@ -152,10 +155,10 @@ Route::get('/search', [LandingController::class, 'search']);
 // Route::get('/getCountPosition', [LandingController::class, 'getCountPosition']);
 // Route::get('/getCountOffer', [LandingController::class, 'getCountOffer']);
 
-// Report
-Route::get('/index-programs', [ReportController::class, 'indexPrograms']);
-
+// Chart
 Route::get('/bar-chart', [ChartController::class, 'barChart']);
 Route::get('/user-pie-chart', [ChartController::class, 'peoplePieChart']);
 Route::get('/offer-bar-chart', [ChartController::class, 'offerBarChart']);
 Route::get('/app-bar-chart', [ChartController::class, 'appBarChart']);
+Route::get('/program-bar-chart', [ParticipantController::class, 'programBarChart']);
+Route::get('/participant_type_pie_chart', [ParticipantController::class, 'participantTypePieChart']);

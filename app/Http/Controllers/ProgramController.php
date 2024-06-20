@@ -106,6 +106,31 @@ class ProgramController extends Controller
         }
     }
 
+    public function geProgramsByParticipant(Request $request){
+        $userID = $request->get('selectedUser');
+        $roleID = Auth::user()->roleID;
+
+        if(isset($userID)){
+
+            $query = Program::select('programs.program_id', 'programs.name')
+            ->join('participants as p', 'p.program_id', '=', 'programs.program_id')
+            ->groupBy('programs.program_id', 'programs.name');
+
+            if($roleID != 1 && $roleID != 2){
+                $query = $query->where('p.status', 1);
+            }
+
+            if($userID != 'all'){
+                $query = $query->where('p.user_id', $userID);
+            }
+            
+            $programs = $query->get();
+
+            return response()->json($programs);
+
+        }
+    }
+
     // Function to get the programs based on condition (Reusable)
     public function retrievePrograms($userID, $state, $program, $status, $startDate, $endDate){
         if($state == 4){
@@ -235,7 +260,7 @@ class ProgramController extends Controller
                 $table->addColumn('action', function ($row) {
                     $token = csrf_token();
                     $btn = '<div class="justify-content-center">';
-                    $btn .= '<a href="/joinprogram/' . $row->program_id . '"><span class="btn btn-primary"> Lihat </span></a>';
+                    $btn .= '<a href="/joinprogram/' . $row->program_id . '?type=permohonan"><span class="btn btn-primary"> Lihat </span></a>';
 
                     if(Auth::user()->roleID == 1 || Auth::user()->roleID == 2){
                         if($row->approved_status == 1){

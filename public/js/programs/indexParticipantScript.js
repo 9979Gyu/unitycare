@@ -11,7 +11,6 @@ $(document).ready(function() {
     });
 
     var requestParticipantTable;
-    var requestParticipatedTable;
     var selectedState = 1;
     var selectedUser = "all";
     var selectedProgram = "all";
@@ -30,6 +29,7 @@ $(document).ready(function() {
             success: function(response) {
 
                 $("#program").empty();
+                $("#program").append('<option value="all">Semua Program</option>');
     
                 response.forEach(function(item){
                     $("#program").append('<option value="' + item.program_id + '">' + item.name + '</option>');
@@ -41,6 +41,10 @@ $(document).ready(function() {
                 $('.condition-message').html(data);
             }
         });
+
+        fetch_data(selectedState, selectedUser, selectedProgram, startDate, endDate);
+        updateBarChart(selectedState, selectedUser, selectedProgram, startDate, endDate);
+        updatePieChart(selectedState, selectedUser, selectedProgram, startDate, endDate);
     });
 
     $("#startDate1, #endDate1").change(function(){
@@ -52,18 +56,21 @@ $(document).ready(function() {
 
         // Fetch data based on the selected position
         fetch_data(selectedState, selectedUser, selectedProgram, startDate, endDate); 
+        updateBarChart(selectedState, selectedUser, selectedProgram, startDate, endDate);
+        updatePieChart(selectedState, selectedUser, selectedProgram, startDate, endDate);
     });
 
     $("#organization").prop('selectedIndex', 0).trigger('change');
     $("#program").prop('selectedIndex', 0);
     
-
     $("#program").on('change', function(){
         // Get the selected program
         selectedProgram = $(this).val();
 
         // Call fetch_data() with the selected program
-        fetch_data(selectedState, selectedUser, selectedProgram, startDate, endDate); 
+        fetch_data(selectedState, selectedUser, selectedProgram, startDate, endDate);
+        updateBarChart(selectedState, selectedUser, selectedProgram, startDate, endDate);
+        updatePieChart(selectedState, selectedUser, selectedProgram, startDate, endDate);
     });
 
     $('#allRadio, #volunteerRadio, #poorRadio, #deleteRadio').change(function() {
@@ -81,16 +88,18 @@ $(document).ready(function() {
         }
         
         // Fetch data based on the selected position
-        fetch_data(selectedState, selectedUser, selectedProgram, startDate, endDate); 
+        fetch_data(selectedState, selectedUser, selectedProgram, startDate, endDate);
+        updateBarChart(selectedState, selectedUser, selectedProgram, startDate, endDate);
+        updatePieChart(selectedState, selectedUser, selectedProgram, startDate, endDate); 
 
     });
 
     function fetch_data(selectedState, selectedUser, selectedProgram, startDate, endDate) {
 
         // Make AJAX request to fetch data based on the selected program
-        if ($.fn.DataTable.isDataTable('#requestTable')) {
+        if ($.fn.DataTable.isDataTable('#requestParticipantTable')) {
             // If DataTable already initialized, destroy it
-            $('#requestTable').DataTable().destroy();
+            $('#requestParticipantTable').DataTable().destroy();
         }
 
         requestParticipantTable = $('#requestParticipantTable').DataTable({
@@ -124,7 +133,9 @@ $(document).ready(function() {
                 data: {
                     programID: selectedProgram,
                     userID : selectedUser,
-                    state: selectedState
+                    state: selectedState,
+                    startDate: startDate, 
+                    endDate: endDate
                 },
                 type: 'GET',
 
@@ -134,7 +145,7 @@ $(document).ready(function() {
                 "className": "text-center",
                 "width": "2%"
             }, {
-                "targets": [1, 2, 3, 4, 5, 6],
+                "targets": [1, 2, 3, 4, 5, 6, 7, 8],
                 "className": "text-center",
             },], 
             columns: [{
@@ -146,7 +157,7 @@ $(document).ready(function() {
                 }
             }, {
                 data: function(row) {
-                    return row.joined_username + ' <br>' + row.joined_useremail + ' <br>+60' + row.joined_usercontact;
+                    return row.joined_username + ' <br>' + row.joined_useremail;
                 },
                 name: 'user',
                 orderable: true,
@@ -162,25 +173,33 @@ $(document).ready(function() {
                 orderable: true,
                 searchable: true
             }, {
-                data: function(row) {
-                    return parseDate(row.created_at);
-                },
+                data: 'applied_date',
                 name: 'applied_date',
                 orderable: true,
                 searchable: true
             }, {
                 data: "program_name",
-                name: 'name',
+                name: 'programName',
+                orderable: true,
+                searchable: true
+            }, {
+                data: "programtype",
+                name: 'programType',
                 orderable: true,
                 searchable: true
             }, {
                 data: function(row) {
-                    return row.program_creator_name + ' <br>' + row.program_creator_email + ' <br>+60' + row.program_creator_contact;
+                    return row.program_creator_name + ' <br>' + row.program_creator_email;
                 },
                 name: 'creator',
                 orderable: true,
                 searchable: true,
-            }, ]
+            }, {
+                data: 'action',
+                name: 'action',
+                orderable: false,
+                searchable: false,
+            },]
             
         });
     }
@@ -202,7 +221,8 @@ $(document).ready(function() {
                 success: function(data) {
                     $('#dismissModal').modal('hide');
                     $('.condition-message').html("Berjaya tarik diri");
-                    updateCardContainer(selectedCityState, keyword);
+                    requestParticipantTable.ajax.reload();
+
                 },
                 error: function (data) {
                     $('.condition-message').html(data);

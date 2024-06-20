@@ -10,14 +10,17 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Exports\ExportParticipant;
+use App\Exports\ExportParticipatedProgram;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Mail;
 use DB;
+use DataTables;
+
 
 class ParticipantController extends Controller
 {
 
-    // Function to display list of program or participants 
+    // Function to display list of participants 
     public function index(){
         if(Auth::check()){
 
@@ -38,15 +41,49 @@ class ParticipantController extends Controller
                 $users = User::where([
                     ['users.status', 1],
                 ])
-                ->join('program as p', 'p.user_id', '=', 'users.id')
+                ->join('programs as p', 'p.user_id', '=', 'users.id')
                 ->select('users.id', 'users.name')
                 ->groupBy('users.id', 'users.name')
                 ->orderBy('users.name')
                 ->get();
             }
-
+  
             return view('participants.index', compact('users', 'roleID'));
+        }
 
+        return redirect('/login')->withErrors(['message' => 'Sila log masuk']);
+
+    }
+
+    // Function to display list of participated program 
+    public function indexParticipated(){
+        if(Auth::check()){
+
+            $roleID = Auth::user()->roleID;
+            $userID = Auth::user()->id;
+
+            if($roleID != 1 && $roleID != 2){
+                $users = User::where([
+                    ['status', 1],
+                    ['id', $userID],
+                ])
+                ->select('id', 'name')
+                ->groupBy('id', 'name')
+                ->orderBy('name')
+                ->get();
+            }
+            else{
+                $users = User::where([
+                    ['users.status', 1],
+                ])
+                ->join('participants as p', 'p.user_id', '=', 'users.id')
+                ->select('users.id', 'users.name')
+                ->groupBy('users.id', 'users.name')
+                ->orderBy('users.name')
+                ->get();
+            }
+  
+            return view('participants.indexApply', compact('users', 'roleID'));
         }
 
         return redirect('/login')->withErrors(['message' => 'Sila log masuk']);
@@ -54,12 +91,14 @@ class ParticipantController extends Controller
     }
 
     // Function to display create participants view
-    public function create($id){
+    public function create(Request $request, $id){
 
         if(Auth::check()){
 
             $roleID = Auth::user()->roleID;
             $userID = Auth::user()->id;
+
+            $type = $request->query('type', 'true');
 
             $program = Program::with('organization')
             ->where([
@@ -107,7 +146,7 @@ class ParticipantController extends Controller
             $volRemain = $volLimit->programSpecs[0]->qty_limit - $volLimit->programSpecs[0]->qty_enrolled;
             $poorRemain = $poorLimit->programSpecs[0]->qty_limit - $poorLimit->programSpecs[0]->qty_enrolled;
 
-            return view('participants.add', compact('program', 'volLimit', 'poorLimit', 'volRemain', 'poorRemain', 'participantExist', 'roleID', 'userID'));
+            return view('participants.add', compact('program', 'volLimit', 'poorLimit', 'volRemain', 'poorRemain', 'participantExist', 'roleID', 'userID', 'type'));
             
         }
 
@@ -188,14 +227,255 @@ class ParticipantController extends Controller
     }
 
     // Function to retrieve participants
-    public function retrieveParticipants($state, $userID, $prorgamID, $startDate, $endDate){
+    public function retrieveParticipants($state, $userID, $programID, $startDate, $endDate){
+
+        $query = Participant::join('users as joined_users', 'joined_users.id', '=', 'participants.user_id')
+        ->join('user_types as ut', 'ut.user_type_id', '=', 'participants.user_type_id')
+        ->join('programs as p', 'p.program_id', '=', 'participants.program_id')
+        ->join('types as t', 't.type_id', '=', 'p.type_id')
+        ->join('users as program_creator', 'program_creator.id', '=', 'p.user_id')
+        ->where([
+            ['p.status', 1],
+            ['p.approved_status', 2],
+        ]);
+
+        if($startDate != null && $endDate != null){
+            $query->where([
+                ['participants.created_at', '>=', $startDate],
+                ['participants.created_at', '<=', $endDate],
+            ]);
+        }
+
+        if($userID != "all"){
+            $query = $query->where('p.user_id', $userID);
+        }
+
+        if($programID != "all"){
+            $query = $query->where('p.program_id', $programID);
+        }
+
+        if($state == 0 || $state == 1){
+            $query = $query->where('participants.status', $state);
+        }
+        else{
+            $query = $query->where([
+                ['participants.status', 1],
+                ['participants.user_type_id', $state], 
+            ]);
+        }
+
+        $selectedParticipants = $query->select(
+            'participants.created_at',
+            'participants.participant_id',
+            'participants.status',
+            'joined_users.name as joined_username',
+            'joined_users.email as joined_useremail',
+            'dt.name as category',
+            'p.name as program_name',
+            'p.program_id',
+            't.name as programtype',
+            'ut.name as typename',
+            'program_creator.name as program_creator_name',
+            'program_creator.email as program_creator_email',
+        )
+        ->leftJoin('poors', function ($join) {
+            $join->on('poors.user_id', '=', 'joined_users.id');
+        })
+        ->leftJoin('disability_types as dt', 'dt.dis_type_id', '=', 'poors.disability_type')
+        ->orderBy("participants.created_at", "asc")
+        ->get();
+
+        // Transform the data but keep it as a collection of objects
+        $selectedParticipants->transform(function ($participant) {
+
+            if($participant->created_at != null){
+                $created_at = explode(' ', $participant->created_at);
+                $participant->applied_date = DateController::parseDate($created_at[0]) . " " . DateController::formatTime($created_at[1]);
+            }
+
+            return $participant;
+        });
+
+        return $selectedParticipants;
+
+    }
+
+    // Function to retrieve participated program based on userid
+    public function retrieveParticipatedProgram($state, $userID, $programID, $startDate, $endDate){
+
+        $query = Program::where('programs.approved_status', 2)
+        ->join('types as t', 't.type_id', '=', 'programs.type_id')
+        ->join('participants as p', 'p.program_id', '=', 'programs.program_id')
+        ->join('users as creator', 'creator.id', '=', 'programs.user_id');
+
+        if($startDate != null && $endDate != null){
+            $query->where([
+                ['p.created_at', '>=', $startDate],
+                ['p.created_at', '<=', $endDate],
+            ]);
+        }
+
+        if($userID != "all"){
+            $query = $query->where('p.user_id', $userID);
+        }
+
+        if($programID != "all"){
+            $query = $query->where('p.program_id', $programID);
+        }
+
+        if($state == 0 || $state == 1){
+            $query = $query->where('p.status', $state);
+        }
+        else{
+            $query = $query->where([
+                ['p.status', 1],
+                ['p.user_type_id', $state], 
+            ]);
+        }
+
+        $selectedParticipants = $query->select(
+            'p.created_at',
+            'p.participant_id',
+            'p.user_id as joined_user_id',
+            'p.status',
+            'programs.name as program_name',
+            'programs.program_id',
+            'programs.description->desc as description',
+            'programs.start_date',
+            'programs.start_time',
+            'programs.end_date',
+            'programs.end_time',
+            'programs.venue',
+            'programs.postal_code',
+            'programs.state',
+            'programs.city',
+            't.name as typename',
+            'creator.name as creator_name',
+            'creator.email as creator_email',
+        )
+        ->orderBy("p.created_at", "asc")
+        ->get();
+
+        // Transform the data but keep it as a collection of objects
+        $selectedParticipants->transform(function ($participant) {
+
+            if($participant->created_at != null){
+                $created_at = explode(' ', $participant->created_at);
+                $participant->applied_date = DateController::parseDate($created_at[0]) . " " . DateController::formatTime($created_at[1]);
+            }
+
+            $participant->start = DateController::parseDate($participant->start_date) . " " . DateController::formatTime($participant->start_time);
+            $participant->end = DateController::parseDate($participant->end_date) . " " . DateController::formatTime($participant->end_time);
+
+            $participant->address = $participant->venue . ', ' . $participant->postal_code . ', ' . $participant->city . ', ' . $participant->state;
+
+            return $participant;
+        });
+
+        return $selectedParticipants;
+
+    }
+
+    // Function to display list of participant
+    public function getParticipantsDatatable(Request $request){
+        if(request()->ajax()){
+            $state = $request->get('state');
+            $programID = $request->get("programID");
+            $userID = $request->get("userID");
+            $startDate = $request->get("startDate");
+            $endDate = $request->get("endDate");
+
+            if(isset($programID)){
+                $selectedParticipants = $this->retrieveParticipants($state, $userID, $programID, $startDate, $endDate);
+            }
+
+            if ($selectedParticipants === null || $selectedParticipants->isEmpty()) {
+                return response()->json([
+                    'data' => [],
+                    'draw' => $request->input('draw', 1), // Ensure to return the draw number
+                    'recordsTotal' => 0,
+                    'recordsFiltered' => 0,
+                ]);
+            }
+
+            $table = Datatables::of($selectedParticipants);
+
+            $table->addColumn('action', function ($row) use ($userID) {
+                $token = csrf_token();
+                $btn = '<div class="justify-content-center">';
+                $btn .= '<a href="/joinprogram/' . $row->program_id . '?type=peserta"><span class="btn btn-primary"> Lihat </span></a>';
+
+                // Can remove participant if is admin or staff
+                if((Auth::user()->roleID == 1 || Auth::user()->roleID == 2) && $row->status == 1){
+                    $btn .= '<a class="dismissAnchor" href="#" id="' . $row->participant_id . '"><span class="btn btn-danger m-1" data-bs-toggle="modal" data-bs-target="#dismissModal"> Padam </span></a>';
+                }
+
+                return $btn;
+            });
+
+            $table->rawColumns(['action']);
+            return $table->make(true);
+        }
+    }
+
+    // Function to display list of participanted program
+    public function getParticipatedDatatable(Request $request){
+        if(request()->ajax()){
+            $state = $request->get('state');
+            $programID = $request->get("programID");
+            $userID = $request->get("userID");
+            $startDate = $request->get("startDate");
+            $endDate = $request->get("endDate");
+
+            if(isset($programID)){
+                $selectedParticipants = $this->retrieveParticipatedProgram($state, $userID, $programID, $startDate, $endDate);
+            }
+
+            if ($selectedParticipants === null || $selectedParticipants->isEmpty()) {
+                return response()->json([
+                    'data' => [],
+                    'draw' => $request->input('draw', 1), // Ensure to return the draw number
+                    'recordsTotal' => 0,
+                    'recordsFiltered' => 0,
+                ]);
+            }
+
+            $table = Datatables::of($selectedParticipants);
+
+            $table->addColumn('action', function ($row) use ($userID) {
+                $token = csrf_token();
+                $btn = '<div class="justify-content-center">';
+                $btn .= '<a href="/joinprogram/' . $row->program_id . '?type=sertai"><span class="btn btn-primary"> Lihat </span></a>';
+
+                // Can remove participant if is admin or staff
+                if((Auth::user()->roleID == 1 || Auth::user()->roleID == 2 || $row->joined_user_id == $userID) && $row->status == 1){
+                    $btn .= '<a class="dismissAnchor" href="#" id="' . $row->participant_id . '"><span class="btn btn-danger m-1" data-bs-toggle="modal" data-bs-target="#dismissModal"> Padam </span></a>';
+                }
+
+                return $btn;
+            });
+
+            $table->rawColumns(['action']);
+            return $table->make(true);
+        }
+    }
+
+    // Function to display number of participant for active program
+    public function programBarChart(Request $request){
+
+        $state = $request->get('state');
+        $programID = $request->get("programID");
+        $userID = $request->get("userID");
+        $startDate = $request->get("startDate");
+        $endDate = $request->get("endDate");
 
         if(isset($programID)){
 
             $query = Participant::join('users as joined_users', 'joined_users.id', '=', 'participants.user_id')
             ->join('user_types as ut', 'ut.user_type_id', '=', 'participants.user_type_id')
             ->join('programs as p', 'p.program_id', '=', 'participants.program_id')
-            ->join('users as program_creator', 'program_creator.id', '=', 'programs.user_id')
+            ->join('types as t', 't.type_id', '=', 'p.type_id')
+            ->join('users as program_creator', 'program_creator.id', '=', 'p.user_id')
             ->where([
                 ['p.status', 1],
                 ['p.approved_status', 2],
@@ -209,11 +489,11 @@ class ParticipantController extends Controller
             }
 
             if($userID != "all"){
-                $query = $query->where('p.user_id', $userID);
+                $query = $query->where('participants.user_id', $userID);
             }
 
             if($programID != "all"){
-                $query = $query->where('p.program_id', $programID);
+                $query = $query->where('participants.program_id', $programID);
             }
 
             if($state == 0 || $state == 1){
@@ -226,76 +506,147 @@ class ParticipantController extends Controller
                 ]);
             }
 
-            $selectedParticipants = $query->select(
-                'participants.created_at',
-                'participants.participant_id',
-                'joined_users.id as userID',
-                'joined_users.name as joined_username',
-                'joined_users.email as joined_useremail',
-                'dt.name as category',
-                'p.name as program_name',
-                'p.program_id',
-                'ut.name as typename',
-                'program_creator.name as program_creator_name',
-                'program_creator.email as program_creator_email',
-            )
-            ->leftJoin('poors', function ($join) {
-                $join->on('poors.user_id', '=', 'joined_users.id');
-            })
-            ->leftJoin('disability_types as dt', 'dt.dis_type_id', '=', 'poors.disability_type')
-            ->orderBy("participants.created_at", "asc")
+            $num = $query->groupBy('p.name')
+            ->selectRaw('p.name as labels, COUNT(*) as data')
             ->get();
+
+            return response()->json([
+                'labels' => $num->pluck('labels'),
+                'data' => $num->pluck('data'),
+            ]);
+
         }
 
-        // Transform the data but keep it as a collection of objects
-        $selectedParticipants->transform(function ($participant) {
-
-            if($participant->created_at != null){
-                $created_at = explode(' ', $participant->created_at);
-                $participant->created_at = DateController::parseDate($created_at[0]) . ' ' . DateController::formatTime($created_at[1]);
-            }
-
-            return $participant;
-        });
-
-        return $selectedParticipants;
     }
 
-    // Function to display list of participant
-    public function getParticipantsDatatable(Request $request)
-    {
-        if(request()->ajax()){
-            $state = $request->get('state');
-            $programID = $request->get("programID");
-            $userID = $request->get("userID");
-            $startDate = $request->get("startDate");
-            $endDate = $request->get("endDate");
-            
-            if(isset($programID)){
-                $selectedParticipants = $this->retrieveParticipants($state, $userID, $prorgamID, $startDate, $endDate);
+    // Function to display number of participant by user type for active program
+    public function participantTypePieChart(Request $request){
+
+        $state = $request->get('state');
+        $programID = $request->get("programID");
+        $userID = $request->get("userID");
+        $startDate = $request->get("startDate");
+        $endDate = $request->get("endDate");
+
+        if(isset($programID)){
+
+            $query = Participant::join('users as joined_users', 'joined_users.id', '=', 'participants.user_id')
+            ->join('user_types as ut', 'ut.user_type_id', '=', 'participants.user_type_id')
+            ->join('programs as p', 'p.program_id', '=', 'participants.program_id')
+            ->join('types as t', 't.type_id', '=', 'p.type_id')
+            ->join('users as program_creator', 'program_creator.id', '=', 'p.user_id')
+            ->where([
+                ['p.status', 1],
+                ['p.approved_status', 2],
+            ]);
+
+            if($startDate != null && $endDate != null){
+                $query->where([
+                    ['participants.created_at', '>=', $startDate],
+                    ['participants.created_at', '<=', $endDate],
+                ]);
             }
 
-            if(isset($selectedParticipants)){
-
-                $table = Datatables::of($selectedParticipants);
-
-                $table->addColumn('action', function ($row) {
-                    $token = csrf_token();
-                    $btn = '<div class="justify-content-center">';
-                    $btn .= '<a href="/joinprogram/' . $row->program_id . '"><span class="btn btn-primary"> Lihat </span></a>';
-
-                    if(Auth::user()->roleID == 1 || Auth::user()->roleID == 2 || $row->userID == $userID){
-                        $btn .= '<a class="dismissAnchor" href="#" id="' . $row->participant_id . '"><span class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#dismissModal"> Padam </span></a>';
-                    }
-
-                    return $btn;
-                });
-
-                $table->rawColumns(['action']);
-                return $table->make(true);
+            if($userID != "all"){
+                $query = $query->where('participants.user_id', $userID);
             }
+
+            if($programID != "all"){
+                $query = $query->where('participants.program_id', $programID);
+            }
+
+            if($state == 0 || $state == 1){
+                $query = $query->where('participants.status', $state);
+            }
+            else{
+                $query = $query->where([
+                    ['participants.status', 1],
+                    ['participants.user_type_id', $state], 
+                ]);
+            }
+
+            $num = $query->groupBy('ut.name')
+            ->selectRaw('ut.name as labels, COUNT(*) as data')
+            ->get();
+
+            return response()->json([
+                'labels' => $num->pluck('labels'),
+                'data' => $num->pluck('data'),
+            ]);
 
         }
+
+    }
+
+    // Function to export participants info
+    public function exportParticipants(Request $request){
+        
+        // Validate the request data
+        $rules = [
+            'roleID' => 'required',
+            'statusFilter' => 'required',
+            'program' => 'required',
+            'organization' => 'required',
+            'startDate' => 'required',
+            'endDate' => 'required',
+        ];
+
+        $validated = $request->validate($rules);
+
+        if($validated){
+            // Retrieve the validated data
+            $state = $request->get('statusFilter');
+            $programID = $request->get("program");
+            $userID = $request->get("organization");
+            $startDate = $request->get('startDate');
+            $endDate = $request->get('endDate');
+
+            if(isset($programID)){
+                $selectedParticipants = $this->retrieveParticipants($state, $userID, $programID, $startDate, $endDate);
+
+                return Excel::download(new ExportParticipant($selectedParticipants), 
+                    'Senarai peserta program - ' . time() . '.xlsx'
+                );
+            }
+        }
+        
+        return redirect()->back()->withErrors(["message" => "Eksport Excel tidak berjaya"]);
+        
+    }
+
+    public function exportParticipated(Request $request){
+        
+        // Validate the request data
+        $rules = [
+            'roleID' => 'required',
+            'statusFilter' => 'required',
+            'program' => 'required',
+            'organization' => 'required',
+            'startDate' => 'required',
+            'endDate' => 'required',
+        ];
+
+        $validated = $request->validate($rules);
+
+        if($validated){
+            // Retrieve the validated data
+            $state = $request->get('statusFilter');
+            $programID = $request->get("program");
+            $userID = $request->get("organization");
+            $startDate = $request->get('startDate');
+            $endDate = $request->get('endDate');
+
+            if(isset($programID)){
+                $selectedPrograms = $this->retrieveParticipatedProgram($state, $userID, $programID, $startDate, $endDate);
+
+                return Excel::download(new ExportParticipatedProgram($selectedPrograms), 
+                    'Senarai program sertai - ' . time() . '.xlsx'
+                );
+            }
+        }
+        
+        return redirect()->back()->withErrors(["message" => "Eksport Excel tidak berjaya"]);
+        
     }
 
     // Email user after add

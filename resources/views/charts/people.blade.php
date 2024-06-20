@@ -30,6 +30,7 @@
                             data: {
                                 labels: labels,
                                 datasets: [{
+                                    label: 'Bilangan',
                                     data: data,
                                     backgroundColor: [
                                         'rgba(255, 99, 132, 0.7)',

@@ -73,15 +73,6 @@ $(document).ready(function(){
         fetch_data(selectedUser, selectedState, selectedType, startDate, endDate);
     });
 
-    $("#resetBtn").click(function(){
-        $("#organization").prop('selectedIndex', 0).trigger('change');
-
-        $("#type").prop('selectedIndex', 0).trigger('change');
-
-        $('#startDate1').val('');
-        $('#endDate1').val('').trigger('change');
-    });
-
     function fetch_data(selectedUser, selectedState, selectedType, startDate, endDate){
 
         // Make AJAX request to fetch data based on the selected position
