@@ -416,8 +416,7 @@ class ApplicationController extends Controller
 
     }
 
-    public function dismiss(Request $request)
-    {
+    public function dismiss(Request $request){
         //
         $id =  $request->get('offerID');
 
@@ -440,125 +439,148 @@ class ApplicationController extends Controller
         return redirect('/viewoffer')->withErrors(["message" => "Tidak berjaya dipadam"]);
     }
 
+    public function retrieveApplication($state, $userID, $jobID, $startDate, $endDate){
+        if($state == 4){
+            $status = 0;
+        }
+        else{
+            $status = 1;
+        }
+
+        $query = Application::where('applications.status', $status)
+        ->join('job_offers as jo', 'jo.offer_id', 'applications.offer_id')
+        ->join('poors', 'poors.poor_id', '=', 'applications.poor_id')
+        ->join('users as u', 'u.id', '=', 'poors.user_id')
+        ->join('jobs as j', 'j.job_id', '=', 'jo.job_id')
+        ->join('disability_types as dt', 'dt.dis_type_id', '=', 'poors.disability_type')
+        ->join('education_levels as el', 'el.edu_level_id', '=', 'poors.education_level')
+        ->leftJoin('users as processed', function($join) {
+            $join->on('processed.id', '=', 'applications.approved_by')
+                 ->whereNotNull('applications.approved_by');
+        });
+
+        if($startDate != null && $endDate != null){
+
+            $query->where([
+                ['applications.applied_date', '>=', $startDate],
+                ['applications.applied_date', '<=', $endDate],
+            ]);
+        }
+
+        if($userID != "all"){
+            $query = $query->where('jo.user_id', $userID);
+        }
+
+        if($state == 1 || $state == 0 || $state == 2){
+            $query = $query->where('applications.approval_status', $state);
+        }
+
+        if($jobID != "all"){
+            $query = $query->where('j.job_id', $jobID);
+        }
+
+        if($state == "is_selected"){
+            $query = $query->where('applications.is_selected', 2);
+        }
+
+        $selectedApplication = $query->select(
+                'applications.*',
+                'applications.description->description as description',
+                'applications.description->reason as reason',
+                'u.name as username',
+                'u.email as useremail',
+                'u.contactNo as usercontact',
+                'u.address',
+                'u.state',
+                'u.city',
+                'u.postalCode',
+                'processed.name as processedname', 
+                'processed.email as processedemail',
+                'dt.name as category',
+                'el.name as edu_level',
+                'j.position as position'
+            )
+            ->orderBy("applications.applied_date", "asc")
+            ->get();
+
+        // Transform the data but keep it as a collection of objects
+        $selectedApplication->transform(function ($item) {
+
+            if($item->approved_at != null){
+                $approved_at = explode(' ', $item->approved_at);
+                $item->approved_at = DateController::parseDate($approved_at[0]) . ' ' . DateController::formatTime($approved_at[1]);
+            }
+
+            if($item->approval_status == 0){
+                $approval = "Ditolak: " . $item->reason;
+            }
+            elseif($item->approval_status == 1){
+                $approval = "Belum Diproses";
+            }
+            else{
+                $approval = "Telah Diluluskan";
+            }
+
+            $item->approval = $approval;
+
+            $item->address = $item->address . ', ' . $item->postalCode . 
+            ', ' . $item->city . ', ' . $item->state;
+
+            $appliedDate = explode(' ', $item->applied_date);
+            $item->applied_date = DateController::parseDate($appliedDate[0]) . ' ' . DateController::formatTime($appliedDate[1]);
+
+            return $item;
+        });
+
+        return $selectedApplication;
+    }
+
     // Function to get list of application
     public function getApplicationsDatatable(Request $request){
         if(request()->ajax()){
 
-            $selectedState = $request->get("selectedState");
+            $state = $request->get("state");
             $userID = $request->get("userID");
-            $status = $request->get("status");
-            $selectedPosition = $request->get("positionID");
-            $isSelected = $request->get("isSelected");
+            $jobID = $request->get("jobID");
+            $startDate = $request->get("startDate");
+            $endDate = $request->get("endDate");
 
-            if(isset($selectedPosition)){
-
-                $query = Application::where('applications.status', $status)
-                ->join('job_offers as jo', 'jo.offer_id', 'applications.offer_id')
-                ->join('poors', 'poors.poor_id', '=', 'applications.poor_id')
-                ->join('users as u', 'u.id', '=', 'poors.user_id')
-                ->join('jobs as j', 'j.job_id', '=', 'jo.job_id')
-                ->join('disability_types as dt', 'dt.dis_type_id', '=', 'poors.disability_type')
-                ->join('education_levels as el', 'el.edu_level_id', '=', 'poors.education_level')
-                ->leftJoin('users as processed', function($join) {
-                    $join->on('processed.id', '=', 'applications.approved_by')
-                         ->whereNotNull('applications.approved_by');
-                });
-
-                if($userID != "all"){
-                    $query = $query->where('jo.user_id', $userID);
-                }
-
-                if($selectedState != 3){
-                    $query = $query->where('applications.approval_status', $selectedState);
-                }
-
-                if($selectedPosition != "all"){
-                    $query = $query->where('j.job_id', $selectedPosition);
-                }
-
-                if($isSelected == 2){
-                    $query = $query->where('applications.is_selected', 2);
-                }
-
-                $selectedApplication = $query->select(
-                        'applications.*',
-                        'applications.description->description as description',
-                        'applications.description->reason as reason',
-                        'u.name as username',
-                        'u.email as useremail',
-                        'u.contactNo as usercontact',
-                        'u.address',
-                        'u.state',
-                        'u.city',
-                        'u.postalCode',
-                        'processed.name as processedname', 
-                        'processed.email as processedemail',
-                        'poors.disability_type',
-                        'dt.name as category',
-                        'el.name as edu_level',
-                        'j.position as position'
-                    )
-                    ->orderBy("applications.applied_date", "asc")
-                    ->get();
-
-                // Transform the data but keep it as a collection of objects
-                $selectedApplication->transform(function ($item) {
-
-                    if($item->approved_at == null){
-                        $item->approved_at = $item->updated_at;
-                    }
-
-                    $approved_at = explode(' ', $item->approved_at);
-                    $item->approved_at = DateController::parseDate($approved_at[0]) . ' ' . $approved_at[1];
-
-                    if($item->approval_status == 0){
-                        $approval = "Ditolak: " . $item->reason;
-                    }
-                    elseif($item->approval_status == 1){
-                        $approval = "Belum Diproses";
-                    }
-                    else{
-                        $approval = "Telah Diluluskan";
-                    }
-
-                    $item->approval = $approval;
-
-                    $item->address = $item->address . ', ' . $item->postalCode . 
-                    ', ' . $item->city . ', ' . $item->state;
-
-                    $appliedDate = explode(' ', $item->applied_date);
-                    $item->applied_date = DateController::parseDate($appliedDate[0]) . ' ' . $appliedDate[1];
-
-                    return $item;
-                });
+            if(isset($jobID)){
+                $selectedApplication = $this->retrieveApplication($state, $userID, $jobID, $startDate, $endDate);
             }
 
-            if(isset($selectedApplication)){
-
-                $table = Datatables::of($selectedApplication);
-
-                $table->addColumn('action', function ($row) {
-                    $token = csrf_token();
-                    $btn = '<div class="justify-content-center">';
-                    $btn .= '<a href="/joinoffer/' . $row->offer_id . '"><span class="btn btn-primary m-1"> Lihat </span></a>';
-
-                    if(Auth::user()->roleID == 3){
-                        if($row->approval_status == 1){
-                            // pending approval
-                            $btn .= '<div>';
-                            $btn .= '<a class="approveAnchor" href="#" id="' . $row->application_id . '"><span class="btn btn-success m-1" data-bs-toggle="modal" data-bs-target="#approveModal"> Lulus </span></a>';
-                            $btn .= '<a class="declineAnchor" href="#" id="' . $row->application_id . '"><span class="btn btn-danger m-1" data-bs-toggle="modal" data-bs-target="#declineModal"> Tolak </span></a>';
-                            $btn .= '</div>';
-                        }
-                    }
-                    $btn .= '</div>';
-                
-                    return $btn;
-                });
-
-                $table->rawColumns(['action']);
-                return $table->make(true);
+            if ($selectedApplication === null || $selectedApplication->isEmpty()) {
+                return response()->json([
+                    'data' => [],
+                    'draw' => $request->input('draw', 1), // Ensure to return the draw number
+                    'recordsTotal' => 0,
+                    'recordsFiltered' => 0,
+                ]);
             }
+
+            $table = Datatables::of($selectedApplication);
+
+            $table->addColumn('action', function ($row) {
+                $token = csrf_token();
+                $btn = '<div class="justify-content-center">';
+                $btn .= '<a href="/joinoffer/' . $row->offer_id . '"><span class="btn btn-primary m-1"> Lihat </span></a>';
+
+                if(Auth::user()->roleID == 3){
+                    if($row->approval_status == 1){
+                        // pending approval
+                        $btn .= '<div>';
+                        $btn .= '<a class="approveAnchor" href="#" id="' . $row->application_id . '"><span class="btn btn-success m-1" data-bs-toggle="modal" data-bs-target="#approveModal"> Lulus </span></a>';
+                        $btn .= '<a class="declineAnchor" href="#" id="' . $row->application_id . '"><span class="btn btn-danger m-1" data-bs-toggle="modal" data-bs-target="#declineModal"> Tolak </span></a>';
+                        $btn .= '</div>';
+                    }
+                }
+                $btn .= '</div>';
+            
+                return $btn;
+            });
+
+            $table->rawColumns(['action']);
+            return $table->make(true);
 
         }
 
@@ -738,104 +760,13 @@ class ApplicationController extends Controller
         if($validated){
             // Retrieve the validated data
             $state = $request->get('statusFilter');
-            $status = 1;
-            $selectedPosition = $request->get("position");
+            $jobID = $request->get("position");
             $userID = $request->get('organization');
             $startDate = $request->get('startDate');
             $endDate = $request->get('endDate');
 
-            if($state == 4){
-                $status = 0;
-            }
-
-            if($state == "is_selected"){
-                $state = 3;
-                $is_selected = 2;
-            }
-
-            if(isset($selectedPosition)){
-
-                $query = Application::where([
-                    ['applications.status', $status],
-                    ['applied_date', '>=', $startDate],
-                    ['applied_date', '<=', $endDate],
-                ])
-                ->join('job_offers as jo', 'jo.offer_id', 'applications.offer_id')
-                ->join('poors', 'poors.poor_id', '=', 'applications.poor_id')
-                ->join('users as u', 'u.id', '=', 'poors.user_id')
-                ->join('jobs as j', 'j.job_id', '=', 'jo.job_id')
-                ->join('disability_types as dt', 'dt.dis_type_id', '=', 'poors.disability_type')
-                ->join('education_levels as el', 'el.edu_level_id', '=', 'poors.education_level')
-                ->leftJoin('users as processed', function($join) {
-                    $join->on('processed.id', '=', 'applications.approved_by')
-                         ->whereNotNull('applications.approved_by');
-                });
-
-                if($userID != "all"){
-                    $query = $query->where('jo.user_id', $userID);
-                }
-
-                if($state != 3 && state != 4){
-                    $query = $query->where('applications.approval_status', $state);
-                }
-
-                if($selectedPosition != "all"){
-                    $query = $query->where('j.job_id', $selectedPosition);
-                }
-
-                if($is_selected == 2){
-                    $query = $query->where('applications.is_selected', 2);
-                }
-
-                $selectedApplication = $query->select(
-                        'applications.*',
-                        'applications.description->description as description',
-                        'applications.description->reason as reason',
-                        'u.name as username',
-                        'u.email as useremail',
-                        'u.contactNo as usercontact',
-                        'u.address',
-                        'u.state',
-                        'u.city',
-                        'u.postalCode',
-                        'processed.name as processedname', 
-                        'processed.email as processedemail',
-                        'poors.disability_type',
-                        'dt.name as category',
-                        'el.name as edu_level',
-                        'j.position as position'
-                    )
-                    ->orderBy("applications.applied_date", "asc")
-                    ->get();
-
-                // Transform the data but keep it as a collection of objects
-                $selectedApplication->transform(function ($item) {
-
-                    if($item->approved_at != null){
-                        $approved_at = explode(' ', $item->approved_at);
-                        $item->approved_at = DateController::parseDate($approved_at[0]) . ' ' . $approved_at[1];
-                    }
-
-                    if($item->approval_status == 0){
-                        $approval = "Ditolak: " . $item->reason;
-                    }
-                    elseif($item->approval_status == 1){
-                        $approval = "Belum Diproses";
-                    }
-                    else{
-                        $approval = "Telah Diluluskan";
-                    }
-
-                    $item->approval = $approval;
-
-                    $item->address = $item->address . ', ' . $item->postalCode . 
-                    ', ' . $item->city . ', ' . $item->state;
-
-                    $appliedDate = explode(' ', $item->applied_date);
-                    $item->applied_date = DateController::parseDate($appliedDate[0]) . ' ' . $appliedDate[1];
-
-                    return $item;
-                });
+            if(isset($jobID)){
+                $selectedApplication = $this->retrieveApplication($state, $userID, $jobID, $startDate, $endDate);
             }
 
             return Excel::download(new ExportApplication($selectedApplication), 
@@ -995,31 +926,46 @@ class ApplicationController extends Controller
     // function to display num of application made for each offer in bar chart
     public function appBarChart(Request $request){
         
-        $selectedState = $request->get("selectedState");
+        $state = $request->get("selectedState");
         $userID = $request->get("selectedUser");
-        $status = $request->get("status");
-        $selectedPosition = $request->get("selectedPosition");
-        $isSelected = $request->get("isSelected");
+        $jobID = $request->get("selectedPosition");
+        $startDate = $request->get("startDate");
+        $endDate = $request->get("endDate");
 
-        if(isset($selectedPosition)){
+        if(isset($jobID)){
+
+            if($state == 4){
+                $status = 0;
+            }
+            else{
+                $status = 1;
+            }
 
             $query = Application::where('applications.status', $status)
             ->join('job_offers as jo', 'jo.offer_id', 'applications.offer_id')
             ->join('jobs as j', 'j.job_id', '=', 'jo.job_id');
 
+            if($startDate != null && $endDate != null){
+    
+                $query->where([
+                    ['applications.applied_date', '>=', $startDate],
+                    ['applications.applied_date', '<=', $endDate],
+                ]);
+            }
+
             if($userID != "all"){
                 $query = $query->where('jo.user_id', $userID);
             }
 
-            if($selectedState != 3){
-                $query = $query->where('applications.approval_status', $selectedState);
+            if($state == 1 || $state == 0 || $state == 2){
+                $query = $query->where('applications.approval_status', $state);
             }
 
-            if($selectedPosition != "all"){
-                $query = $query->where('j.job_id', $selectedPosition);
+            if($jobID != "all"){
+                $query = $query->where('j.job_id', $jobID);
             }
 
-            if($isSelected == 2){
+            if($state == "is_selected"){
                 $query = $query->where('applications.is_selected', 2);
             }
 

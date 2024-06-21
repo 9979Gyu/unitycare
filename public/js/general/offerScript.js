@@ -19,6 +19,7 @@ function getJob(selectedUser, component){
 
 // Funciton to display list of city and states
 function getPosition(selectedJob, selectedUser, component){
+    
     $.ajax({
         type: 'GET',
         url: "/getPositions",
@@ -49,7 +50,19 @@ function getPosition(selectedJob, selectedUser, component){
     });
 }
 
-function updateBarChart(selectedUser, selectedPosition, selectedState, status) {
+$("#resetBtn").click(function(){
+    $("#organization").prop('selectedIndex', 0).trigger('change');
+    $("#jobname").prop('selectedIndex', 0).trigger('change');
+    $("#job").prop('selectedIndex', 0).trigger('change');
+    $("#position").prop('selectedIndex', 0).trigger('change');
+
+    $('#startDate1').val('');
+    $('#endDate1').val('').trigger('change');
+    $('#allRadio').prop('checked', true).trigger('change');
+});
+
+// Function to display number of offer for each position
+function updateOfferBarChart(selectedUser, selectedPosition, selectedState, startDate, endDate) {
     $.ajax({
         url: '/offer-bar-chart', // URL to fetch data from
         type: 'GET',
@@ -57,8 +70,9 @@ function updateBarChart(selectedUser, selectedPosition, selectedState, status) {
         data: {
             selectedUser :  selectedUser,
             selectedPosition: selectedPosition, 
-            selectedState: selectedState, 
-            status: status
+            selectedState: selectedState,
+            startDate: startDate,
+            endDate: endDate,
         },
         success: function(response) {
             var labels = response.labels;
@@ -102,7 +116,7 @@ function updateBarChart(selectedUser, selectedPosition, selectedState, status) {
                         plugins: {
                             title: {
                                 display: true,
-                                text: 'Bilangan Pekerjaan',
+                                text: 'Bilangan Tawaran berdasarkan Jawatan',
                                 font: {
                                     size: 18,
                                 }
@@ -127,7 +141,7 @@ function updateBarChart(selectedUser, selectedPosition, selectedState, status) {
     });
 }
 
-function updateParticipantBarChart(selectedUser, selectedPosition, selectedState, status, isSelected) {
+function updateParticipantBarChart(selectedUser, selectedPosition, selectedState, startDate, endDate) {
     $.ajax({
         url: '/app-bar-chart', // URL to fetch data from
         type: 'GET',
@@ -135,9 +149,9 @@ function updateParticipantBarChart(selectedUser, selectedPosition, selectedState
         data: {
             selectedUser :  selectedUser,
             selectedPosition: selectedPosition, 
-            selectedState: selectedState, 
-            status: status,
-            isSelected: isSelected
+            selectedState: selectedState,
+            startDate: startDate,
+            endDate: endDate
         },
         success: function(response) {
             var labels = response.labels;
@@ -181,7 +195,7 @@ function updateParticipantBarChart(selectedUser, selectedPosition, selectedState
                         plugins: {
                             title: {
                                 display: true,
-                                text: 'Bilangan Pekerjaan',
+                                text: 'Bilangan Permohonan berdasarkan Pekerjaan',
                                 font: {
                                     size: 18,
                                 }

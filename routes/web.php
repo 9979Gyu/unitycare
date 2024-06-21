@@ -149,7 +149,7 @@ Route::post('/updateApproval', [ApplicationController::class, 'updateApproval'])
 Route::post('/confirmOffer', [ApplicationController::class, 'confirmOffer']);
 
 // Chart
-Route::get('/offer-bar-chart', [ChartController::class, 'offerBarChart']);
+Route::get('/offer-bar-chart', [OfferController::class, 'offerBarChart']);
 Route::get('/app-bar-chart', [ApplicationController::class, 'appBarChart']);
 Route::get('/user-pie-chart', [LandingController::class, 'peoplePieChart']);
 Route::get('/program-bar-chart', [ParticipantController::class, 'programBarChart']);

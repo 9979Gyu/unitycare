@@ -1,15 +1,15 @@
 $(document).ready(function() {
 
     $('#organization').select2({
-        placeholder: 'Pilih Pengurus',
+        placeholder: 'Semua Organisasi',
     });
 
     $('#job').select2({
-        placeholder: 'Pilih Pekerjaan',
+        placeholder: 'Semua Pekerjaan',
     });
 
     $('#position').select2({
-        placeholder: 'Pilih Jawatan',
+        placeholder: 'Semua Jawatan',
     });
 
     var requestTable;
@@ -17,8 +17,8 @@ $(document).ready(function() {
     var selectedUser = "all";
     var selectedJob = "all";
     var selectedPosition = "all";
-    var status = 1;
-    var isSelected = 1;
+    var startDate = "";
+    var endDate = "";
 
     $("#organization").on('change', function(){
         // set value
@@ -26,8 +26,7 @@ $(document).ready(function() {
         // get job list for dropdown
         getJob(selectedUser, "#job");
 
-        fetch_data(selectedUser, selectedPosition, selectedState, status, isSelected);
-        updateParticipantBarChart(selectedUser, selectedPosition, selectedState, status, isSelected);
+        fetch_data(selectedUser, selectedPosition, selectedState, startDate, endDate);
 
     });
 
@@ -39,20 +38,30 @@ $(document).ready(function() {
         selectedJob = $("#job option:selected").val();
 
         getPosition(selectedJob, selectedUser, "#position");
-
     });
 
     $("#position").on('change', function(){
         // Get the selected position
         selectedPosition = $(this).val();
-        fetch_data(selectedUser, selectedPosition, selectedState, status, isSelected);
-        updateParticipantBarChart(selectedUser, selectedPosition, selectedState, status, isSelected)
+        fetch_data(selectedUser, selectedPosition, selectedState, startDate, endDate);
 
+    });
+
+    $("#startDate1, #endDate1").change(function(){
+
+        startDate = $("#startDate1").val();
+        endDate = $("#endDate1").val();
+
+        if(endDate == ""){
+            endDate = startDate;
+        }
+        // Fetch data
+        fetch_data(selectedUser, selectedPosition, selectedState, startDate, endDate);
     });
 
     // Function to handle radio button value
     $('#allRadio, #pendingRadio, #approveRadio, #declineRadio, #deleteRadio, #confirmRadio').change(function() {
-        status = 1;
+
         if ($('#allRadio').is(':checked')) {
             selectedState = 3;
         }
@@ -66,20 +75,21 @@ $(document).ready(function() {
             selectedState = 0;
         }
         else if ($('#confirmRadio').is(':checked')) {
-            isSelected = 2;
+            selectedState = "is_selected";
         }
         else if ($('#deleteRadio').is(':checked')) {
-            status = 0;
+            selectedState = 4;
         }
 
         // Fetch data based on the selected position
-        fetch_data(selectedUser, selectedPosition, selectedState, status, isSelected);
-        updateParticipantBarChart(selectedUser, selectedPosition, selectedState, status, isSelected)
+        fetch_data(selectedUser, selectedPosition, selectedState, startDate, endDate);
     });
 
-    function fetch_data(selectedUser, selectedPosition, selectedState, status, isSelected) {
-
-        console.log("1");
+    function fetch_data(selectedUser, selectedPosition, selectedState, startDate, endDate) {
+        
+        
+        console.log("12", selectedPosition, selectedUser);
+        updateParticipantBarChart(selectedUser, selectedPosition, selectedState, startDate, endDate);
 
         // Make AJAX request to fetch data based on the selected position
         if ($.fn.DataTable.isDataTable('#requestTable')) {
@@ -116,11 +126,11 @@ $(document).ready(function() {
             ajax: {
                 url: "/getApplications",
                 data: {
-                    selectedState: selectedState,
-                    positionID: selectedPosition,
+                    state: selectedState,
+                    jobID: selectedPosition,
                     userID: selectedUser,
-                    status: status,
-                    isSelected: isSelected,
+                    startDate: startDate,
+                    endDate: endDate,
                 },
                 type: 'GET',
 
@@ -130,7 +140,7 @@ $(document).ready(function() {
                 "className": "text-center",
                 "width": "2%"
             }, {
-                "targets": [1, 2, 3, 4, 5, 6, 7],
+                "targets": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
                 "className": "text-center",
             },], 
             columns: [{
@@ -163,7 +173,7 @@ $(document).ready(function() {
                 orderable: true,
                 searchable: true,
             }, {
-                data: "approval",
+                data: "description",
                 name: 'description',
                 orderable: false,
                 searchable: true,
@@ -175,6 +185,35 @@ $(document).ready(function() {
             }, {
                 data: "position",
                 name: 'position',
+                orderable: true,
+                searchable: true
+            }, {
+                data: function(row) {
+                    if(row.approval_status == 0){
+                        return '<span class="text-danger"><b>' + row.approval + '</b></span>';
+                    }
+                    else if(row.approval_status == 2){
+                        return '<span class="text-success"><b>' + row.approval + '</b></span>';
+                    }
+                    else{
+                        return '<span><b>' + row.approval + '</b></span>';
+                    }
+                },
+                name: 'status',
+                orderable: true,
+                searchable: true
+            }, {
+                data: function(row) {
+                    if(row.processedname != null){
+                        return row.processedname + 
+                        '<br>' + row.processedemail +
+                        '<br> Pada: ' + row.approved_at;
+                    }
+                    else{
+                        return " ";
+                    }
+                },
+                name: 'processed',
                 orderable: true,
                 searchable: true
             }, {

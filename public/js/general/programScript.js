@@ -179,9 +179,9 @@ function updateProgramPieChart(selectedState, selectedUser, selectedProgram, sta
 
 $("#resetBtn").click(function(){
     $("#organization").prop('selectedIndex', 0).trigger('change');
-
     $("#type").prop('selectedIndex', 0).trigger('change');
 
     $('#startDate1').val('');
     $('#endDate1').val('').trigger('change');
+    $('#allRadio').prop('checked', true).trigger('change');
 });

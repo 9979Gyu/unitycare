@@ -7,7 +7,7 @@ $(document).ready(function() {
 
     // Initialize select2
     $('#organization').select2({
-        placeholder: 'Pilih Pengurus',
+        placeholder: 'Pilih Organisasi',
     });
 
     $('#jobname').select2({
@@ -26,14 +26,20 @@ $(document).ready(function() {
     var selectedPosition = "all";
     var status = 1;
     var roleID = $("#roleID").val();
+    var startDate = "";
+    var endDate = "";
+
+    fetch_data(selectedUser, selectedPosition, selectedState, startDate, endDate);
 
     $("#organization").change(function(){
         // set value
         selectedUser = $("#organization option:selected").val();
         // get job list for dropdown
         getJob(selectedUser, "#jobname");
-        fetch_data(selectedUser, selectedPosition, selectedState, status);
-        updateBarChart(selectedUser, selectedPosition, selectedState, status)
+        getPosition(selectedJob, selectedUser, "#position");
+
+        fetch_data(selectedUser, selectedPosition, selectedState, startDate, endDate);
+
     });
 
     $("#jobname").on('change', function(){
@@ -48,17 +54,24 @@ $(document).ready(function() {
         selectedPosition = $("#position option:selected").val();
 
         // get job list for dropdown
-        fetch_data(selectedUser, selectedPosition, selectedState, status);
-        updateBarChart(selectedUser, selectedPosition, selectedState, status)
+        fetch_data(selectedUser, selectedPosition, selectedState, startDate, endDate);
     });
 
-    $("#organization").prop('selectedIndex', 0).trigger('change');
-    $("#jobname").prop('selectedIndex', 0).trigger('change');
-    $("#position").prop('selectedIndex', 0);
+    $("#startDate1, #endDate1").change(function(){
+
+        startDate = $("#startDate1").val();
+        endDate = $("#endDate1").val();
+
+        if(endDate == ""){
+            endDate = startDate;
+        }
+        // Fetch data
+        fetch_data(selectedUser, selectedPosition, selectedState, startDate, endDate);
+    });
     
     // Function to handle radio button value
     $('#allRadio, #pendingRadio, #approveRadio, #declineRadio, #deleteRadio').change(function() {
-        status = 1;
+
         if ($('#allRadio').is(':checked')) {
             selectedState = 3;
         }
@@ -72,15 +85,17 @@ $(document).ready(function() {
             selectedState = 0;
         }
         else if ($('#deleteRadio').is(':checked')) {
-            status = 0
+            selectedState = 4;
         }
 
         // Fetch data based on the selected position
-        fetch_data(selectedUser, selectedPosition, selectedState, status);
-        updateBarChart(selectedUser, selectedPosition, selectedState, status)
+        fetch_data(selectedUser, selectedPosition, selectedState, startDate, endDate);
+
     });
     
-    function fetch_data(selectedUser, selectedPosition, selectedState, status) {
+    function fetch_data(selectedUser, selectedPosition, selectedState, startDate, endDate) {
+
+        updateOfferBarChart(selectedUser, selectedPosition, selectedState, startDate, endDate);
 
         // Make AJAX request to fetch data based on the selected position
         if ($.fn.DataTable.isDataTable('#requestTable')) {
@@ -120,7 +135,9 @@ $(document).ready(function() {
                     selectedUser : selectedUser, 
                     selectedPosition : selectedPosition, 
                     selectedState : selectedState, 
-                    status : status
+                    status : status,
+                    startDate: startDate,
+                    endDate: endDate,
                 },
                 type: 'GET',
 

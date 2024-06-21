@@ -56,6 +56,21 @@
         </div>
 
         <div class="row mb-3">
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label for="startDate">Dari</label>
+                    <input type="date" class="form-control" id="startDate1" name="startDate" placeholder="Dari">
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label for="endDate">Hingga</label>
+                    <input type="date" class="form-control" id="endDate1" name="endDate" placeholder="Hingga">
+                </div>
+            </div> 
+        </div>
+
+        <div class="row mb-3">
             <div class="col">
                 <div class="form-check form-check-inline">
                     <input class="form-check-input" type="radio" name="statusFilter" id="allRadio" value="3" checked>
@@ -85,6 +100,7 @@
                 @endif
             </div>
             <div class="col">
+                <button class="btn btn-outline-secondary float-end ml-2" type="button" id="resetBtn">Padam</button>
                 <button class="btn btn-outline-primary float-end" type="button" id="excelBtn">Excel</button>
             </div>
         </div>
@@ -144,6 +160,8 @@
                                 <th>Sebab Mohon</th>
                                 <th>Tarikh Mohon</th>
                                 <th>Jawatan</th>
+                                <th>Status</th>
+                                <th>Diproses</th>
                                 <th>Tindakan</th>
                             </tr>
                         </thead>
@@ -157,7 +175,7 @@
             <!-- chart -->
             <div class="tab-pane fade" id="chart" role="tabpanel" aria-labelledby="chart-tab">
                 <div class="justify-content-center d-flex m-2">
-                    <div class="charts">
+                    <div class="barCharts">
                         <canvas id="barChart"></canvas>
                     </div>
                 </div>
@@ -219,7 +237,7 @@
     </div>
 
     <script src="{{ asset('js/general/offerScript.js') }}"></script>
-    <script src="{{ asset('js/indexApplicationScript.js') }}"></script>
+    <script src="{{ asset('js/offers/indexApplicationScript.js') }}"></script>
     <script src="{{ asset('js/general/modalScript.js') }}"></script>
 
 
