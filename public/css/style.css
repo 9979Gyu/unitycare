@@ -104,3 +104,36 @@ body{
 .pieCharts {
     width: 50%;
 }
+
+/* Default styles */
+#poverty-content .justify-content-center {
+    display: flex;
+    justify-content: center;
+}
+
+#poverty-content .d-flex {
+    display: flex;
+    flex-wrap: wrap; /* Allow items to wrap to the next line */
+}
+
+#poverty-content .chart-container {
+    width: 100%; /* Default width for all devices */
+    margin-bottom: 20px; /* Add some spacing between items */
+}
+
+#poverty-content .flex-grow-1 {
+    width: 100%; /* Default width for all devices */
+}
+
+/* Media query for laptops and larger devices */
+@media (min-width: 1024px) {
+    #poverty-content .chart-container {
+        width: 40%; /* Adjusted width for laptops */
+        margin-bottom: 0; /* Remove margin bottom for laptops */
+        margin-right: 20px; /* Add some spacing between items */
+    }
+
+    #poverty-content .flex-grow-1 {
+        width: calc(60% - 20px); /* Adjusted width for laptops */
+    }
+}

@@ -20,6 +20,7 @@ $(document).ready(function() {
 
     $('#citystate').select2({
         placeholder: 'Pilih Bandar atau Negeri',
+        allowClear: true,
     });
     
     // Define and declare variables
@@ -311,7 +312,9 @@ $(document).ready(function() {
                         oid: el.oid, 
                         approval_status: el.approval_status, 
                         reason: el.reason, 
-                        description: el.description 
+                        description: el.description, 
+                        is_selected: el.is_selected,
+                        status: el.status, 
                     }; 
                 });
 
@@ -322,7 +325,7 @@ $(document).ready(function() {
 
                     if(
                         (!keyword || matchesKeyword(offer, keyword)) && 
-                        (!citystate || matchesCityState(offer, citystate))
+                        (!citystate || matchesCityState(offer, citystate) && !offer.is_full)
                     ){
                     
                         // User is B40/OKU and job offer is approved by staff
@@ -583,7 +586,7 @@ $(document).ready(function() {
                     $('#dismissModal').modal('hide');
                     $('.condition-message').html(data);
                     
-                    requestTable.ajax.reload();
+                    updateCardContainer();
 
                 },
                 error: function (data) {

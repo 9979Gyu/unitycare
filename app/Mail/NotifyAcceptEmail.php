@@ -5,11 +5,9 @@ namespace App\Mail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Content;
-use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class NotifyApplicationEmail extends Mailable
+class NotifyAcceptEmail extends Mailable
 {
     use Queueable, SerializesModels;
     public $mailData;
@@ -30,7 +28,7 @@ class NotifyApplicationEmail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'UnityCare - Permohonan' . $this->mailData['subject'],
+            subject: 'UnityCare - Tawaran Diterima',
         );
     }
 
@@ -40,7 +38,7 @@ class NotifyApplicationEmail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.notifyApplication',
+            view: 'emails.notifyAccept',
         );
     }
 
@@ -61,6 +59,6 @@ class NotifyApplicationEmail extends Mailable
      */
     public function build()
     {
-        return $this->subject('Makluman Mengenai Permohonan ' . $this->mailData['subject'])->view('emails.notifyApplication');
+        return $this->subject('Makluman Mengenai Tawaran')->view('emails.notifyAccept');
     }
 }

@@ -14,9 +14,13 @@
         </div>
     @endif
 
-    @if (session()->has('error'))
-        <div class="alert alert-danger condition-message">
-            {{ session('error') }}
+    @if ($errors->any())
+        <div class="alert alert-danger condition-message"">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
         </div>
     @endif
 
@@ -79,15 +83,26 @@
             <tr>
                 <th scope="row">Pilihan</th>
                 <td colspan="3">
-                @if(Auth::user()->roleID == 5)
-                    @if($offer->user_id != Auth::user()->id && $alreadyApply == 0)
-                        <button type="button" class="btn btn-success" name="apply" id="apply" value="mohon"><b>Mohon</b></button>
-                    @elseif($applicationExist > 0 && $alreadyApply > 0 && $approval == 2)
-                        <button type="button" class="btn btn-success" name="approve" id="approve" value="terima"><b>Terima</b></button>
-                        <button type="button" class="btn btn-danger" name="decline" id="decline" value="tolak"><b>Tolak</b></button>
+                    @if($user->roleID == 5)
+                        <!-- is not creator and not yet apply -->
+                        @if($offer->user_id != $user->id && $applied == 0)
+                            <button type="button" class="btn btn-success" name="apply" id="apply" value="mohon"><b>Mohon</b></button>
+                        <!-- applied and approved -->
+                        @elseif($applied > 0)
+                            @if($approval == 2)
+                                <button type="button" class="btn btn-success" name="approve" id="approve" value="terima"><b>Terima</b></button>
+                                <button type="button" class="btn btn-danger" name="decline" id="decline" value="tolak"><b>Tolak</b></button>
+                            @elseif($approval == 1)
+                                <button type="button" class="btn btn-danger" name="dismiss" id="dismiss"><b>Tarik Diri</b></button>
+                            @endif
+                        @endif
                     @endif
-                @endif
-                <button type="button" class="btn btn-secondary" onclick="window.location='/viewoffer'"><b>Tutup</b></button>
+
+                    @if($type == 'true')
+                        <button type="button" class="btn btn-secondary" onclick="window.location='/viewoffer'"><b>Tutup</b></button>
+                    @elseif($type == 'permohonan')
+                        <button type="button" class="btn btn-secondary" onclick="window.location='/viewapplication'"><b>Tutup</b></button>
+                    @endif
                 </td>
             </tr>
         </table>
@@ -120,6 +135,29 @@
         </div>
     </form>
 
+    <!-- Dismiss Job -->
+    <form method="POST" action="/dismissoffer" id="dismissForm">
+        @csrf
+        <div class="modal fade" id="dismissModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="dismissModalLabel">Tarik Diri Daripada Tawaran</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Adakah anda pasti untuk berhenti memohon pekerjaan ini?
+                        <input type="number" name="offerID" id="offerID" value="{{ $offer->offer_id }}" hidden>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-danger" id="dismiss">Tarik Diri</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
     <!-- Confirm job -->
     <form method="POST" action="/confirmOffer" id="confirmForm">
         @csrf
@@ -132,7 +170,7 @@
                     </div>
                     <div class="modal-body">
                         <p>Adakah anda pasti untuk menerima perkerjaan ini? </p>
-                        <input type="number" name="offerID" value="{{ $offer->offer_id }}" hidden>  
+                        <input type="number" name="offerID" id="offerID" value="{{ $offer->offer_id }}" hidden>  
                         <input type="number" name="approval_status" value="2" hidden>  
                     </div>
                     <div class="modal-footer">
@@ -156,7 +194,7 @@
                     </div>
                     <div class="modal-body">
                         <p>Adakah anda pasti untuk menolak perkerjaan ini? </p>
-                        <input type="number" name="offerID" value="{{ $offer->offer_id }}" hidden>  
+                        <input type="number" name="offerID" id="offerID" value="{{ $offer->offer_id }}" hidden>
                         <input type="number" name="approval_status" value="0" hidden>
                     </div>
                     <div class="modal-footer">
@@ -173,7 +211,7 @@
      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
      crossorigin=""></script>
     <script src="{{ asset('js/general/mapScript.js') }}"></script>
-    <script src="{{ asset('js/processApplicationScript.js') }}"></script>
+    <script src="{{ asset('js/offers/processApplicationScript.js') }}"></script>
     <script src="{{ asset('js/general/dateScript.js') }}"></script>
 
 @endsection

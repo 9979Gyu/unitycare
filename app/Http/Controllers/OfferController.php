@@ -800,7 +800,9 @@ class OfferController extends Controller
             'applications.description->reason as reason',
             'applications.description->description as description',
             'applications.offer_id as oid',
-            'u.id as user_id'
+            'u.id as user_id',
+            'applications.is_selected',
+            'applications.status',
         )
         ->get();
 

@@ -42,9 +42,9 @@
         <div class="row mb-3">
             <div class="col-sm-6">
                 <select name="jobname" id="jobname" class="form-control select2 ">
-                    <!-- <option value="all">Semua Pekerjaan</option> -->
+                    <option value="all">Semua Pekerjaan</option>
                     @foreach($applications as $application)
-                        <option value="{{ $application }}">{{ $application }}</option>
+                        <option value="{{ $application->name }}">{{ $application->name }}</option>
                     @endforeach
                 </select>
             </div>

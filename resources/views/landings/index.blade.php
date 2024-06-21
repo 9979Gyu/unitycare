@@ -188,12 +188,14 @@
 
         <br>
 
-        <div class="justify-content-center d-flex">
-            <div style="width: 40%">
-                @include('charts.people')
-            </div>
-            <div class="flex-grow-1">
-                <object data="https://data.gov.my/ms-MY/data-catalogue/embed/hies_district?visual=poverty" width="100%" height="400px"></object>
+        <div id="poverty-content">
+            <div class="justify-content-center d-flex">
+                <div class="chart-container">
+                    @include('charts.people')
+                </div>
+                <div class="flex-grow-1">
+                    <object data="https://data.gov.my/ms-MY/data-catalogue/embed/hies_district?visual=poverty" width="100%" height="400px"></object>
+                </div>
             </div>
         </div>
 

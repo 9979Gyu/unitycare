@@ -7,20 +7,19 @@ $(document).ready(function(){
         }
     });
 
-    var selectedID;
     $('#apply').click(function() {
-        selectedID = $("#offerId").val();
         $('#applyModal').modal('show');
     });
 
     $('#approve').click(function() {
-        selectedID = $("#offerId").val();
         $('#approveModal').modal('show');
     });
 
     $('#decline').click(function() {
-        selectedID = $("#offerId").val();
         $('#declineModal').modal('show');
     });
-    
+
+    $('#dismiss').click(function() {
+        $('#dismissModal').modal('show');
+    });
 });

@@ -35,9 +35,8 @@ class ExportApplied implements FromCollection, WithHeadings, ShouldAutoSize
                     'Purata Gaji' => 'RM ' . $item->min_salary . ' - RM ' . $item->max_salary,
                     'Sebab Mohon' => $item->description,
                     'Tarikh Mohon' => $item->applied_date,
-                    'Nama Pengurus' => $item->username,
-                    'Emel Pengurus' => $item->useremail,
-                    'Telefon Pengurus' => '(+60)' . $item->usercontact,
+                    'Nama Pengurus' => $item->processedname,
+                    'Emel Pengurus' => $item->processedemail,
                     'Status' => $item->approval,
                     'Diproses Pada' => $item->approved_at,
                 ];
@@ -60,7 +59,6 @@ class ExportApplied implements FromCollection, WithHeadings, ShouldAutoSize
             'Tarikh Mohon',
             'Nama Pengurus',
             'Emel Pengurus',
-            'Telefon Pengurus',
             'Status',
             'Diproses Pada'
         ];
