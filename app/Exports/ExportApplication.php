@@ -23,6 +23,14 @@ class ExportApplication implements FromCollection, WithHeadings, ShouldAutoSize
     {
         if(isset($this->selectedApplication)){
             $selectedApplication = $this->selectedApplication->map(function ($item) {
+
+                if($item->processedname != null){
+                    $processed = $item->processedname . " (" . $item->processedemail . ")";
+                }
+                else{
+                    $processed = "";
+                }
+
                 return[
                     'Nama Pemohon' => $item->username,
                     'Emel Pemohon' => $item->useremail,
@@ -34,7 +42,7 @@ class ExportApplication implements FromCollection, WithHeadings, ShouldAutoSize
                     'Tarikh Mohon' => $item->applied_date, 
                     'Jawatan' => $item->position, 
                     'Status' => $item->approval,
-                    'Diproses Oleh' => $item->processedname . " (" . $item->processedemail . ")", 
+                    'Diproses Oleh' => $processed, 
                     'Diproses Pada' => $item->approved_at, 
                 ];
             });

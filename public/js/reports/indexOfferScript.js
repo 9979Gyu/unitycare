@@ -17,6 +17,10 @@ $(document).ready(function() {
     $('#position').select2({
         placeholder: 'Pilih Jawatan',
     });
+
+    $('#citystate').select2({
+        placeholder: 'Pilih Bandar atau Negeri',
+    });
     
     // Define and declare variables
     var requestTable;
@@ -29,18 +33,18 @@ $(document).ready(function() {
     var startDate = "";
     var endDate = "";
 
-    fetch_data(selectedUser, selectedPosition, selectedState, startDate, endDate);
-
     $("#organization").change(function(){
         // set value
         selectedUser = $("#organization option:selected").val();
+
         // get job list for dropdown
         getJob(selectedUser, "#jobname");
-        getPosition(selectedJob, selectedUser, "#position");
 
         fetch_data(selectedUser, selectedPosition, selectedState, startDate, endDate);
 
     });
+    
+    $("#organization").prop('selectedIndex', 0).trigger('change');
 
     $("#jobname").on('change', function(){
         // set value
@@ -216,7 +220,17 @@ $(document).ready(function() {
                 orderable: true,
                 searchable: true
             }, {
-                data: 'approval',
+                data: function(row) {
+                    if(row.approval_status == 0){
+                        return '<span class="text-danger"><b>' + row.approval + '</b></span>';
+                    }
+                    else if(row.approval_status == 2){
+                        return '<span class="text-success"><b>' + row.approval + '</b></span>';
+                    }
+                    else{
+                        return '<span><b>' + row.approval + '</b></span>';
+                    }
+                },
                 name: 'approval',
                 orderable: true,
                 searchable: true
@@ -243,7 +257,6 @@ $(document).ready(function() {
             
         });
     }
-
 
     // Function to handle B40 / OKU case
     if(roleID == 5){
@@ -409,6 +422,20 @@ $(document).ready(function() {
             }
         });
     }
+
+    // Set interval to refresh data every 60 seconds
+    setInterval(function() {
+        fetch_data(selectedUser, selectedPosition, selectedState, startDate, endDate);
+        updateCardContainer();
+    }, 60000);
+    
+    $("#resetBtn").click(function(){
+        $("#organization").trigger('change');
+        $("#jobname").trigger('change');
+
+        $('#startDate1').val('');
+        $('#endDate1').val('').trigger('change');
+    });
 
     // csrf token for ajax
     $.ajaxSetup({

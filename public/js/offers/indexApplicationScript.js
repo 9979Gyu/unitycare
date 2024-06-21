@@ -31,8 +31,6 @@ $(document).ready(function() {
     });
 
     $("#organization").prop('selectedIndex', 0).trigger('change');
-    $("#job").prop('selectedIndex', 0);
-    $("#position").prop('selectedIndex', 0);
 
     $("#job").on('change', function(){
         selectedJob = $("#job option:selected").val();
@@ -85,10 +83,17 @@ $(document).ready(function() {
         fetch_data(selectedUser, selectedPosition, selectedState, startDate, endDate);
     });
 
+    
+    $("#resetBtn").click(function(){
+        $("#organization").trigger('change');
+        $("#jobname").trigger('change');
+
+        $('#startDate1').val('');
+        $('#endDate1').val('').trigger('change');
+    });
+
     function fetch_data(selectedUser, selectedPosition, selectedState, startDate, endDate) {
         
-        
-        console.log("12", selectedPosition, selectedUser);
         updateParticipantBarChart(selectedUser, selectedPosition, selectedState, startDate, endDate);
 
         // Make AJAX request to fetch data based on the selected position

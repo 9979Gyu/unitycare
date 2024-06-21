@@ -200,12 +200,14 @@ class OfferController extends Controller
         ->orderBy('job_offers.updated_at', 'desc')
         ->get();
 
+        
+
         // Transform the data but keep it as a collection of objects
         $selectedOffers->transform(function ($offer) {
 
             if($offer->approved_at != null){
                 $approved_at = explode(' ', $offer->approved_at);
-                $offer->approved_at = DateController::parseDate($approved_at[0]) . ' ' . $approved_at[1];
+                $offer->approved_at = DateController::parseDate($approved_at[0]) . ' ' . DateController::formatTime($approved_at[1]);
             }
 
             if($offer->approval_status == 0){
@@ -255,6 +257,9 @@ class OfferController extends Controller
             $startDate = $request->get('startDate');
             $endDate = $request->get('endDate');
 
+            $loggedRoleID = Auth::user()->roleID;
+            $loggedUserID = Auth::user()->id;
+
             // Handling for retrieve offers based on conditions
             if(isset($userID) && isset($jobID) && isset($state)){
                 $selectedOffers = $this->retrieveOffers($userID, $jobID, $state, $startDate, $endDate);
@@ -271,14 +276,13 @@ class OfferController extends Controller
 
             $table = Datatables::of($selectedOffers);
 
-            $table->addColumn('action', function ($row) {
+            $table->addColumn('action', function ($row) use($loggedUserID, $loggedRoleID) {
                 $token = csrf_token();
                 $btn = '<div class="justify-content-center">';
                 $btn .= '<a href="/joinoffer/' . $row->offer_id . '"><span class="btn btn-primary m-1"> Lihat </span></a>';
                 
                 //  Is admin or staff
-                if(Auth::user()->roleID == 1 || Auth::user()->roleID == 2){
-                    
+                if($loggedRoleID == 1 || $loggedRoleID == 2){
                     if($row->approval_status == 1){
                         // Program is pending approval
                         $btn .= '<div>';
@@ -288,17 +292,17 @@ class OfferController extends Controller
                     }
                 }
                 else{
-                    if($row->user_id == Auth::user()->id){
-                        if($row->approval_status == 1){
-                            
+                    if($row->user_id == $loggedUserID){
+                        if($row->approval_status == 1 || $row->approval_status == 0){
                             // Program is pending approval
                             $btn .= '<div>';
                             $btn .= '<a href="/editoffer/' . $row->offer_id . '"><span class="btn btn-warning m-1"> Kemaskini </span></a>';
                             $btn .= '</div>';
                         }
                     }
-                    $btn .= '<a class="deleteAnchor" href="#" id="' . $row->offer_id . '"><span class="btn btn-danger m-1" data-bs-toggle="modal" data-bs-target="#deleteModal"> Padam </span></a>';
                 }
+
+                $btn .= '<a class="deleteAnchor" href="#" id="' . $row->offer_id . '"><span class="btn btn-danger m-1" data-bs-toggle="modal" data-bs-target="#deleteModal"> Padam </span></a>';
 
                 $btn .= '</div>';
 
@@ -389,7 +393,7 @@ class OfferController extends Controller
         if($validated){
 
             $desc = [
-                "description" => $request->get('description'),
+                "description" => trim($request->get('description')),
                 "reason" => "",
             ];
 
@@ -445,6 +449,7 @@ class OfferController extends Controller
                 ->join('shift_types as st', 'st.shift_type_id', 'job_offers.shift_type_id')
                 ->where([
                     ['job_offers.status', 1],
+                    ['job_offers.approval_status', '<>', 2],
                     ['j.status', 1],
                     ['jt.status', 1],
                     ['st.status', 1],
@@ -482,23 +487,6 @@ class OfferController extends Controller
 
         // if all false
         return redirect('/login')->withErrors(['message' => 'Sila log masuk']);
-    }
-
-    // Function to get all job types
-    function getJobTypes(){
-        $jobTypes = Job_Type::where('status', 1)
-        ->get();
-
-        return $jobTypes;
-    }
-
-    // Function to get all shift types
-    function getShiftTypes(){
-        $shiftTypes = Shift_Type::where('status', 1)
-        ->get();
-
-        return $shiftTypes;
-
     }
 
     // Function to update the offer detail
@@ -548,7 +536,7 @@ class OfferController extends Controller
         if($validated){
 
             $desc = [
-                "description" => $request->get('description'),
+                "description" => trim($request->get('description')),
                 "reason" => "",
             ];
 
@@ -591,6 +579,23 @@ class OfferController extends Controller
 
     }
 
+    // Function to get all job types
+    function getJobTypes(){
+        $jobTypes = Job_Type::where('status', 1)
+        ->get();
+
+        return $jobTypes;
+    }
+
+    // Function to get all shift types
+    function getShiftTypes(){
+        $shiftTypes = Shift_Type::where('status', 1)
+        ->get();
+
+        return $shiftTypes;
+
+    }
+
     // Function to update approval of offer
     public function updateApproval(Request $request){
 
@@ -605,18 +610,6 @@ class OfferController extends Controller
 
             if($roleID == 1 || $roleID == 2 || $roleID == 3){
 
-                // Get the current description
-                $currentDesc = Job_Offer::where('offer_id', $offerID)
-                ->value('description');
-
-                // Decode the JSON to an associative array
-                $descArray = json_decode($currentDesc, true);
-
-                // Update the 'reason' field
-                $descArray['reason'] = $request->get('reason');
-
-                // Encode the array back to JSON
-                $newDesc = json_encode($descArray);
                 $result = 0;
 
                 // Approve offer
@@ -637,6 +630,19 @@ class OfferController extends Controller
                 // Decline offer
                 else{
 
+                    // Get the current description
+                    $currentDesc = Job_Offer::where('offer_id', $offerID)
+                    ->value('description');
+
+                    // Decode the JSON to an associative array
+                    $descArray = json_decode($currentDesc, true);
+
+                    // Update the 'reason' field
+                    $descArray['reason'] = $request->get('reason');
+
+                    // Encode the array back to JSON
+                    $newDesc = json_encode($descArray);
+
                     $result = Job_Offer::where([
                         ['job_offers.offer_id', $offerID],
                         ['job_offers.status', 1],
@@ -656,6 +662,7 @@ class OfferController extends Controller
                     $this->notifyUser($offerID);
 
                     return redirect('/viewoffer')->with('success', 'Data berjaya dikemaskini');
+
                 }
             }
 
@@ -675,7 +682,27 @@ class OfferController extends Controller
         if(Auth::check()){
             
             if($offerID != null){
+
+                // Get the current description
+                $currentDesc = Job_Offer::where('offer_id', $offerID)
+                ->value('description');
+
+                // Decode the JSON to an associative array
+                $descArray = json_decode($currentDesc, true);
+
+                // Update the 'reason' field
+                $descArray['reason'] = "Dipadam";
+
+                // Encode the array back to JSON
+                $newDesc = json_encode($descArray);
+
                 $userID = Auth::user()->id;
+
+                $processorID = User::where([
+                    ['roleID', 1],
+                    ['status', 1],
+                ])
+                ->value('id');
 
                 $result = Job_Offer::where([
                     ['status', 1],
@@ -684,6 +711,10 @@ class OfferController extends Controller
                 ])
                 ->update([
                     'status' => 0,
+                    'approval_status' => 0,
+                    'approved_by' => $processorID,
+                    'approved_at' => date('Y-m-d H:i:s'),
+                    'description' => $newDesc,
                     'updated_at' => date('Y-m-d H:i:s'),
                 ]);
 
@@ -704,9 +735,11 @@ class OfferController extends Controller
 
                     $update = Application::where('offer_id', $offerID)
                     ->update([
-                        'description' => $newDesc,
                         'approval_status' => 0,
-                        'status' => 0,
+                        'approved_by' => $processorID,
+                        'approved_at' => date('Y-m-d H:i:s'),
+                        'description' => $newDesc,
+                        'updated_at' => date('Y-m-d H:i:s'),
                     ]);
 
                     $this->notifyAllUser($offerID);
@@ -821,22 +854,29 @@ class OfferController extends Controller
 
         $offer = Job_Offer::where('job_offers.offer_id', $offerID)
         ->join('jobs', 'jobs.job_id', '=', 'job_offers.job_id')
+        ->join('users as u', 'u.id', '=', 'job_offers.user_id')
+        ->select(
+            'u.username', 
+            'u.email',
+            'job_offers.approved_at',
+            'job_offers.approval_status',
+            'jobs.position',
+            'job_offers.description->reason as reason',
+        )
         ->first();
-        $user = User::where('id', $offer->user_id)->select('username', 'email')->first();
 
-        if($offer->approved_at == null){
-            $offer->approved_at = $offer->updated_at;
+        if($offer->approved_at != null){
+            $approved_at = explode(' ', $offer->approved_at);
+            $offer->approved_at = DateController::parseDate($approved_at[0]) . ' ' . DateController::formatTime($approved_at[1]);
         }
 
-        $approved_at = explode(' ', $offer->approved_at);
-        $offer->approved_at = DateController::parseDate($approved_at[0]) . ' ' . $approved_at[1];
-
-        Mail::to($user->email)->send(new NotifyJoinEmail([
-            'name' => $user->username,
+        Mail::to($offer->email)->send(new NotifyJoinEmail([
+            'name' => $offer->username,
             'subject' => 'pekerjaan',
             'approval' => $offer->approval_status,
             'offer' => $offer->position,
             'datetime' => $offer->approved_at,
+            'reason' => $offer->reason ? $offer->reason : "",
         ]));
     }
 
@@ -845,37 +885,40 @@ class OfferController extends Controller
 
         $users = Application::where([
             ['applications.offer_id', $offerID],
-            ['applications.approval_status', '>', 0],
+            ['applications.approval_status', 0],
             ['applications.status', 1],
         ])
         ->join('poors', 'poors.poor_id', '=', 'applications.poor_id')
         ->join('users', 'users.id', '=', 'poors.user_id')
         ->select(
+            'users.username', 
             'users.email',
-            'users.username',
+            'applications.approved_at',
+            'applications.description->reason as reason',
         )
         ->get();
 
-        $offer = Job_Offer::where('job_offers.offer_id', $offerID)
+        $position = Job_Offer::where('job_offers.offer_id', $offerID)
         ->join('jobs', 'jobs.job_id', '=', 'job_offers.job_id')
-        ->first();
-
-        dd($offer, $users);
-
-        if($offer->approved_at == null){
-            $offer->approved_at = $offer->updated_at;
-        }
-
-        $approved_at = explode(' ', $offer->approved_at);
-        $offer->approved_at = DateController::parseDate($approved_at[0]) . ' ' . $approved_at[1];
+        ->value('jobs.position');
 
         foreach($users as $user){
-            Mail::to($user->email)->send(new NotifyJoinEmail([
+
+            if($user->approved_at != null){
+                $approved_at = explode(' ', $user->approved_at);
+                $datetime = DateController::parseDate($approved_at[0]) . ' ' . DateController::formatTime($approved_at[1]);
+            }
+            else{
+                $datetime = "";
+            }
+
+            Mail::to($user->email)->queue(new NotifyJoinEmail([
                 'name' => $user->username,
                 'subject' => 'pekerjaan',
                 'approval' => 0,
-                'offer' => $offer->position,
-                'datetime' => $offer->approved_at,
+                'offer' => $position,
+                'datetime' => $datetime,
+                'reason' => $user->reason ? $user->reason : "",
             ]));
         }
     }

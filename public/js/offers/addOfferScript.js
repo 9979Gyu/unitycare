@@ -86,8 +86,6 @@ $(document).ready(function(){
         
         var selectedValue = $('#jobType option:selected').val();
 
-        console.log(selectedValue , "!");
-
         $('[data-toggle="tooltip' + selectedValue + '"]').tooltip();
 
         if (selectedValue == 1) {
@@ -129,11 +127,8 @@ $(document).ready(function(){
 
     // Function to pre-set time based on shift
     $("#shiftType").on('change', function(){
-        selectedShift = $("#shiftType option:selected").val();
 
-        // Reset min and max attributes initially
-        $("#start_time").val("");
-        $("#end_time").val("");
+        selectedShift = $("#shiftType option:selected").val();
 
         // is Waktu biasa
         if(selectedShift == 1){

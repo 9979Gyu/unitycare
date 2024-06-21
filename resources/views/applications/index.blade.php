@@ -90,7 +90,7 @@
                 </div>
                 <div class="form-check form-check-inline">
                     <input class="form-check-input" type="radio" name="statusFilter" id="confirmRadio" value="is_selected">
-                    <label class="form-check-label" for="confirm">Telah Terima</label>
+                    <label class="form-check-label" for="confirm">Terima Kerja</label>
                 </div>
                 @if(Auth::user()->roleID == 1)
                     <div class="form-check form-check-inline">

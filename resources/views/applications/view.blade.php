@@ -42,9 +42,9 @@
         <div class="row mb-3">
             <div class="col-sm-6">
                 <select name="jobname" id="jobname" class="form-control select2 ">
-                    <option value="all">Semua Pekerjaan</option>
-                    @foreach($applications as $apps)
-                        <option value="{{ $apps->name }}">{{ $apps->name }}</option>
+                    <!-- <option value="all">Semua Pekerjaan</option> -->
+                    @foreach($applications as $application)
+                        <option value="{{ $application }}">{{ $application }}</option>
                     @endforeach
                 </select>
             </div>
@@ -52,6 +52,21 @@
                 <select name="position" id="position" class="form-control select2">
                     <option value="all">Semua Jawatan</option>
                 </select>
+            </div> 
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label for="startDate">Dari</label>
+                    <input type="date" class="form-control" id="startDate1" name="startDate" placeholder="Dari">
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label for="endDate">Hingga</label>
+                    <input type="date" class="form-control" id="endDate1" name="endDate" placeholder="Hingga">
+                </div>
             </div> 
         </div>
 
@@ -75,7 +90,7 @@
                 </div>
                 <div class="form-check form-check-inline">
                     <input class="form-check-input" type="radio" name="statusFilter" id="confirmRadio" value="is_selected">
-                    <label class="form-check-label" for="confirm">Telah Terima</label>
+                    <label class="form-check-label" for="confirm">Terima Kerja</label>
                 </div>
                 @if(Auth::user()->roleID == 1)
                     <div class="form-check form-check-inline">
@@ -85,6 +100,7 @@
                 @endif
             </div>
             <div class="col">
+                <button class="btn btn-outline-secondary float-end ml-2" type="button" id="resetBtn">Padam</button>
                 <button class="btn btn-outline-primary float-end" type="button" id="excelBtn">Excel</button>
             </div>
         </div>
@@ -184,7 +200,7 @@
 
     <script src="{{ asset('js/general/dateScript.js') }}"></script>
     <script src="{{ asset('js/general/offerScript.js') }}"></script>
-    <script src="{{ asset('js/viewApplicationScript.js') }}"></script>
+    <script src="{{ asset('js/offers/viewApplicationScript.js') }}"></script>
     <script src="{{ asset('js/general/modalScript.js') }}"></script>
 
 

@@ -139,7 +139,7 @@
         <div class="row mb-3">
             <label for="description" class="col-sm-2 col-form-label required">Penerangan Penuh Pekerjaan</label>
             <div class="col-sm-10">
-                <textarea value="{{ old('description') }}" name="description" class="form-control" id="description" placeholder="Kemahiran diperlukan, Peringkat pendidikan" required></textarea>
+                <textarea name="description" class="form-control" id="description" placeholder="Kemahiran diperlukan, Peringkat pendidikan" required>{{ old('description') }}</textarea>
             </div>
         </div>
 
@@ -180,7 +180,7 @@
 
     </form>
 
-    <script src="{{ asset('js/addOfferScript.js') }}"></script>
+    <script src="{{ asset('js/offers/addOfferScript.js') }}"></script>
     <script src="{{ asset('js/general/postcodeScript.js') }}"></script>
     <script src="{{ asset('js/general/dateScript.js') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>

@@ -88,9 +88,9 @@ class ApplicationController extends Controller
                     ->groupBy('j.name')
                     ->orderBy('j.name', 'asc')
                     ->get();
-                    
+
                     // View list of job offer which the application is made
-                    return view('applications.view', compact('roleNo', 'users', 'applications'));
+                    return view('applications.view', compact('roleNo', 'applications', 'users'));
                 }
                 // Is admin or staff
                 else if($roleNo == 1 || $roleNo == 2){

@@ -30,12 +30,7 @@ function getPosition(selectedJob, selectedUser, component){
         success: function(data) {
             $(component).empty();
             
-            if(selectedJob == "all"){
-                $(component).append('<option value="all" selected>Semua Jawatan</option>');
-            }
-            else{
-                $(component).append('<option value="0" selected>Pilih Jawatan</option>');
-            }
+            $(component).append('<option value="all" selected>Semua Jawatan</option>');
 
             data.forEach(function(item){
                 $(component).append('<option value="' + item.job_id + '">' + item.position + '</option>');
@@ -49,17 +44,6 @@ function getPosition(selectedJob, selectedUser, component){
         }
     });
 }
-
-$("#resetBtn").click(function(){
-    $("#organization").prop('selectedIndex', 0).trigger('change');
-    $("#jobname").prop('selectedIndex', 0).trigger('change');
-    $("#job").prop('selectedIndex', 0).trigger('change');
-    $("#position").prop('selectedIndex', 0).trigger('change');
-
-    $('#startDate1').val('');
-    $('#endDate1').val('').trigger('change');
-    $('#allRadio').prop('checked', true).trigger('change');
-});
 
 // Function to display number of offer for each position
 function updateOfferBarChart(selectedUser, selectedPosition, selectedState, startDate, endDate) {
@@ -142,6 +126,10 @@ function updateOfferBarChart(selectedUser, selectedPosition, selectedState, star
 }
 
 function updateParticipantBarChart(selectedUser, selectedPosition, selectedState, startDate, endDate) {
+
+    console.log(selectedUser, selectedPosition, selectedState, startDate, endDate);
+
+
     $.ajax({
         url: '/app-bar-chart', // URL to fetch data from
         type: 'GET',

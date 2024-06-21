@@ -3,15 +3,15 @@ $(document).ready(function() {
 
     // Initialize select2
     $('#organization').select2({
-        placeholder: 'Pilih Pengurus',
+        placeholder: 'Semua Pemohon',
     });
 
     $('#jobname').select2({
-        placeholder: 'Pilih Pekerjaan',
+        placeholder: 'Semua Pekerjaan',
     });
 
     $('#position').select2({
-        placeholder: 'Pilih Jawatan',
+        placeholder: 'Semua Jawatan',
     });
     
     // Define and declare variables
@@ -21,14 +21,11 @@ $(document).ready(function() {
     var selectedJob = "all";
     var selectedPosition = "all";
     var status = 1;
-    var roleID = $("#roleID").val();
     var isSelected = 1;
 
     $("#organization").change(function(){
         // set value
         selectedUser = $("#organization option:selected").val();
-        // get job list for dropdown
-        getJob(selectedUser, "#jobname");
         fetch_data(selectedUser, selectedPosition, selectedState, status, isSelected);
     });
 
@@ -223,6 +220,14 @@ $(document).ready(function() {
             
         });
     }
+
+    $("#resetBtn").click(function(){
+        $("#organization").trigger('change');
+        $("#jobname").trigger('change');
+
+        $('#startDate1').val('');
+        $('#endDate1').val('').trigger('change');
+    });
 
     // csrf token for ajax
     $.ajaxSetup({
