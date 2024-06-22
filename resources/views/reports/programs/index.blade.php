@@ -228,14 +228,14 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="boostModalLabel">Meningkatkan Program</h5>
+                    <h5 class="modal-title" id="boostModalLabel">Mempromosi Program</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    Adakah anda pasti untuk meningkatkan program?
+                    Adakah anda pasti untuk mempromosikan program?
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" id="boost">Galak</button>
+                    <button type="button" class="btn btn-danger" id="boost">Hantar</button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
                 </div>
             </div>

@@ -398,29 +398,28 @@ $(document).ready(function() {
         });
     });
 
-    $(document).on('click', '.dismissAnchor', function() {
+    // Function to approve program
+    $(document).on('click', '.boostAnchor', function() {
         selectedID = $(this).attr('id');
     });
 
-    $('#dismiss').click(function() {
-        if (selectedID) {
-            $.ajax({
-                type: 'POST',
-                dataType: 'html',
-                url: "/dismissoffer",
-                data: { offerID : selectedID },
-                success: function(data) {
-                    $('#dismissModal').modal('hide');
-                    $('.condition-message').html(data);
-                    
-                    updateCardContainer();
+    $('#boost').click(function() {
+        
+        $.ajax({
+            type: 'POST',
+            dataType: 'html',
+            url: "/boostOffer",
+            data: { offerID : selectedID },
+            success: function(data) {
+                $('#boostModal').modal('hide');
+                $('.condition-message').html(data);
 
-                },
-                error: function (data) {
-                    $('.condition-message').html(data);
-                }
-            })
-        }
+                requestTable.ajax.reload();
+            },
+            error: function (data) {
+                $('.condition-message').html(data);
+            }
+        });
     });
 
 });

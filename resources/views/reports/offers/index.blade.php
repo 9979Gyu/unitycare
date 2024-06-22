@@ -157,7 +157,7 @@
                                 <th>Tarikh</th>
                                 <th>Masa</th>
                                 <th>Purata Gaji</th>
-                                <th>Pekerja Diperlukan</th>
+                                <th>Pekerja Diperlukan (terima/perlu)</th>
                                 <th>Penerangan</th>
                                 <th>Pengurus</th>
                                 <th>Status</th>
@@ -250,6 +250,25 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger" id="delete">Padam</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Boost Modal -->
+    <div class="modal fade" id="boostModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="boostModalLabel">Mempromosi Pekerjaan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Adakah anda pasti untuk mempromosikan pekerjaan?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="boost">Hantar</button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
                 </div>
             </div>

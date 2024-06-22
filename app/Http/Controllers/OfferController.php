@@ -318,6 +318,9 @@ class OfferController extends Controller
                             $btn .= '<a href="/editoffer/' . $row->offer_id . '"><span class="btn btn-warning m-1"> Kemaskini </span></a>';
                             $btn .= '</div>';
                         }
+                        elseif($row->is_full == false){
+                            $btn .= '<a class="boostAnchor" href="#" id="' . $row->offer_id . '"><span class="btn btn-warning m-1" data-bs-toggle="modal" data-bs-target="#boostModal"> Galak </span></a>';
+                        }
                     }
                 }
 
@@ -1052,6 +1055,26 @@ class OfferController extends Controller
             'labels' => $num->pluck('labels'),
             'data' => $num->pluck('data'),
         ]);
+    }
+
+    // Function to update offer updated date time to promote it
+    public function boostOffer(Request $request){
+        $offerID = $request->get('offerID');
+
+        if(isset($offerID)){
+            Job_Offer::where([
+                ['offer_id', $offerID],
+                ['status', 1],
+                ['approval_status', 2],
+            ])
+            ->update([
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
+
+            return redirect('/viewoffer')->with('success', 'Data berjaya dikemaskini');
+        }
+
+        return redirect()->back()->withErrors(['message' => "Data tidak berjaya dikemaskini"]);
     }
 
 }

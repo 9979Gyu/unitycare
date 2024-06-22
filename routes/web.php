@@ -139,6 +139,9 @@ Route::post('/approval', [OfferController::class, 'updateApproval']);
 Route::post('/deleteoffer', [OfferController::class, 'destroy']);
 Route::get('/getUpdatedOffers', [OfferController::class, 'getUpdatedOffers']);
 
+Route::post('/boostOffer', [OfferController::class, 'boostOffer']);
+
+
 // Application
 Route::get('/joinoffer/{id}', [ApplicationController::class, 'create']);
 Route::post('/dismissoffer', [ApplicationController::class, 'dismiss']);
