@@ -99,6 +99,7 @@ class ParticipantController extends Controller
             $userID = Auth::user()->id;
 
             $type = $request->query('type', 'true');
+            $action = $request->query('action', 'view');
 
             $program = Program::with('organization')
             ->where([
@@ -146,7 +147,8 @@ class ParticipantController extends Controller
             $volRemain = $volLimit->programSpecs[0]->qty_limit - $volLimit->programSpecs[0]->qty_enrolled;
             $poorRemain = $poorLimit->programSpecs[0]->qty_limit - $poorLimit->programSpecs[0]->qty_enrolled;
 
-            return view('participants.add', compact('program', 'volLimit', 'poorLimit', 'volRemain', 'poorRemain', 'participantExist', 'roleID', 'userID', 'type'));
+            return view('participants.add', compact('program', 'volLimit', 'poorLimit', 'volRemain', 'poorRemain', 
+            'participantExist', 'roleID', 'userID', 'type', 'action'));
             
         }
 

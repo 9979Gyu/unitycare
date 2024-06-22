@@ -58,6 +58,7 @@ $(document).ready(function() {
 
         var userID = $("#uid").val();
         var roleID = $("#roleID").val();
+        var enrolledPrograms = [];
 
         $.ajax({
             type: 'GET',
@@ -75,10 +76,14 @@ $(document).ready(function() {
                 var volChecked = $('#voluntaryCheckBox').is(':checked');
                 var skillDevChecked = $('#skillDevCheckBox').is(':checked');
 
-                var enrolledPrograms = $.map(data.enrolled, function(el) {
+                enrolledPrograms = $.map(data.enrolled, function(el) {
                     return {
                         pid: el.pid,
-                        participant_id: el.participant_id
+                        participant_id: el.participant_id,
+                        startDate: el.start_date,
+                        startTime: el.start_time,
+                        endDate: el.end_date,
+                        endTime: el.end_time
                     };
                 });
 
@@ -90,47 +95,49 @@ $(document).ready(function() {
                     
                     if((!keyword || matchesKeyword(program, keyword)) && (!selectedCityState || matchesCityState(program, selectedCityState))){
 
-                        var button;
+                        var button = '';
+                        var canApply = true;
 
-                        button = '<a class="viewAnchor btn btn-info m-2" href="/joinprogram/' + program.program_id + '">' +
+                        for(var i=0; i<enrolledPrograms.length; i++){
+                            var result = doDatesOverlap(program.start_date, program.start_time, 
+                                program.end_date, program.end_time,
+                                enrolledPrograms[i].startDate, enrolledPrograms[i].startTime, 
+                                enrolledPrograms[i].endDate, enrolledPrograms[i].endTime);
+                            
+                            if(result){
+                                canApply = false;
+                                break;
+                            }
+                        }
+
+                        if(canApply){
+                            button += '<a class="applyAnchor btn btn-success" href="/joinprogram/' + program.program_id + '?action=apply">' +
+                            '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-person-plus-fill" viewBox="0 0 16 16">' +
+                            '<path d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>' +
+                            '<path fill-rule="evenodd" d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5"/>' +
+                            '</svg> Mohon</a>';
+                        }
+                        else if(program.program_id === enrolledPrograms[i].pid){
+                            button += '<a class="viewAnchor btn btn-info m-2" href="/joinprogram/' + program.program_id + '">' +
                             '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">' +
                             '<path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>' +
                             '</svg> Lihat </a>';
 
-                        if(enrolledPrograms.length == 0){
-                            if(program.close_date >= todayDate() && program.user_id != userID && roleID != 3){
-                                button += '<a class="applyAnchor btn btn-success" href="/joinprogram/' + program.program_id + '">' +
-                                '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-person-plus-fill" viewBox="0 0 16 16">' +
-                                '<path d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>' +
-                                '<path fill-rule="evenodd" d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5"/>' +
-                                '</svg> Mohon</a>';
-                            }
+                            button += '<a class="dismissAnchor btn btn-danger" href="#" id="' + enrolledPrograms[i].participant_id + '" data-bs-toggle="modal" data-bs-target="#dismissModal">' +
+                            '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-person-dash-fill" viewBox="0 0 16 16">' +
+                            '<path fill-rule="evenodd" d="M11 7.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5"/>' +
+                            '<path d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>' +
+                            '</svg> Tarik Diri</a>';
                         }
-
-                        for (var i = 0; i < enrolledPrograms.length; i++) {
-                            // If contain same program id, means user already enrolled
-                            if (program.program_id === enrolledPrograms[i].pid) {
-                                button += '<a class="dismissAnchor btn btn-danger" href="#" id="' + enrolledPrograms[i].participant_id + '" data-bs-toggle="modal" data-bs-target="#dismissModal">' +
-                                '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-person-dash-fill" viewBox="0 0 16 16">' +
-                                '<path fill-rule="evenodd" d="M11 7.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5"/>' +
-                                '<path d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>' +
-                                '</svg> Tarik Diri</a>';
-                            }
-                            else{
-                                if(program.close_date >= todayDate() && program.user_id != userID && roleID != 3){
-                                    button += '<a class="applyAnchor btn btn-success" href="/joinprogram/' + program.program_id + '">' +
-                                    '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-person-plus-fill" viewBox="0 0 16 16">' +
-                                    '<path d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>' +
-                                    '<path fill-rule="evenodd" d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5"/>' +
-                                    '</svg> Mohon</a>';
-                                }
-                            }
+                        else{
+                            button += '<a class="viewAnchor btn btn-info m-2" href="/joinprogram/' + program.program_id + '">' +
+                            '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">' +
+                            '<path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>' +
+                            '</svg> Lihat </a>';
                         }
-
-                        
 
                         if((volChecked && program.type_id == 1) || (skillDevChecked && program.type_id == 2) || (!volChecked && !skillDevChecked)){
-                            if(program.approved_status == 2 && program.status == 1){
+                            if(program.approved_status == 2 && program.status == 1 && program.user_id != userID && roleID != 3){
                                 $(".card-container").append(
                                     '<div class="card" id="' + program.program_id + '">' +
                                         '<div class="card-header bg-primary text-white">' + program.typename + '</div>' +
@@ -157,6 +164,17 @@ $(document).ready(function() {
                 $('.condition-message').html(data);
             }
         });
+
+        // If the program time is crash
+        function doDatesOverlap(start_date1, start_time1, end_date1, end_time1, start_date2, start_time2, end_date2, end_time2) {
+
+            var startDateTime1 = new Date(start_date1 + ' ' + start_time1);
+            var endDateTime1 = new Date(end_date1 + ' ' + end_time1);
+            var startDateTime2 = new Date(start_date2 + ' ' + start_time2);
+            var endDateTime2 = new Date(end_date2 + ' ' + end_time2);
+
+            return (startDateTime1 < endDateTime2 && endDateTime1 > startDateTime2);
+        }
 
         function matchesKeyword(program, keyword) {
             return program.venue.toLowerCase().includes(keyword) ||

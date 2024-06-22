@@ -94,17 +94,17 @@
                     <input type="number" name="programID" value="{{ $program->program_id }}" hidden>
                     <td colspan="3">
                         <!-- Did not apply, close date not reach, is not creator, is not enterprise -->
-                        @if($participantExist == 0 && $program->close_date >= today() && $program->user_id != $userID && $roleID != 3 && $type == 'true')
+                        @if($action == "apply" || $participantExist == 0)
+                            @if($program->close_date >= today() && $program->user_id != $userID && $roleID != 3 && $type == 'true')
+                                <!-- is poor, can be perserta -->
+                                @if($poorRemain > 0 && $roleID == 5)
+                                    <button type="submit" class="btn btn-success" name="button_id" value="3"><b>Jadi Peserta</b></button>
+                                @endif
 
-                            <!-- is poor, can be perserta -->
-                            @if($poorRemain > 0 && $roleID == 5)
-                                <button type="submit" class="btn btn-success" name="button_id" value="3"><b>Jadi Peserta</b></button>
+                                @if($volRemain > 0)
+                                    <button type="submit" class="btn btn-info" name="button_id" value="2"><b>Jadi Sukarelawan</b></button>
+                                @endif
                             @endif
-
-                            @if($volRemain > 0)
-                                <button type="submit" class="btn btn-info" name="button_id" value="2"><b>Jadi Sukarelawan</b></button>
-                            @endif
-
                         @endif
 
                         @if($type == 'true')

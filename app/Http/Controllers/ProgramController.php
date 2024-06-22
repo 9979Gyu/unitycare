@@ -390,16 +390,24 @@ class ProgramController extends Controller
         ->get();
 
         $enrolled = Participant::where([
-            ['user_id', $userID],
-            ['status', 1]
+            ['participants.user_id', $userID],
+            ['participants.status', 1]
         ])
-        ->select('program_id as pid', 'participant_id')
+        ->join('programs as p', 'p.program_id', '=', 'participants.program_id')
+        ->select(
+            'participants.program_id as pid', 
+            'participants.participant_id',
+            'p.start_date',
+            'p.start_time',
+            'p.end_date',
+            'p.end_time',
+        )
         ->get();
 
         return response()->json([
             'activePrograms' => $activePrograms,
             'enrolled' => $enrolled
-        ]);        
+        ]);
     }
 
     // Function to update program status to 0

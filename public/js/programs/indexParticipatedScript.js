@@ -179,7 +179,7 @@ $(document).ready(function() {
                 data: 'start',
                 name: 'start_datetime',
                 orderable: true,
-                searchable: true
+                searchable: true,
             }, {
                 data: 'end',
                 name: 'end_datetime',
