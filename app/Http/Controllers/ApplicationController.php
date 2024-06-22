@@ -341,6 +341,7 @@ class ApplicationController extends Controller
             $user = Auth::user();
 
             $type = $request->query('type', 'true');
+            $action = $request->query('action', 'true');
 
             $offer = Job_Offer::where([
                 ['offer_id', $id],
@@ -390,7 +391,7 @@ class ApplicationController extends Controller
 
             // dd($applicationExist);
     
-            return view('applications.add', compact('offer', 'applied', 'approval', 'user', 'type'));
+            return view('applications.add', compact('offer', 'applied', 'approval', 'user', 'type', 'action'));
         }
 
         return redirect('/login')->withErrors(['message' => 'Anda tidak dibenarkan untuk melayari halaman ini']);

@@ -302,24 +302,13 @@ $(document).ready(function() {
                 $(".card-container").empty();
 
                 // No job exist
-                if (data.canApply.length == 0) {
+                if (data.allOffers.length == 0) {
                     $(".card-container").append("<div class='m-2'>Tiada rekod berkenaan</div>");
                 }
 
                 // Get the value of the input box and selected option
                 var keyword = $('#keyword').val();
                 var citystate = $('#citystate option:selected').val();
-
-                var enrolled = $.map(data.enrolledOffers, function(el) { 
-                    return { 
-                        oid: el.oid, 
-                        approval_status: el.approval_status, 
-                        reason: el.reason, 
-                        description: el.description, 
-                        is_selected: el.is_selected,
-                        status: el.status, 
-                    }; 
-                });
 
                 $.each(data.allOffers, function(index, offer){
 
@@ -334,27 +323,26 @@ $(document).ready(function() {
                         // User is B40/OKU and job offer is approved by staff
                         if(roleID == 5 && offer.approval_status == 2){
 
-                            var button;
+                            var button = '';
                             var approvalText = ''; // store the text of approval
                             var approvalColor = ''; // store the color of approval text
                             var reasonAdd = '';
 
                             minsal = numberWithCommas(offer.min_salary);
                             maxsal = numberWithCommas(offer.max_salary);
-    
-                            button = '<a class="viewAnchor btn btn-info m-2" href="/joinoffer/' + offer.offer_id + '">' +
-                                '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">' +
-                                '<path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>' +
-                                '</svg> Lihat </a>';
 
-                            // check if user enroll the offer already
-                            var enrolledOffer = enrolled.find(e => e.oid === offer.offer_id);
+                            // Already apply offer
+                            if(offer.enrolled_approval_status != null){
 
-                            if(enrolledOffer){
+                                button += '<a class="viewAnchor btn btn-info m-2" href="/joinoffer/' + offer.offer_id + '?action=true">' +
+                                    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">' +
+                                    '<path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>' +
+                                    '</svg> Lihat </a>';
 
-                                reasonAdd = "Sebab mohon: " + enrolledOffer.description;
+                                reasonAdd = "Sebab mohon: " + enrolledOffer[offer.offer_id].description;
 
-                                if(enrolledOffer.approval_status == 1){
+                                if(offer.enrolled_approval_status == 1){
+                                    
                                     button += '<a class="dismissAnchor btn btn-danger" href="#" id="' + offer.offer_id + '" data-bs-toggle="modal" data-bs-target="#dismissModal">' +
                                         '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-person-dash-fill" viewBox="0 0 16 16">' +
                                         '<path fill-rule="evenodd" d="M11 7.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5"/>' +
@@ -362,21 +350,21 @@ $(document).ready(function() {
                                         '</svg> Tarik Diri</a>';
 
                                 }
-                                else if(enrolledOffer.approval_status == 2){
-                                    if(enrolledOffer.is_selected == 1){
+                                else if(offer.enrolled_approval_status == 2){
+                                    if(offer.enrolled_is_selected == 1){
                                         approvalText = "Permohonan Diterima. Sila Membuat Keputusan di Halaman Permohonan";
                                     }
                                     approvalColor = "text-success";
                                 }
                                 else {
-                                    approvalText = "Permohonan Ditolak: " + enrolledOffer.reason;
+                                    approvalText = "Permohonan Ditolak: " + enrolledOffer[offer.offer_id].reason;
                                     approvalColor = "text-danger";
                                 }
 
                             }
                             // Did not enroll
-                            else{
-                                button += '<a class="applyAnchor btn btn-success" href="/joinoffer/' + offer.offer_id + '">' +
+                            else if(offer.crash == false){
+                                button += '<a class="applyAnchor btn btn-success" href="/joinoffer/' + offer.offer_id + '?action=nc1">' +
                                     '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-person-plus-fill" viewBox="0 0 16 16">' +
                                     '<path d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>' +
                                     '<path fill-rule="evenodd" d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5"/>' +

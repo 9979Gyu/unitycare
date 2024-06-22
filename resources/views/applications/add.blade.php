@@ -83,9 +83,9 @@
             <tr>
                 <th scope="row">Pilihan</th>
                 <td colspan="3">
-                    @if($user->roleID == 5)
+                    @if($user->roleID == 5 && $offer->user_id != $user->id)
                         <!-- is not creator and not yet apply -->
-                        @if($offer->user_id != $user->id && $applied == 0)
+                        @if($action="nc1" || $applied == 0)
                             <button type="button" class="btn btn-success" name="apply" id="apply" value="mohon"><b>Mohon</b></button>
                         <!-- applied and approved -->
                         @elseif($applied > 0)

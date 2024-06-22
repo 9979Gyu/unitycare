@@ -757,16 +757,31 @@ class OfferController extends Controller
 
     }
 
-    // to check time crash
-    public function doDatesOverlap($start_date1, $start_time1, $end_date1, $end_time1, 
-        $start_date2, $start_time2, $end_date2, $end_time2) {
+    private function isDateTimeClash($offer1, $offer2) {
+        $start1 = $offer1->start_date . ' ' . $offer1->start_time;
+        $end1 = $offer1->end_date . ' ' . $offer1->end_time;
+        $start2 = $offer2->start_date . ' ' . $offer2->start_time;
+        $end2 = $offer2->end_date . ' ' . $offer2->end_time;
+    
+        // Check if there is an overlap in datetime
+        return !(strtotime($end1) <= strtotime($start2) || strtotime($end2) <= strtotime($start1));
+    }
 
-        $startDateTime1 = $start_date1 + ' ' + $start_time1;
-        $endDateTime1 = $end_date1 + ' ' + $end_time1;
-        $startDateTime2 = $start_date2 + ' ' + $start_time2;
-        $endDateTime2 = $end_date2 + ' ' + $end_time2;
-
-        return ($startDateTime1 < $endDateTime2 && $endDateTime1 > $startDateTime2);
+    private function checkDateTimeClash($currentOffer, $enrolledOffers) {
+        foreach ($enrolledOffers as $enrolledOffer) {
+            // Skip self-comparison
+            if ($currentOffer->offer_id == $enrolledOffer->oid) {
+                continue;
+            }
+    
+            // Check for datetime clash
+            if ($this->isDateTimeClash($currentOffer, $enrolledOffer)) {
+                // Clash found
+                return true; 
+            }
+        }
+    
+        return false;
     }
 
     // Function to get list of job offers
@@ -781,7 +796,6 @@ class OfferController extends Controller
         $allOffers = Job_Offer::where([
             ['job_offers.status', 1],
             ['job_offers.approval_status', 2],
-            ['job_offers.is_full', 0],
         ])
         ->join('users as u', 'u.id', '=', 'job_offers.user_id')
         ->join('job_types as jt', 'jt.job_type_id', '=', 'job_offers.job_type_id')
@@ -823,43 +837,26 @@ class OfferController extends Controller
             'jo.start_time',
             'jo.end_time',
         )
-        ->get();
-        
-        $canApply = [];
-        $enrolledOfferIds = $enrolledOffers->pluck('oid')->toArray();
+        ->get()
+        ->keyBy('oid');
 
-        foreach($allOffers as $offer){
-            //$offer->offer_id exists in enrolled offers and is not Sepenuh Masa
-            if (in_array($offer->offer_id, $enrolledOfferIds) && $offer->job_type_id != 1) {
-                $isCrashed = false;
-
-                // check if enrolled offers datetime crash with other offers
-                foreach($enrolledOffers as $enrolled){
-                    // Skip self-comparison
-                    if($enrolled->oid == $offer->offer_id){
-                        continue;
-                    }
-
-                    $isOverlap = doDatesOverlap(
-                        $offer->start_date, $offer->start_time, $offer->end_date, $offer->end_time, 
-                        $enrolled->start_date, $enrolled->start_time, $enrolled->end_date, $enrolled->end_time
-                    );
-
-                    if($isOverlap){
-                        $isCrashed = true;
-                        break;
-                    }
-                }
-
-                if(!$isCrashed){
-                    $canApply[] = $offer;
-                }
-
+        foreach ($allOffers as &$offer) {
+            // Add enrolled offer attributes if exists
+            if ($enrolledOffer = $enrolledOffers[$offer->offer_id] ?? null) {
+                $offer->enrolled_approval_status = $enrolledOffer->approval_status;
+                $offer->enrolled_is_selected = $enrolledOffer->is_selected;
+            } 
+            else {
+                $offer->enrolled_approval_status = null;
+                $offer->enrolled_is_selected = null;
             }
+        
+            // Check for datetime clashes with other offers
+            $offer->crash = $this->checkDateTimeClash($offer, $enrolledOffers);
         }
 
         return response()->json([
-            'canApply' => $canApply,
+            'allOffers' => $allOffers,
             'enrolledOffers' => $enrolledOffers
         ]);
     }

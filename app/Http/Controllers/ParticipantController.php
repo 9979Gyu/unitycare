@@ -99,7 +99,7 @@ class ParticipantController extends Controller
             $userID = Auth::user()->id;
 
             $type = $request->query('type', 'true');
-            $action = $request->query('action', 'view');
+            $action = $request->query('action', 'true');
 
             $program = Program::with('organization')
             ->where([
