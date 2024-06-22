@@ -768,6 +768,7 @@ class OfferController extends Controller
 
         $allOffers = Job_Offer::where([
             ['job_offers.status', 1],
+            ['job_offers.is_full', 0],
         ])
         ->join('users as u', 'u.id', '=', 'job_offers.user_id')
         ->join('job_types as jt', 'jt.job_type_id', '=', 'job_offers.job_type_id')

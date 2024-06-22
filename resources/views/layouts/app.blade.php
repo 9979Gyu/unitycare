@@ -108,6 +108,8 @@
         </div>
     </div>
 
+    <script src="{{ asset('js/logout.js') }}"></script>
+
     <script type="text/javascript">
         $(document).ready(function(){
 

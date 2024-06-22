@@ -325,7 +325,7 @@ $(document).ready(function() {
 
                     if(
                         (!keyword || matchesKeyword(offer, keyword)) && 
-                        (!citystate || matchesCityState(offer, citystate) && !offer.is_full)
+                        (!citystate || matchesCityState(offer, citystate))
                     ){
                     
                         // User is B40/OKU and job offer is approved by staff
@@ -396,7 +396,6 @@ $(document).ready(function() {
                                     '</div>' +
                                 '</div><br>'
                             );
-
                         }
 
                     }
