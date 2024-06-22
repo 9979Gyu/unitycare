@@ -63,7 +63,7 @@
 
     <div class="row md-3">
         <div class="col-sm-6">
-            <label for="jobType" class="col-form-label required">Jenis Pekerjaan</label>
+            <label for="jobType" class="col-form-label">Jenis Pekerjaan</label>
             <select name="jobType" id="jobType" class="form-control">
                 <option value="all" selected>Semua Jenis (Sepenuh Masa, Sambilan...)</option>
                 @foreach($jobTypes as $jobType)
@@ -73,7 +73,7 @@
         </div>
 
         <div class="col-sm-6">
-            <label for="shiftType" class="col-form-label required">Jadual Pekerjaan (Shift)</label>
+            <label for="shiftType" class="col-form-label">Jadual Pekerjaan (Shift)</label>
             <select name="shiftType" id="shiftType" class="form-control">
                 <option value="all" selected>Semua Syif</option>    
                 @foreach($shiftTypes as $shiftType)

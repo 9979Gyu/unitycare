@@ -1,13 +1,3 @@
-<!-- <div class="container-fluid d-flex align-items-center ">
-    <div class="flex-shrink-0">
-        <img src="{{ asset('images/webicon-512px.png') }}" alt="Gambar Aplikasi" class="img-fluid">
-    </div>
-    <div class="flex-grow-1">
-        <h1>UNITY CARE</h1>
-        <span>PEMBANGUNAN MASYARAKAT</span>
-    </div>
-</div> -->
-
 <nav class="navbar navbar-expand-lg navbar-dark navCustom">
 
     <div class="container-fluid">
@@ -113,6 +103,19 @@
                             @endif
                         </ul>
                     </li>
+
+                    @if(Auth::user()->roleID == 1 || Auth::user()->roleID == 2)
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <b>Laporan</b>
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="/indexparticipant"><b>Pekerjaan</b></a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="/viewoffer"><b>Program</b></a></li>
+                            </ul>
+                        </li>
+                    @endif
                 @endif
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
