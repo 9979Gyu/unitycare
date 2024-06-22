@@ -235,6 +235,32 @@ $(document).ready(function() {
         }
     });
 
+    $(document).on('click', '.deleteAnchor', function() {
+        selectedID = $(this).attr('id');
+    });
+
+    $('#delete').click(function() {
+        if (selectedID) {
+            $.ajax({
+                type: 'POST',
+                dataType: 'html',
+                url: "/deleteparticipant",
+                data: { 
+                    selectedID : selectedID,
+                },
+                success: function(data) {
+                    $('#deleteModal').modal('hide');
+                    $('.condition-message').html("Berjaya padam data");
+                    requestParticipatedTable.ajax.reload();
+
+                },
+                error: function (data) {
+                    $('.condition-message').html(data);
+                }
+            })
+        }
+    });
+
     // csrf token for ajax
     $.ajaxSetup({
         headers: {

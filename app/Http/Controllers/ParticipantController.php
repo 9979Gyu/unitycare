@@ -226,6 +226,24 @@ class ParticipantController extends Controller
         return redirect()->back()->withErrors(["message" => "Tidak berjaya dipadam"]);
     }
 
+    // Function to update program status to 0
+    public function destroy(Request $request){
+
+        $partID = $request->get('selectedID');
+
+        $result = Participant::where('participant_id', $partID)
+            ->update([
+                'status' => 0,
+            ]);
+
+        if($result){
+            return response()->json(['message' => 'Berjaya dipadam']);
+        }
+        else{
+            return redirect()->back()->withErrors(["message" => "Tidak berjaya dipadam"]);
+        }
+    }
+
     // Function to retrieve participants
     public function retrieveParticipants($state, $userID, $programID, $startDate, $endDate){
 
@@ -450,8 +468,11 @@ class ParticipantController extends Controller
                 $btn .= '<a href="/joinprogram/' . $row->program_id . '?type=sertai"><span class="btn btn-primary"> Lihat </span></a>';
 
                 // Can remove participant if is admin or staff
-                if((Auth::user()->roleID == 1 || $row->joined_user_id == $userID) && $row->status == 1 && $row->close_date >= $now){
-                    $btn .= '<a class="dismissAnchor" href="#" id="' . $row->participant_id . '"><span class="btn btn-danger m-1" data-bs-toggle="modal" data-bs-target="#dismissModal"> Tarik Diri </span></a>';
+                if((Auth::user()->roleID == 1 || $row->joined_user_id == $userID) && $row->status == 1){
+                    if($row->close_date >= $now)
+                        $btn .= '<a class="dismissAnchor" href="#" id="' . $row->participant_id . '"><span class="btn btn-danger m-1" data-bs-toggle="modal" data-bs-target="#dismissModal"> Tarik Diri </span></a>';
+                    elseif($row->end_date < $now)
+                        $btn .= '<a class="deleteAnchor" href="#" id="' . $row->participant_id . '"><span class="btn btn-danger m-1" data-bs-toggle="modal" data-bs-target="#deleteModal"> Padam </span></a>';
                 }
 
                 return $btn;

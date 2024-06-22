@@ -112,6 +112,8 @@ Route::get('/indexparticipant', [ParticipantController::class, 'index']);
 Route::get('/indexparticipated', [ParticipantController::class, 'indexParticipated']);
 Route::get('/getParticipantsDatatable', [ParticipantController::class, 'getParticipantsDatatable']);
 Route::get('/getParticipatedDatatable', [ParticipantController::class, 'getParticipatedDatatable']);
+Route::post('/deleteparticipant', [ParticipantController::class, 'destroy']);
+
 
 // Jobs
 Route::get('/createjob', [JobController::class, 'create']);

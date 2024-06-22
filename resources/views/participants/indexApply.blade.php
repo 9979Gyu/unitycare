@@ -77,16 +77,12 @@
                     <input class="form-check-input" type="radio" name="statusFilter" id="poorRadio" value="3">
                     <label class="form-check-label" for="poor">Peserta</label>
                 </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="statusFilter" id="deleteRadio" value="0">
-                    <label class="form-check-label" for="delete">
-                        @if($roleID == 1)
-                            Dipadam
-                        @else
-                            Luput
-                        @endif
-                    </label>
-                </div>
+                @if($roleID == 1)
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="statusFilter" id="deleteRadio" value="0">
+                        <label class="form-check-label" for="delete">Dipadam</label>
+                    </div> 
+                @endif
             </div>
             <div class="col">
                 <button class="btn btn-outline-secondary float-end ml-2" type="button" id="resetBtn">Padam</button>
@@ -188,6 +184,25 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger" id="dismiss">Tarik Diri</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Modal -->
+    <div class="modal fade" id="deleteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Padam Rekod</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Adakah anda pasti untuk berhenti memadam rekod?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="delete">Padam</button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
                 </div>
             </div>
