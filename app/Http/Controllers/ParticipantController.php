@@ -349,11 +349,12 @@ class ParticipantController extends Controller
             'programs.postal_code',
             'programs.state',
             'programs.city',
+            'programs.close_date',
             't.name as typename',
             'creator.name as creator_name',
             'creator.email as creator_email',
         )
-        ->orderBy("p.created_at", "asc")
+        ->orderBy("p.created_at", "desc")
         ->get();
 
         // Transform the data but keep it as a collection of objects
@@ -441,15 +442,16 @@ class ParticipantController extends Controller
             }
 
             $table = Datatables::of($selectedParticipants);
+            $now = date('Y-m-d');
 
-            $table->addColumn('action', function ($row) use ($userID) {
+            $table->addColumn('action', function ($row) use ($userID, $now) {
                 $token = csrf_token();
                 $btn = '<div class="justify-content-center">';
                 $btn .= '<a href="/joinprogram/' . $row->program_id . '?type=sertai"><span class="btn btn-primary"> Lihat </span></a>';
 
                 // Can remove participant if is admin or staff
-                if((Auth::user()->roleID == 1 || Auth::user()->roleID == 2 || $row->joined_user_id == $userID) && $row->status == 1){
-                    $btn .= '<a class="dismissAnchor" href="#" id="' . $row->participant_id . '"><span class="btn btn-danger m-1" data-bs-toggle="modal" data-bs-target="#dismissModal"> Padam </span></a>';
+                if((Auth::user()->roleID == 1 || $row->joined_user_id == $userID) && $row->status == 1 && $row->close_date >= $now){
+                    $btn .= '<a class="dismissAnchor" href="#" id="' . $row->participant_id . '"><span class="btn btn-danger m-1" data-bs-toggle="modal" data-bs-target="#dismissModal"> Tarik Diri </span></a>';
                 }
 
                 return $btn;
@@ -461,7 +463,7 @@ class ParticipantController extends Controller
     }
 
     // Reuse function for set query for get program participant count
-    public function retrievePartQuery($state, $programID, $userID, $startDate, $endDate){
+    public function retrievePartQuery($state, $programID, $userID, $startDate, $endDate, $types){
         $query = Participant::join('users as joined_users', 'joined_users.id', '=', 'participants.user_id')
         ->join('user_types as ut', 'ut.user_type_id', '=', 'participants.user_type_id')
         ->join('programs as p', 'p.program_id', '=', 'participants.program_id')
@@ -477,6 +479,15 @@ class ParticipantController extends Controller
                 ['participants.created_at', '>=', $startDate],
                 ['participants.created_at', '<=', $endDate],
             ]);
+        }
+
+        if($userID != "all"){
+            if($types == "creator"){
+                $query = $query->where('p.user_id', $userID);
+            }
+            else{
+                $query = $query->where('participants.user_id', $userID);
+            }
         }
 
         if($programID != "all"){
@@ -507,7 +518,7 @@ class ParticipantController extends Controller
 
         if(isset($programID)){
 
-            $query = $this->retrievePartQuery($state, $programID, $userID, $startDate, $endDate);
+            $query = $this->retrievePartQuery($state, $programID, $userID, $startDate, $endDate, "join");
 
             $num = $query->groupBy('ut.name')
             ->selectRaw('ut.name as labels, COUNT(*) as data')
@@ -533,7 +544,100 @@ class ParticipantController extends Controller
 
         if(isset($programID)){
 
-            $query = $this->retrievePartQuery($state, $programID, $userID, $startDate, $endDate);
+            $query = $this->retrievePartQuery($state, $programID, $userID, $startDate, $endDate, "join");
+
+            $num = $query->groupBy('p.name')
+            ->selectRaw('p.name as labels, COUNT(*) as data')
+            ->get();
+
+            return response()->json([
+                'labels' => $num->pluck('labels'),
+                'data' => $num->pluck('data'),
+            ]);
+
+        }
+
+    }
+
+    // Reuse function for set query for get program participant count
+    public function retrieveParticipantQuery($state, $programID, $userID, $startDate, $endDate){
+        $query = Participant::join('users as joined_users', 'joined_users.id', '=', 'participants.user_id')
+        ->join('user_types as ut', 'ut.user_type_id', '=', 'participants.user_type_id')
+        ->join('programs as p', 'p.program_id', '=', 'participants.program_id')
+        ->join('types as t', 't.type_id', '=', 'p.type_id')
+        ->join('users as program_creator', 'program_creator.id', '=', 'p.user_id')
+        ->where([
+            ['p.status', 1],
+            ['p.approved_status', 2],
+        ]);
+
+        if($startDate != null && $endDate != null){
+            $query->where([
+                ['participants.created_at', '>=', $startDate],
+                ['participants.created_at', '<=', $endDate],
+            ]);
+        }
+
+        if($userID != "all"){
+            $query = $query->where('participants.user_id', $userID);
+        }
+
+        if($programID != "all"){
+            $query = $query->where('participants.program_id', $programID);
+        }
+
+        if($state == 0 || $state == 1){
+            $query = $query->where('participants.status', $state);
+        }
+        else{
+            $query = $query->where([
+                ['participants.status', 1],
+                ['participants.user_type_id', $state], 
+            ]);
+        }
+
+        return $query;
+    }
+
+    // Function to display number of participant by user type for active program
+    public function participantTypePieChart(Request $request){
+
+        $state = $request->get('state');
+        $programID = $request->get("programID");
+        $userID = $request->get("userID");
+        $startDate = $request->get("startDate");
+        $endDate = $request->get("endDate");
+
+        if(isset($programID)){
+
+            $query = $this->retrievePartQuery($state, $programID, $userID, $startDate, $endDate, "creator");
+
+            $num = $query->groupBy('ut.name')
+            ->selectRaw('ut.name as labels, COUNT(*) as data')
+            ->get();
+
+
+            return response()->json([
+                'labels' => $num->pluck('labels'),
+                'data' => $num->pluck('data'),
+            ]);
+
+        }
+
+    }
+
+    // Function to display number of participant for active program
+    public function participantBarChart(Request $request){
+
+        $state = $request->get('state');
+        $programID = $request->get("programID");
+        $userID = $request->get("userID");
+        $startDate = $request->get("startDate");
+        $endDate = $request->get("endDate");
+
+        if(isset($programID)){
+
+            $query = $this->retrievePartQuery($state, $programID, $userID, $startDate, $endDate, "creator");
 
             $num = $query->groupBy('p.name')
             ->selectRaw('p.name as labels, COUNT(*) as data')

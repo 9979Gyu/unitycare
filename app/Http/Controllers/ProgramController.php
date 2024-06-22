@@ -35,7 +35,7 @@ class ProgramController extends Controller
     // Function to display view for program based on role
     public function index(){
 
-        $this->updateProgramStatus();
+        // $this->updateProgramStatus();
 
         if(Auth::check()){
 

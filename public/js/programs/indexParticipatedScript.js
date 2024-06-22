@@ -91,6 +91,8 @@ $(document).ready(function() {
 
     function fetch_data(selectedState, selectedUser, selectedProgram, startDate, endDate) {
 
+        console.log(selectedState, selectedUser, selectedProgram, startDate, endDate);
+
         updateProgramBarChart(selectedState, selectedUser, selectedProgram, startDate, endDate);
         updateProgramPieChart(selectedState, selectedUser, selectedProgram, startDate, endDate); 
 
@@ -100,7 +102,6 @@ $(document).ready(function() {
             $('#requestParticipatedTable').DataTable().destroy();
         }
 
-        console.log(selectedState, selectedUser, selectedProgram, startDate, endDate);
         requestParticipatedTable = $('#requestParticipatedTable').DataTable({
             language: {
                 "sEmptyTable":     "Tiada data tersedia dalam jadual",

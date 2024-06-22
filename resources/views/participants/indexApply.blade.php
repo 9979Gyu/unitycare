@@ -77,12 +77,16 @@
                     <input class="form-check-input" type="radio" name="statusFilter" id="poorRadio" value="3">
                     <label class="form-check-label" for="poor">Peserta</label>
                 </div>
-                @if(Auth::user()->roleID == 1)
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="statusFilter" id="deleteRadio" value="0">
-                        <label class="form-check-label" for="delete">Dipadam</label>
-                    </div>
-                @endif
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="statusFilter" id="deleteRadio" value="0">
+                    <label class="form-check-label" for="delete">
+                        @if($roleID == 1)
+                            Dipadam
+                        @else
+                            Luput
+                        @endif
+                    </label>
+                </div>
             </div>
             <div class="col">
                 <button class="btn btn-outline-secondary float-end ml-2" type="button" id="resetBtn">Padam</button>

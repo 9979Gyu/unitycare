@@ -46,6 +46,7 @@ $(document).ready(function() {
     });
 
     $("#startDate1, #endDate1").change(function(){
+
         startDate = $("#startDate1").val();
         endDate = $("#endDate1").val();
         if(endDate == ""){
@@ -55,9 +56,6 @@ $(document).ready(function() {
         // Fetch data based on the selected position
         fetch_data(selectedState, selectedUser, selectedProgram, startDate, endDate);
     });
-
-    $("#organization").prop('selectedIndex', 0).trigger('change');
-    $("#program").prop('selectedIndex', 0);
     
     $("#program").on('change', function(){
         // Get the selected program
@@ -85,10 +83,15 @@ $(document).ready(function() {
         fetch_data(selectedState, selectedUser, selectedProgram, startDate, endDate);
     });
 
+
+    $("#organization").prop('selectedIndex', 0).trigger('change');
+    $("#program").prop('selectedIndex', 0);
+
+
     function fetch_data(selectedState, selectedUser, selectedProgram, startDate, endDate) {
 
-        updateProgramBarChart(selectedState, selectedUser, selectedProgram, startDate, endDate);
-        updateProgramPieChart(selectedState, selectedUser, selectedProgram, startDate, endDate); 
+        updateParticipantPieChart(selectedState, selectedUser, selectedProgram, startDate, endDate); 
+        updateParticipantBarChart(selectedState, selectedUser, selectedProgram, startDate, endDate);
 
         // Make AJAX request to fetch data based on the selected program
         if ($.fn.DataTable.isDataTable('#requestParticipantTable')) {
