@@ -32,8 +32,28 @@ class OfferController extends Controller
             // if is B40 / OKU
             if($roleID == 5){
 
+                $jobTypes = Job_Type::where('status', 1)
+                ->whereHas('jobOffers', function ($query) {
+                    $query->where([
+                        ['approval_status', 2],
+                        ['status', 1],
+                    ]);
+                })
+                ->select('job_type_id', 'name', 'description')
+                ->get();
+
+                $shiftTypes = Shift_Type::where('status', 1)
+                ->whereHas('jobOffers', function ($query) {
+                    $query->where([
+                        ['approval_status', 2],
+                        ['status', 1],
+                    ]);
+                })
+                ->select('shift_type_id', 'name', 'description')
+                ->get();
+
                 // Display view offer in card container
-                return view('offers.view', compact('userID', 'roleID'));
+                return view('offers.view', compact('userID', 'roleID', 'jobTypes', 'shiftTypes'));
 
             }
             // is admin, staff or enterprise
@@ -46,7 +66,6 @@ class OfferController extends Controller
                     ->get();
                 }
                 else{
-
                     // Get the list of user created offer
                     $users = User::where('users.status', 1)
                     ->join('job_offers as jo', 'jo.user_id', 'users.id')
@@ -836,15 +855,23 @@ class OfferController extends Controller
             'jo.end_date',
             'jo.start_time',
             'jo.end_time',
+            'jo.job_type_id',
         )
         ->get()
         ->keyBy('oid');
+
+        $alwaysNo = false;
 
         foreach ($allOffers as &$offer) {
             // Add enrolled offer attributes if exists
             if ($enrolledOffer = $enrolledOffers[$offer->offer_id] ?? null) {
                 $offer->enrolled_approval_status = $enrolledOffer->approval_status;
                 $offer->enrolled_is_selected = $enrolledOffer->is_selected;
+
+                // If it is Sepenuh Masa job
+                if ($enrolledOffer->job_type_id == 1 && $enrolledOffer->is_selected == 2) {
+                    $alwaysNo = true;
+                }
             } 
             else {
                 $offer->enrolled_approval_status = null;
@@ -857,7 +884,8 @@ class OfferController extends Controller
 
         return response()->json([
             'allOffers' => $allOffers,
-            'enrolledOffers' => $enrolledOffers
+            'enrolledOffers' => $enrolledOffers,
+            'alwaysNo' => $alwaysNo,
         ]);
     }
 

@@ -37,8 +37,7 @@
             <div class="col-lg-8 col-md-10 col-12 search-bar">
                 <div class="input-group-prepend tooltip-container m-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-briefcase-fill" viewBox="0 0 16 16" data-bs-toggle="tooltip" data-placement="top"
-                        title="Nama Pekerjaan atau Penganjur (Contoh: Kerjaya)
-                        Tarikh Mula (Contoh: 24-06-2023)">
+                        title="Nama Pekerjaan atau Penganjur (Contoh: Kerjaya)">
                         <path d="M6.5 1A1.5 1.5 0 0 0 5 2.5V3H1.5A1.5 1.5 0 0 0 0 4.5v1.384l7.614 2.03a1.5 1.5 0 0 0 .772 0L16 5.884V4.5A1.5 1.5 0 0 0 14.5 3H11v-.5A1.5 1.5 0 0 0 9.5 1zm0 1h3a.5.5 0 0 1 .5.5V3H6v-.5a.5.5 0 0 1 .5-.5"/>
                         <path d="M0 12.5A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5V6.85L8.129 8.947a.5.5 0 0 1-.258 0L0 6.85z"/>
                     </svg>
@@ -58,6 +57,31 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <br>
+
+    <div class="row md-3">
+        <div class="col-sm-6">
+            <label for="jobType" class="col-form-label required">Jenis Pekerjaan</label>
+            <select name="jobType" id="jobType" class="form-control">
+                <option value="all" selected>Semua Jenis (Sepenuh Masa, Sambilan...)</option>
+                @foreach($jobTypes as $jobType)
+                    <option value="{{ $jobType->job_type_id }}" data-toggle="tooltip{{ $jobType->job_type_id }}" data-placement="top" title="{{ $jobType->description }}">{{ $jobType->name }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        <div class="col-sm-6">
+            <label for="shiftType" class="col-form-label required">Jadual Pekerjaan (Shift)</label>
+            <select name="shiftType" id="shiftType" class="form-control">
+                <option value="all" selected>Semua Syif</option>    
+                @foreach($shiftTypes as $shiftType)
+                    <option value="{{ $shiftType->shift_type_id }}" data-toggle="tooltip{{ $shiftType->shift_type_id }}" data-placement="top" title="{{ $shiftType->description }}">{{ $shiftType->name }}</option>
+                @endforeach
+            </select>
+        </div>
+
     </div>
 
     <br>
@@ -85,7 +109,8 @@
         </div>
     </div>
 
-    <script src="{{ asset('js/reports/indexOfferScript.js') }}"></script>
+    <script src="{{ asset('js/general/offerScript.js') }}"></script>
+    <script src="{{ asset('js/offers/viewOfferScript.js') }}"></script>
     <script src="{{ asset('js/general/dateScript.js') }}"></script>
 
 @endsection
