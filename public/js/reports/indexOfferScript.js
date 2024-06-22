@@ -1,4 +1,7 @@
 $(document).ready(function() {
+        
+    // Initialize Bootstrap tooltip
+    $('[data-bs-toggle="tooltip"]').tooltip();
 
     // Disabled the Tolak button in modal
     $("#decline").prop("disabled", true);
@@ -22,7 +25,7 @@ $(document).ready(function() {
         placeholder: 'Pilih Bandar atau Negeri',
         allowClear: true,
     });
-    
+
     // Define and declare variables
     var requestTable;
     var selectedState = 3;
@@ -299,7 +302,7 @@ $(document).ready(function() {
                 $(".card-container").empty();
 
                 // No job exist
-                if (data.allOffers.length == 0) {
+                if (data.canApply.length == 0) {
                     $(".card-container").append("<div class='m-2'>Tiada rekod berkenaan</div>");
                 }
 

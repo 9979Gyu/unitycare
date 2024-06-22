@@ -757,6 +757,18 @@ class OfferController extends Controller
 
     }
 
+    // to check time crash
+    public function doDatesOverlap($start_date1, $start_time1, $end_date1, $end_time1, 
+        $start_date2, $start_time2, $end_date2, $end_time2) {
+
+        $startDateTime1 = $start_date1 + ' ' + $start_time1;
+        $endDateTime1 = $end_date1 + ' ' + $end_time1;
+        $startDateTime2 = $start_date2 + ' ' + $start_time2;
+        $endDateTime2 = $end_date2 + ' ' + $end_time2;
+
+        return ($startDateTime1 < $endDateTime2 && $endDateTime1 > $startDateTime2);
+    }
+
     // Function to get list of job offers
     public function getUpdatedOffers(){
 
@@ -768,6 +780,7 @@ class OfferController extends Controller
 
         $allOffers = Job_Offer::where([
             ['job_offers.status', 1],
+            ['job_offers.approval_status', 2],
             ['job_offers.is_full', 0],
         ])
         ->join('users as u', 'u.id', '=', 'job_offers.user_id')
@@ -792,6 +805,7 @@ class OfferController extends Controller
 
         $enrolledOffers = Application::join('poors as p', 'p.poor_id', '=', 'applications.poor_id')
         ->join('users as u', 'u.id', '=', 'p.user_id')
+        ->join('job_offers as jo', 'jo.offer_id', '=', 'applications.offer_id')
         ->where([
             ["u.id", $uid],
             ['applications.status', 1],
@@ -804,13 +818,50 @@ class OfferController extends Controller
             'u.id as user_id',
             'applications.is_selected',
             'applications.status',
+            'jo.start_date',
+            'jo.end_date',
+            'jo.start_time',
+            'jo.end_time',
         )
         ->get();
+        
+        $canApply = [];
+        $enrolledOfferIds = $enrolledOffers->pluck('oid')->toArray();
+
+        foreach($allOffers as $offer){
+            //$offer->offer_id exists in enrolled offers and is not Sepenuh Masa
+            if (in_array($offer->offer_id, $enrolledOfferIds) && $offer->job_type_id != 1) {
+                $isCrashed = false;
+
+                // check if enrolled offers datetime crash with other offers
+                foreach($enrolledOffers as $enrolled){
+                    // Skip self-comparison
+                    if($enrolled->oid == $offer->offer_id){
+                        continue;
+                    }
+
+                    $isOverlap = doDatesOverlap(
+                        $offer->start_date, $offer->start_time, $offer->end_date, $offer->end_time, 
+                        $enrolled->start_date, $enrolled->start_time, $enrolled->end_date, $enrolled->end_time
+                    );
+
+                    if($isOverlap){
+                        $isCrashed = true;
+                        break;
+                    }
+                }
+
+                if(!$isCrashed){
+                    $canApply[] = $offer;
+                }
+
+            }
+        }
 
         return response()->json([
-            'allOffers' => $allOffers,
+            'canApply' => $canApply,
             'enrolledOffers' => $enrolledOffers
-        ]);        
+        ]);
     }
 
     // Function to export offers
