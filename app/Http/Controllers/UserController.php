@@ -273,6 +273,7 @@ class UserController extends Controller
                 'ICNo' => $ic,
                 'roleID' => $request->get('roleID'),
                 'remember_token' => Str::random(32),
+                'image' => 'default_image.png',
             ]);
 
             $user->save();
@@ -348,10 +349,14 @@ class UserController extends Controller
             
             $remember_token = Str::random(32);
             $email = Str::lower(trim($request->get('email')));
+            $name = Str::lower(trim($request->get('name')));
 
             $update = User::where('id', $id)->update(['remember_token' => $remember_token]);
 
             if($update){
+
+                $old_user = User::where('id', $id)->select('username', 'email', 'image')->first();
+
                 $data = [
                     'email' => $email,
                     'username' => Str::lower(trim($request->get('username'))),
@@ -365,7 +370,20 @@ class UserController extends Controller
                     'remember_token' => $remember_token,
                 ];
 
-                $old_user = User::where('id', $id)->select('username', 'email')->first();
+                if ($request->hasFile('image')) {
+                    $file = $request->file('image');
+                
+                    // Check if the file upload was successful
+                    if ($file->isValid()) {
+                        $filename = $name . '.' . $file->getClientOriginalExtension();
+                        $file->move(public_path('public/user_images'), $filename);
+                        $data['image'] = $filename;
+                    }
+                } 
+                else {
+                    $data['image'] = $old_user->image;
+                }
+
     
                 Mail::to($old_user->email)->send(new ChangeProfileEmail($data, $remember_token, $old_user->username));
     
@@ -809,6 +827,7 @@ class UserController extends Controller
             $user->postalCode = $data['postalCode'];
             $user->officeNo = $data['officeNo'];
             $user->status = $data['status'];
+            $user->image = $data['image'];
 
             $user->save();
             

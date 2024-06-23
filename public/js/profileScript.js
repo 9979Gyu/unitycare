@@ -1,6 +1,7 @@
 $(document).ready(function() {
     
     $("input").attr("readonly", true);
+    $("#image").attr("readonly", false);
 
     $("#submitBtn").prop('disabled', true);
     $("#submitBtn").hide();
@@ -18,6 +19,22 @@ $(document).ready(function() {
 
         $("#submitBtn").show();
         $("#submitBtn").prop('disabled', false);
+    });
+
+    $("#image").change(function(){
+        var allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        var file = this.files[0];
+
+        if(this.value != null && file != null){
+            if (!allowedTypes.includes(file.type)) {
+                alert('Sila pilih fail imej yang sah (JPEG, PNG, atau GIF).');
+                this.value = '';
+            }
+        }
+        else{
+            this.value = '';
+        }
+
     });
 
 });

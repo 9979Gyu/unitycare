@@ -23,7 +23,7 @@
 
     <br>
 
-    <form action="/updateuser" method="post" class="container" id="profileForm">
+    <form action="/updateuser" method="post" class="container" id="profileForm" enctype="multipart/form-data">
         @csrf
         <div class="mb-3">
             <h5>Maklumat Peribadi</h5>
@@ -32,6 +32,19 @@
             <label for="name" class="col-sm-2 col-form-label required">Nama</label>
             <div class="col-sm-10">
                 <input type="text" name="name" class="form-control" id="name" value="{{ $user->name }}" required>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <label for="name" class="col-sm-2 col-form-label required">Muat Naik Imej</label>
+            <div class="col-sm-4">
+                <input type="file" class="form-control"  name="image" id="image">
+            </div>
+            <div class="col-sm-4">
+                <img src="{{ asset('public/user_images/' . $user->image) }}" style="width:50px;">
+                <span name="currentImage" id="currentImage">
+                    <a href="{{ asset('public/user_images/' . $user->image) }}" target="_blank">{{ $user->image }}</a>
+                </span>
             </div>
         </div>
 
