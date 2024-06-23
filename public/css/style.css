@@ -105,6 +105,13 @@ body{
     width: 50%;
 }
 
+.square-box {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    overflow: hidden;
+}
+
 /* Default styles */
 #poverty-content .justify-content-center {
     display: flex;

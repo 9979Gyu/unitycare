@@ -136,23 +136,30 @@ $(document).ready(function() {
                             '</svg> Lihat </a>';
                         }
 
+                        var img = "public/user_images/" + program.image;
+
                         if((volChecked && program.type_id == 1) || (skillDevChecked && program.type_id == 2) || (!volChecked && !skillDevChecked)){
                             if(program.approved_status == 2 && program.status == 1 && program.user_id != userID && roleID != 3){
                                 $(".card-container").append(
-                                    '<div class="card" id="' + program.program_id + '">' +
+                                    '<div class="card mb-3">' +
                                         '<div class="card-header bg-primary text-white">' + program.typename + '</div>' +
-                                        '<div class="card-body d-flex justify-content-between">' +
-                                            '<div><h5 class="card-title">' + program.name + '</h5>' +
-                                                '<p class="card-text">' + program.venue + ', ' + program.postal_code + 
+                                        '<div class="card-body d-flex justify-content-between flex-wrap">' +
+                                            '<div class="m-3 mb-md-0 d-flex justify-content-center align-items-center">' +
+                                                '<img src="' + img + '" class="img-fluid square-box" alt="Imej Organisasi">' +
+                                            '</div>' +
+                                            '<div class="flex-fill">' +
+                                                '<h5 class="card-title">' + program.name + '</h5>' +
+                                                '<p class="card-text">' + program.venue + ', ' + program.postal_code +
                                                     ', ' + program.city + ', ' + program.state + '</p>' +
                                                 '<p class="card-text">' + program.description + '</p>' +
                                                 '<p class="card-text text-secondary">kemaskini ' + parseDate(program.updated_at) + '</p>' +
                                             '</div>' +
-                                            '<div>' + button + '</div>' +
+                                            '<div class="text-center text-md-right">' +
+                                                button +
+                                            '</div>' +
                                         '</div>' +
-                                    '</div>' + 
-                                    '<br>'
-                                );
+                                    '</div>'
+                                );                                                                
                             }
                         }
 

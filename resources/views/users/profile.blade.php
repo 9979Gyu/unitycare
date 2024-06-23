@@ -41,7 +41,7 @@
                 <input type="file" class="form-control"  name="image" id="image">
             </div>
             <div class="col-sm-4">
-                <img src="{{ asset('public/user_images/' . $user->image) }}" style="width:50px;">
+                <img src="{{ asset('public/user_images/' . $user->image) }}" class="square-box">
                 <span name="currentImage" id="currentImage">
                     <a href="{{ asset('public/user_images/' . $user->image) }}" target="_blank">{{ $user->image }}</a>
                 </span>

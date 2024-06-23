@@ -55,10 +55,12 @@
                     <th scope="row">Tamat</th>
                     <td colspan="3">{{ $program->end_date }} {{ $program->end_time }}</td>
                 </tr>
-                <tr>
-                    <th scope="row">Penerangan</th>
-                    <td colspan="3">{{ $program->description }}</td>
-                </tr>
+                @if (!empty(json_decode($program->description, true)))
+                    <tr>
+                        <th scope="row">Penerangan</th>
+                        <td colspan="3">{!! nl2br(e(json_decode($program->description, true)['desc'])) !!}</td>
+                    </tr>
+                @endif
                 <tr>
                     <th scope="row">Tarikh Tutup Permohonan</th>
                     <td colspan="3">{{ $program->close_date }}</td>

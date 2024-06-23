@@ -140,8 +140,12 @@ $(document).ready(function() {
 
                             $(".card-container").append(
                                 '<div class="card" id="' + offer.offer_id + '">' +
-                                    '<div class="card-body d-flex justify-content-between">' +
-                                        '<div><p class="card-text ' +  approvalColor + '"><b>' + approvalText + '</b></p>' +
+                                    '<div class="card-body d-flex justify-content-between flex-wrap">' +
+                                        '<div class="m-3 mb-md-0 d-flex justify-content-center align-items-center">' +
+                                            '<img src="' + offer.image + '" class="img-fluid square-box" alt="Imej Organisasi">' +
+                                        '</div>' +
+                                        '<div class="flex-fill">' +
+                                            '<p class="card-text ' + approvalColor + '"><b>' + approvalText + '</b></p>' +
                                             '<h4 class="card-title">' + offer.jobposition + '</h4>' +
                                             '<p class="card-text">' + offer.username + '<br>' + offer.venue + ', ' + offer.postal_code + ', ' + offer.city + ', ' + offer.state + '</p>' +
                                             '<p class="card-text badge badge-primary"> RM ' + minsal + ' - RM ' + maxsal + ' sebulan</p>' +
@@ -150,7 +154,7 @@ $(document).ready(function() {
                                             '<p class="card-text"><b>' + reasonAdd + '</b></p>' +
                                             '<p class="card-text text-secondary"> kemaskini ' + parseDate(offer.updateDate) + '</p>' +
                                         '</div>' +
-                                        '<div>' + button + '</div>' +
+                                        '<div class="text-center text-md-right">' + button + '</div>' +
                                     '</div>' +
                                 '</div><br>'
                             );

@@ -384,7 +384,8 @@ class ProgramController extends Controller
             'u.name as username', 
             'u.contactNo as usercontact', 
             'u.email as useremail',
-            't.name as typename'
+            'u.image',
+            't.name as typename',
         )
         ->orderBy('programs.updated_at', 'desc')
         ->get();
@@ -683,7 +684,7 @@ class ProgramController extends Controller
         if($validated){
 
             $desc = [
-                "desc" => ucwords(trim($request->get('description'))),
+                "desc" => trim($request->get('description')),
                 "reason" => "",
             ];
 

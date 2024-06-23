@@ -830,6 +830,7 @@ class OfferController extends Controller
             'u.name as username', 
             'u.contactNo as usercontact', 
             'u.email as useremail',
+            'u.image',
             'j.name as jobname',
             'j.position as jobposition',
             'jt.name as typename',
@@ -868,6 +869,7 @@ class OfferController extends Controller
         $alwaysNo = false;
 
         foreach ($allOffers as &$offer) {
+            $offer->image = "public/user_images/" . $offer->image;
             // Add enrolled offer attributes if exists
             if ($enrolledOffer = $enrolledOffers[$offer->offer_id] ?? null) {
                 $offer->enrolled_approval_status = $enrolledOffer->approval_status;

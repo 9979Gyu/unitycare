@@ -34,7 +34,8 @@ class User extends Authenticatable
         'roleID',
         'sector_id',
         'remember_token',
-        'email_verified_at'
+        'email_verified_at',
+        'image',
     ];
 
     /**
