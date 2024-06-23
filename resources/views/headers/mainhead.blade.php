@@ -17,10 +17,10 @@
                 <!-- Not logged in -->
                 @if(!Auth::check())
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown1" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <b>Jadi Ahli</b>
                         </a>
-                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown1">
                             <li><a class="dropdown-item" href="/create?user=Syarikat"><b>Syarikat</b></a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="/create?user=Sukarelawan"><b>Sukarelawan</b></a></li>
@@ -34,10 +34,10 @@
                     <!-- Is Admin or Staff -->
                     @if(Auth::user()->roleID == 1 || Auth::user()->roleID == 2 || Auth::user()->roleID == 4)
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown2" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <b>Pengguna</b>
                             </a>
-                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown2">
                                 @if(Auth::user()->roleID == 1)
                                     <li><a class="dropdown-item" href="/view/2"><b>Pekerja</b></a></li>
                                     <li><hr class="dropdown-divider"></li>
@@ -59,10 +59,10 @@
                     <!-- Is not volunteer -->
                     @if(Auth::user()->roleID != 4)
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown3" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <b>Pekerjaan</b>
                             </a>
-                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown3">
                                 
                                 <li><a class="dropdown-item" href="/viewoffer"><b>Lihat</b></a></li>
                                 <!-- Is admin and staff -->
@@ -83,10 +83,10 @@
                     @endif
 
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown4" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <b>Program</b>
                         </a>
-                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown4">
                             <li><a class="dropdown-item" href="/viewallprograms"><b>Lihat</b></a></li>
                             <!-- Is not B40 / OKU -->
                             @if(Auth::user()->roleID != 5)
@@ -106,10 +106,10 @@
 
                     @if(Auth::user()->roleID == 1 || Auth::user()->roleID == 2)
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown5" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <b>Laporan</b>
                             </a>
-                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown5">
                                 <li><a class="dropdown-item" href="/indexparticipant"><b>Pekerjaan</b></a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="/viewoffer"><b>Program</b></a></li>
@@ -118,7 +118,7 @@
                     @endif
                 @endif
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown6" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <b>
                             @if(Auth::check())
                                 {{Auth::user()->username}}
@@ -127,7 +127,7 @@
                             @endif
                         </b>
                     </a>
-                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown6">
                         
                         @if(Auth::check())
                             

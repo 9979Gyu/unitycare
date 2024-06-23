@@ -29,8 +29,7 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index($roleNo)
-    {
+    public function index($roleNo){
         //
         if(Auth::check()){
             $logRole = Auth::user()->roleID;
@@ -55,8 +54,7 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create(Request $request)
-    {
+    public function create(Request $request){
         $role = $request->query('user');
         
         switch ($role) {
@@ -151,6 +149,7 @@ class UserController extends Controller
                 $validated = $request->validate($rules);
 
                 if($validated){
+ 
                     $password = Str::random(8);
 
                     $user = new User([
@@ -306,8 +305,7 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
-    {
+    public function edit($id){
         //
         $user = User::where([
             ['id', $id],
@@ -328,8 +326,7 @@ class UserController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request)
-    {
+    public function update(Request $request){
         $id = $request->get('uid');
 
         //
@@ -351,19 +348,21 @@ class UserController extends Controller
 
             $username = Str::lower(trim($request->get('username')));
             $email = Str::lower(trim($request->get('email')));
+            $remember_token = Str::random(32);
 
-            DB::table('users')
-                ->where('id', $id)
-                ->update([
-                    'email' => $email,
-                    'username' => $username,
-                ]);
+            $result = User::where('id', $id)
+            ->update([
+                'username' => $username,
+                'remember_token' => $remember_token,
+            ]);
 
-            if($id == Auth::user()->id){
-                return redirect('/viewprofile')->with('success', 'Data berjaya dikemaskini');
-            }
-            else{
-                return redirect('/view/' . $request->get('roleID'))->with('success', 'Data berjaya dikemaskini');
+            if($result){
+
+                $user = User::where('id', $id)->select('username', 'remember_token')->first();
+                $user->password = "(Kata laluan terkini akaun anda)";
+                $user->email = $email;
+                $this->validateEmail($user);
+                return redirect('/')->with('success', 'Sila semak emel untuk mengesahkan perubahan.');
             }
 
         }
@@ -386,8 +385,7 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request)
-    {
+    public function destroy(Request $request){
         //
         $id = $request->get('selectedID');
         $result = DB::table('users')
@@ -461,9 +459,7 @@ class UserController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function verifyUser(Request $request)
-    {   
-
+    public function verifyUser(Request $request){   
         // validate the user data
         $request->validate([
             'username' => "required",
@@ -569,16 +565,17 @@ class UserController extends Controller
         Mail::to($user->email)->send(new WelcomeEmail([
             'name' => $user->username,
             'password' => $user->password,
-            'remember_token' => $user->remember_token
+            'remember_token' => $user->remember_token,
+            'email' => $user->email,
         ]));
     }
 
     public function confirmEmail(Request $request){
         $token = $request->query('token');
+        $email = $request->query('email');
 
         $user = User::where([
             ['remember_token', $token],
-            ['status', 0],
         ])
         ->first();
 
@@ -586,7 +583,8 @@ class UserController extends Controller
 
             $now = Carbon::now();
             $user->email_verified_at = $now;
-            $user->remember_token = null;
+            $user->remember_token = NULL;
+            $user->email = $email;
             $user->status = 1;
             
             $user->save();
@@ -595,7 +593,7 @@ class UserController extends Controller
             
         }
 
-        return redirect('/login')->with(['error' => "Emel pengesahan tidak berjaya"], 400);
+        return redirect('/login')->withErrors(['message' => 'Emel pengesahan tidak berjaya']);
 
     }
 
@@ -610,6 +608,7 @@ class UserController extends Controller
         ->first();
 
         if($user){
+
             $user->remember_token = Str::random(32);
             $user->save();
 
@@ -636,6 +635,7 @@ class UserController extends Controller
         ->first();
 
         if($user){
+
             $user->remember_token = Str::random(32);
             $user->save();
 

@@ -34,7 +34,7 @@
         </div>
 
         <div class="row mb-3">
-            <label for="ICNo" class="col-sm-2 col-form-label required">IC No</label>
+            <label for="ICNo" class="col-sm-2 col-form-label required">Nombor Pengenalan</label>
             <div class="col-sm-10">
                 <input type="text" value="{{ old('ICNo') }}" name="ICNo" class="form-control" id="ICNo" pattern="\d{12}" title="Sila berikan nombor IC yang betul" required placeholder="Contoh: 021221041234">
             </div>

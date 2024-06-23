@@ -36,7 +36,7 @@
         </div>
 
         <div class="row mb-3">
-            <label for="ICNo" class="col-sm-2 col-form-label required">IC No</label>
+            <label for="ICNo" class="col-sm-2 col-form-label required">Nombor Pengenalan</label>
             <div class="col-sm-10">
                 <input type="text" value="{{ $user->ICNo }}" name="ICNo" class="form-control" id="ICNo" pattern="\d{12}" title="Sila berikan nombor IC yang betul" required placeholder="Contoh: 021221041234">
             </div>
@@ -120,19 +120,20 @@
             </div>
         </div>
 
+        <input type="number" value="{{ $user->id }}" name="uid" class="form-control" id="uid" hidden>
+        <input type="number" value="{{ $user->roleID }}" name="roleID" class="form-control" id="roleID" hidden>
+
         <div class="row mb-3">
             <label for="email" class="col-sm-2 col-form-label required">Emel</label>
             <div class="col-sm-10">
                 <input type="email" value="{{ $user->email }}" name="email" class="form-control" id="email" pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$">
-                <input type="number" value="{{ $user->id }}" name="uid" class="form-control" id="uid" hidden>
-                <input type="number" value="{{ $user->roleID }}" name="roleID" class="form-control" id="roleID" hidden>
             </div>
         </div>
 
         <div class="row">
             <div class="col-sm-10 offset-sm-2">
-                <button type="submit" class="btn btn-primary" id="submitBtn">Hantar</button>
-                <button type="button" class="btn btn-primary" id="editBtn">Kemaskini</button>
+                <button type="submit" class="btn btn-primary" name="submitBtn" id="submitBtn">Hantar</button>
+                <button type="button" class="btn btn-primary" name="editBtn" id="editBtn">Kemaskini</button>
                 <button type="button" onclick="window.location='/'" class="btn btn-danger">Tutup</button>
             </div>
         </div>
@@ -140,7 +141,7 @@
     </form>
 
     <br>
-
-    <script src="{{ asset('js/general/postcodeScript.js') }}"></script>
+    
     <script src="{{ asset('js/profileScript.js') }}"></script>
+    <script src="{{ asset('js/general/postcodeScript.js') }}"></script>
 @endsection

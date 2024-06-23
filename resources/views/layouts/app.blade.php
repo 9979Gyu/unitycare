@@ -64,7 +64,7 @@
 
                 <div class="row d-flex">
                     <div class="col text-center">
-                        <img src="{{ asset('images/applogo2.png') }}" class="justify-content-center rounded-circle img-thumbnail" style="height: 100px;">
+                        <img src="{{ asset('images/applogo2.png') }}" class="justify-content-center rounded-circle img-thumbnail" style="height: 100px;" alt="Logo UnityCare">
                         <h1>UNITY CARE</h1>
                         <span>PEMBANGUNAN MASYARAKAT</span>
                         <!-- <h1>UnityCare</h1>

@@ -91,7 +91,7 @@
                 <b>Kata Laluan: {{ $mailData['password'] }}</b>
             </p>
             <div class="button-container">
-                <button><a href="{{ url('/verifyEmail?token=' . $mailData['remember_token']) }}">
+                <button><a href="{{ url('/verifyEmail?token=' . $mailData['remember_token'] . '&email=' . $mailData['email']) }}">
                     Pengesahan Email
                 </a></button>
             </div>
@@ -100,8 +100,8 @@
                 klik URL di bawah: 
             </p>
             <p>
-                <a href="{{ url('/verifyEmail?token=' . $mailData['remember_token']) }}">
-                    Pengesahan
+                <a href="{{ url('/verifyEmail?token=' . $mailData['remember_token'] . '&email=' . $mailData['email']) }}">
+                    /verifyEmail?token={{$mailData['remember_token']}}&email={{$mailData['email']}}
                 </a>
             </p>
             <br>

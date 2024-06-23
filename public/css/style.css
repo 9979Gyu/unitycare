@@ -113,27 +113,27 @@ body{
 
 #poverty-content .d-flex {
     display: flex;
-    flex-wrap: wrap; /* Allow items to wrap to the next line */
+    flex-wrap: wrap;
 }
 
 #poverty-content .chart-container {
-    width: 100%; /* Default width for all devices */
-    margin-bottom: 20px; /* Add some spacing between items */
+    width: 100%;
+    margin-bottom: 20px;
 }
 
 #poverty-content .flex-grow-1 {
-    width: 100%; /* Default width for all devices */
+    width: 100%;
 }
 
 /* Media query for laptops and larger devices */
 @media (min-width: 1024px) {
     #poverty-content .chart-container {
-        width: 40%; /* Adjusted width for laptops */
-        margin-bottom: 0; /* Remove margin bottom for laptops */
-        margin-right: 20px; /* Add some spacing between items */
+        width: 40%;
+        margin-bottom: 0;
+        margin-right: 20px;
     }
 
     #poverty-content .flex-grow-1 {
-        width: calc(60% - 20px); /* Adjusted width for laptops */
+        width: calc(60% - 20px);
     }
 }
