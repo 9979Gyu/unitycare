@@ -312,7 +312,7 @@ class UserController extends Controller
             ['status', 1]
         ])->first();
 
-        if(Auth::check()){
+        if(Auth::check() && Auth::user()->roleID == 1){
             return view('users.edit', compact('user'));
         }
         else{
