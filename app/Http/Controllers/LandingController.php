@@ -22,6 +22,7 @@ class LandingController extends Controller{
 
     public function index(){
         
+        $now =  date('Y-m-d');
         // Check if user logged in and is B40/OKU
         if(Auth::check() && Auth::user()->roleID == 5){
 
@@ -33,17 +34,21 @@ class LandingController extends Controller{
                 $query->where([
                     ['approval_status', 2],
                     ['status', 1],
-                    ['poor_id', $poorId]
+                    ['poor_id', $poorId],
                 ]);
             })
             ->with([
-                'organizations.jobOffers' => function ($query) use ($poorId) {
-                    $query->whereHas('applications', function ($query) use ($poorId) {
+                'organizations.jobOffers' => function ($query) use ($poorId, $now) {
+                    $query->whereHas('applications', function ($query) use ($poorId, $now) {
                         $query->where([
                             ['approval_status', 2],
                             ['status', 1],
                             ['poor_id', $poorId]
-                        ]);
+                        ])
+                        ->where(function ($query) use ($now) {
+                            $query->whereNull('end_date')
+                                  ->orWhere('end_date', '>=', $now);
+                        });
                     })
                     ->with([
                         'shiftType',
@@ -67,10 +72,11 @@ class LandingController extends Controller{
                 $query->where([
                     ['approval_status', 2],
                     ['status', 1],
+                    ['is_full', 0],
                 ]);
             })
             ->with([
-                'organizations.jobOffers' => function ($query) {
+                'organizations.jobOffers' => function ($query) use($now){
                     $query->with([
                         'shiftType',
                         'jobType',
@@ -79,7 +85,12 @@ class LandingController extends Controller{
                     ->where([
                         ['approval_status', 2],
                         ['status', 1],
-                    ]);
+                        ['is_full', 0],
+                    ])
+                    ->where(function ($query) use ($now) {
+                        $query->whereNull('end_date')
+                              ->orWhere('end_date', '>=', $now);
+                    });
                 },
                 // Ensures that the organization related to jobOffers is eagerly loaded
                 'organizations.jobOffers.organization'
@@ -93,6 +104,7 @@ class LandingController extends Controller{
     public function search(Request $request)
     {
         $searchQuery = $request->get('query');
+        $now =  date('Y-m-d');
 
         if(isset($searchQuery)){
 
@@ -101,6 +113,7 @@ class LandingController extends Controller{
                 ->where([
                     ['programs.status', 1],
                     ['programs.approved_status', 2],
+                    ['programs.end_date', '>=', $now],
                 ])
                 ->select(
                     'programs.*',
@@ -143,6 +156,7 @@ class LandingController extends Controller{
             ->where([
                 ['job_offers.status', 1],
                 ['job_offers.approval_status', 2],
+                ['job_offers.end_date', '>=', $now],
             ])
             ->select(
                 'job_offers.offer_id',
@@ -212,9 +226,12 @@ class LandingController extends Controller{
 
     public static function getProgramsByApprovedStatus(){
 
+        $now =  date('Y-m-d');
+
         $query = Program::where([
             ['programs.status', 1],
-            ['programs.approved_status', 2]
+            ['programs.approved_status', 2],
+            ['programs.end_date', '>=', $now],
         ])
         ->select(
             'programs.name',
