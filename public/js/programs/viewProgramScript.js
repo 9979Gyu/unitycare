@@ -143,19 +143,23 @@ $(document).ready(function() {
                                 $(".card-container").append(
                                     '<div class="card mb-3">' +
                                         '<div class="card-header bg-primary text-white">' + program.typename + '</div>' +
-                                        '<div class="card-body d-flex justify-content-between flex-wrap">' +
-                                            '<div class="m-3 mb-md-0 d-flex justify-content-center align-items-center">' +
-                                                '<img src="' + img + '" class="img-fluid square-box" alt="Imej Organisasi">' +
+                                        '<div class="card-body row">' +
+                                            '<div class="col-md-2 mb-3 mb-md-0">' +
+                                                '<div class="d-flex justify-content-center align-items-center">' +
+                                                    '<img src="' + img + '" class="img-fluid square-box" alt="Imej Organisasi">' +
+                                                '</div>' +
                                             '</div>' +
-                                            '<div class="flex-fill">' +
-                                                '<h5 class="card-title">' + program.name + '</h5>' +
-                                                '<p class="card-text">' + program.venue + ', ' + program.postal_code +
-                                                    ', ' + program.city + ', ' + program.state + '</p>' +
-                                                '<p class="card-text">' + program.description + '</p>' +
-                                                '<p class="card-text text-secondary">kemaskini ' + parseDate(program.updated_at) + '</p>' +
+                                            '<div class="col-md-8">' + // Medium size column for content
+                                                '<div>' +
+                                                    '<h5 class="card-title">' + program.name + '</h5>' +
+                                                    '<p class="card-text">' + program.venue + ', ' + program.postal_code +
+                                                        ', ' + program.city + ', ' + program.state + '</p>' +
+                                                    '<p class="card-text">' + program.description + '</p>' +
+                                                    '<p class="card-text text-secondary">kemaskini ' + parseDate(program.updated_at) + '</p>' +
+                                                '</div>' +
                                             '</div>' +
-                                            '<div class="text-center text-md-right">' +
-                                                button +
+                                            '<div class="col-md-2 mb-3 mb-md-0">' +
+                                                '<div class="text-center text-md-right">' + button + '</div>' +
                                             '</div>' +
                                         '</div>' +
                                     '</div>'

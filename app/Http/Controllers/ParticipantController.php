@@ -108,8 +108,6 @@ class ParticipantController extends Controller
             ])
             ->select(
                 '*',
-                'description->desc as description',
-                'description->reason as reason'
             )
             ->first();
 
