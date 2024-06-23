@@ -70,6 +70,7 @@ Route::post('/export-applies', [ApplicationController::class, 'exportApplied']);
 Route::get('/create', [UserController::class, 'create']);
 Route::post('/store', [UserController::class, 'store']);
 Route::get('/verifyEmail', [UserController::class, 'confirmEmail']);
+Route::get('/verifyProfile', [UserController::class, 'confirmProfile']);
 Route::get('/view/{roleNo}', [UserController::class, 'index']);
 Route::get('/getstaff', [UserController::class, 'getUsersDatatable'])->name('user.getAllDatatable');
 Route::get('/edituser/{id}', [UserController::class, 'edit']);

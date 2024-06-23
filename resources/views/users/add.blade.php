@@ -43,7 +43,7 @@
         <div class="row mb-3">
             <label for="contactNo" class="col-sm-2 col-form-label required">Nombor Telefon (60+)</label>
             <div class="col-sm-4">
-                <input type="text" value="{{ old('contactNo') }}" name="contactNo" class="form-control" id="contactNo" pattern="\d{9,10}" title="Sila berikan nombor telefon yang betul" required>
+                <input type="number" value="{{ old('contactNo') }}" name="contactNo" class="form-control" id="contactNo" pattern="\d{9,10}" title="Sila berikan nombor telefon yang betul" required>
             </div>
 
             <label for="officeNo" class="col-sm-2 col-form-label">Nombor Telefon Pejabat</label>

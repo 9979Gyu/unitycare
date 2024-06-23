@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\WelcomeEmail;
 use App\Mail\ForgotPasswordEmail;
 use App\Mail\NotifyPasswordChange;
+use App\Mail\ChangeProfileEmail;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 
@@ -346,22 +347,31 @@ class UserController extends Controller
 
         if($validated){
 
-            $username = Str::lower(trim($request->get('username')));
-            $email = Str::lower(trim($request->get('email')));
+            Auth::logout();
+            
             $remember_token = Str::random(32);
+            $email = Str::lower(trim($request->get('email')));
 
-            $result = User::where('id', $id)
-            ->update([
-                'username' => $username,
-                'remember_token' => $remember_token,
-            ]);
+            $update = User::where('id', $id)->update(['remember_token' => $remember_token]);
 
-            if($result){
+            if($update){
+                $data = [
+                    'email' => $email,
+                    'username' => Str::lower(trim($request->get('username'))),
+                    'contactNo' => $request->get('contactNo'),
+                    'address' => ucwords(trim($request->get('address'))),
+                    'state' => $request->get('state'),
+                    'city' => $request->get('city'),
+                    'postalCode' => $request->get('postalCode'),
+                    'status' => 0,
+                    'officeNo' => $request->get('officeNo'),
+                    'remember_token' => $remember_token,
+                ];
 
-                $user = User::where('id', $id)->select('username', 'remember_token')->first();
-                $user->password = "(Kata laluan terkini akaun anda)";
-                $user->email = $email;
-                $this->validateEmail($user);
+                $old_user = User::where('id', $id)->select('username', 'email')->first();
+    
+                Mail::to($old_user->email)->send(new ChangeProfileEmail($data, $remember_token, $old_user->username));
+    
                 return redirect('/')->with('success', 'Sila semak emel untuk mengesahkan perubahan.');
             }
 
@@ -773,6 +783,43 @@ class UserController extends Controller
             'name' => $user->username,
             'datetime' => $formattedDateTime
         ]));
+
+    }
+    
+    // Function to update user detail after verify email
+    public function confirmProfile(Request $request){
+        $token = $request->query('token');
+        $data = $request->query('data');
+
+        $user = User::where([
+            ['remember_token', $token],
+        ])
+        ->first();
+
+        if($user){
+
+            // Decode JSON-encoded $data to array
+            $data = json_decode(urldecode($data), true);
+
+            $user->email_verified_at = now();
+            $user->remember_token = null;
+            $user->email = $data['email'];
+            $user->username = $data['username'];
+            $user->contactNo = $data['contactNo'];
+            $user->address = $data['address'];
+            $user->state = $data['state'];
+            $user->city = $data['city'];
+            $user->postalCode = $data['postalCode'];
+            $user->officeNo = $data['officeNo'];
+            $user->status = $data['status'];
+
+            $user->save();
+            
+            return redirect('/login')->with(['success' => "Profil berjaya dikemaskini"]);
+            
+        }
+
+        return redirect('/login')->withErrors(['message' => 'Emel pengesahan tidak berjaya']);
 
     }
 

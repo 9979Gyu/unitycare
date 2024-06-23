@@ -43,12 +43,12 @@
         <div class="row mb-3">
             <label for="contactNo" class="col-sm-2 col-form-label required">Nombor Telefon (60+)</label>
             <div class="col-sm-4">
-                <input type="text" value="{{ $user->contactNo }}" name="contactNo" class="form-control" id="contactNo" pattern="\d{9,10}" title="Sila berikan nombor telefon yang betul" required>
+                <input type="number" value="{{ $user->contactNo }}" name="contactNo" class="form-control" id="contactNo" pattern="\d{9,10}" title="Sila berikan nombor telefon yang betul" required>
             </div>
 
             <label for="officeNo" class="col-sm-2 col-form-label">Nombor Telefon Pejabat</label>
             <div class="col-sm-4">
-                <input type="text" value="{{ $user->officeNo }}" name="officeNo" class="form-control" id="officeNo">
+                <input type="number" value="{{ $user->officeNo }}" name="officeNo" class="form-control" id="officeNo">
             </div>
         </div>
 
