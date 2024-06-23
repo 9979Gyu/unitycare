@@ -36,19 +36,22 @@
         <div class="row mb-3">
             <label for="ICNo" class="col-sm-2 col-form-label required">Nombor Pengenalan</label>
             <div class="col-sm-10">
-                <input type="text" value="{{ $user->ICNo }}" name="ICNo" class="form-control" id="ICNo" pattern="\d{12}" title="Sila berikan nombor IC yang betul" required placeholder="Contoh: 021221041234">
+                <input type="text" value="{{ $user->ICNo }}" name="ICNo" class="form-control" id="ICNo" 
+                    pattern="([0-9]{2})(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])([0-9]{2})([0-9]{4})"
+                    title="Sila berikan nombor IC yang betul (tiada symbol -)"  
+                    placeholder="Contoh: 021221041234" required>
             </div>
         </div>
 
         <div class="row mb-3">
             <label for="contactNo" class="col-sm-2 col-form-label required">Nombor Telefon (60+)</label>
             <div class="col-sm-4">
-                <input type="number" value="{{ $user->contactNo }}" name="contactNo" class="form-control" id="contactNo" pattern="\d{9,10}" title="Sila berikan nombor telefon yang betul" required>
+                <input type="tel" value="{{ $user->contactNo }}" name="contactNo" class="form-control" id="contactNo" pattern="\d{9,10}" title="Sila berikan nombor telefon yang betul" required>
             </div>
 
             <label for="officeNo" class="col-sm-2 col-form-label">Nombor Telefon Pejabat</label>
             <div class="col-sm-4">
-                <input type="number" value="{{ $user->officeNo }}" name="officeNo" class="form-control" id="officeNo">
+                <input type="tel" value="{{ $user->officeNo }}" name="officeNo" class="form-control" id="officeNo">
             </div>
         </div>
 
@@ -91,14 +94,16 @@
         <div class="row mb-3">
             <label for="username" class="col-sm-2 col-form-label required">Nama Pengguna</label>
             <div class="col-sm-10">
-                <input type="text" value="{{ $user->username }}" name="username" class="form-control" id="username" pattern=".{3,}" maxlength="25" title="Three or more characters">
+                <input type="text" value="{{ $user->username }}" name="username" class="form-control" id="username" 
+                pattern=".{3,}" maxlength="25" title="Tiga huruf ke atas">
             </div>
         </div>
 
         <div class="row mb-3">
             <label for="email" class="col-sm-2 col-form-label required">Emel</label>
             <div class="col-sm-10">
-                <input type="email" value="{{ $user->email }}" name="email" class="form-control touppercase" id="email" pattern="[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$">
+                <input type="email" value="{{ $user->email }}" name="email" class="form-control touppercase" id="email" 
+                pattern="[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$" title="Sila berikan email yang betul">
             </div>
         </div>
 

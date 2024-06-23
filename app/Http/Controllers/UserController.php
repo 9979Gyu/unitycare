@@ -57,12 +57,9 @@ class UserController extends Controller
      */
     public function create(Request $request){
         $role = $request->query('user');
-        
+
         switch ($role) {
-            case 'myadmin':
-                $roleNo = 1; 
-                break;
-            case 'Pekerja':
+            case 'Kakitangan':
                 $roleNo = 2; 
                 break;
             case 'Syarikat':
