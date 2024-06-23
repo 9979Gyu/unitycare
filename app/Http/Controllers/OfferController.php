@@ -180,6 +180,16 @@ class OfferController extends Controller
         ->join('shift_types as st', 'st.shift_type_id', '=', 'job_offers.shift_type_id')
         ->join('jobs as j', 'j.job_id', '=', 'job_offers.job_id');
 
+        if($startDate != null && $endDate != null){
+            $query->whereNull('job_offers.start_date')
+            ->orWhere(function($query) use ($startDate, $endDate) {
+                $query->where([
+                    ['job_offers.start_date', '>=', $startDate],
+                    ['job_offers.start_date', '<=', $endDate],
+                ]);
+            });
+        }
+
         // If user choose Semua
         if($userID != "all"){
             $query->where('job_offers.user_id', $userID);
@@ -192,14 +202,6 @@ class OfferController extends Controller
         // If user choose to view by approval_status
         if($state != 3 && $state != 4){
             $query = $query->where('job_offers.approval_status', $state);
-        }
-
-        if($startDate != null && $endDate != null){
-
-            $query->where([
-                ['job_offers.start_date', '>=', $startDate],
-                ['job_offers.start_date', '<=', $endDate],
-            ]);
         }
 
         $selectedOffers = $query->select(
@@ -1029,12 +1031,15 @@ class OfferController extends Controller
         if($userID != "all"){
             $query->where('job_offers.user_id', $userID);
         }
-
+        
         if($startDate != null && $endDate != null){
-            $query->where([
-                ['job_offers.start_date', '>=', $startDate],
-                ['job_offers.start_date', '<=', $endDate],
-            ]);
+            $query->whereNull('job_offers.start_date')
+            ->orWhere(function($query) use ($startDate, $endDate) {
+                $query->where([
+                    ['job_offers.start_date', '>=', $startDate],
+                    ['job_offers.start_date', '<=', $endDate],
+                ]);
+            });
         }
 
         if($jobID != "all"){
