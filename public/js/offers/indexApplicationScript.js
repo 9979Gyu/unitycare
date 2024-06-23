@@ -294,6 +294,30 @@ $(document).ready(function() {
         });
     });
 
+    $(document).on('click', '.endJobAnchor', function() {
+        selectedID = $(this).attr('id');
+    });
+
+    $('#endJob').click(function() {
+        $.ajax({
+            type: 'POST',
+            dataType: 'html',
+            data: {
+                applicationID : selectedID
+            },
+            url: "/updateEndJob",
+            success: function(data) {
+                $('#endJobModal').modal('hide');
+                $('.condition-message').html(data);
+
+                requestTable.ajax.reload();
+            },
+            error: function (data) {
+                $('.condition-message').html(data);
+            }
+        });
+    });
+
     $(document).on('click', '.declineAnchor', function() {
         selectedID = $(this).attr('id');
     });

@@ -44,7 +44,7 @@ class ApplicationController extends Controller
 
     }
 
-    // Email to notify user about the creation of job
+    // Email to notify user about the creation of job application
     public function notifyUser($applicationID){
 
         $apps = Application::where('applications.application_id', $applicationID)
@@ -58,6 +58,7 @@ class ApplicationController extends Controller
             'applications.approved_at',
             'applications.applied_date',
             'applications.description->reason as reason',
+            'applications.is_selected',
             'users.username',
             'users.email',
         )
@@ -78,6 +79,7 @@ class ApplicationController extends Controller
             'offer' => $apps->position,
             'datetime' => $convertedDate,
             'reason' => $apps->reason ? $apps->reason : "",
+            'is_selected' => $apps->is_selected,
         ]));
     }
 
@@ -513,6 +515,45 @@ class ApplicationController extends Controller
         return redirect('/viewoffer')->withErrors(["message" => "Tidak berjaya dipadam"]);
     }
 
+    public function updateEndJob(Request $request){
+        //
+        $id =  $request->get('applicationID');
+        $now = date('Y-m-d H:i:s');
+
+        $currentDesc = Application::where('application_id', $id)
+        ->value('description');
+
+        // Decode the JSON to an associative array
+        $descArray = json_decode($currentDesc, true);
+
+        // Update the 'reason' field
+        $descArray['reason'] = "Tempoh Pekerjaan Tamat";
+
+        // Encode the array back to JSON
+        $newDesc = json_encode($descArray);
+
+        if(isset($id)){
+            $result = Application::where('application_id', $id)
+            ->update([
+                'approval_status' => 0,
+                'approved_at' => $now,
+                'approved_by' => Auth::user()->id,
+                'updated_at' => $now,
+                'description' => $newDesc,
+            ]);
+    
+            if($result){
+
+                $this->notifyUser($id);
+
+                return redirect()->back()->with(["success" => "Data berjaya dipadam"]);
+            }
+    
+        }
+
+        return redirect('/viewoffer')->withErrors(["message" => "Tidak berjaya dipadam"]);
+    }
+
     public function retrieveApplication($state, $userID, $jobID, $startDate, $endDate){
         if($state == 4){
             $status = 0;
@@ -634,18 +675,21 @@ class ApplicationController extends Controller
 
             $table = Datatables::of($selectedApplication);
 
-            $table->addColumn('action', function ($row) {
+            $table->addColumn('action', function ($row) use($userID) {
                 $token = csrf_token();
                 $btn = '<div class="justify-content-center">';
                 $btn .= '<a href="/joinoffer/' . $row->offer_id . '?type=permohonan"><span class="btn btn-primary m-1"> Lihat </span></a>';
 
-                if(Auth::user()->roleID == 3){
+                if(Auth::user()->roleID == 3 && Auth::user()->id == $userID){
                     if($row->approval_status == 1){
                         // pending approval
                         $btn .= '<div>';
                         $btn .= '<a class="approveAnchor" href="#" id="' . $row->application_id . '"><span class="btn btn-success m-1" data-bs-toggle="modal" data-bs-target="#approveModal"> Lulus </span></a>';
                         $btn .= '<a class="declineAnchor" href="#" id="' . $row->application_id . '"><span class="btn btn-danger m-1" data-bs-toggle="modal" data-bs-target="#declineModal"> Tolak </span></a>';
                         $btn .= '</div>';
+                    }
+                    else if($row->approval_status == 2 && $row->is_selected == 2){
+                        $btn .= '<a class="endJobAnchor" href="#" id="' . $row->application_id . '"><span class="btn btn-danger m-1" data-bs-toggle="modal" data-bs-target="#endJobModal"> Tamat </span></a>';
                     }
                 }
                 $btn .= '</div>';

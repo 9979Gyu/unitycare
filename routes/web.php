@@ -153,6 +153,7 @@ Route::get('/viewapplication', [ApplicationController::class, 'index']);
 Route::get('/getApplicationsByCondition', [ApplicationController::class, 'getApplicationsByCondition']);
 Route::post('/updateApproval', [ApplicationController::class, 'updateApproval']);
 Route::post('/confirmOffer', [ApplicationController::class, 'confirmOffer']);
+Route::post('/updateEndJob', [ApplicationController::class, 'updateEndJob']);
 
 // Chart
 Route::get('/offer-bar-chart', [OfferController::class, 'offerBarChart']);

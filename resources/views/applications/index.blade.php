@@ -236,6 +236,26 @@
         </div>
     </div>
 
+    <!-- End Job Modal -->
+    <div class="modal fade" id="endJobModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="endJobModalLabel">Tamat Tempoh Pekerjaan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Adakah anda pasti untuk menamatkan tempoh pekerjaan pekerja ini?
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="endJob">Tamat</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="{{ asset('js/general/offerScript.js') }}"></script>
     <script src="{{ asset('js/offers/indexApplicationScript.js') }}"></script>
     <script src="{{ asset('js/general/modalScript.js') }}"></script>

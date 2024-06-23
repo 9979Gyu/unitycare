@@ -127,9 +127,6 @@ function updateOfferBarChart(selectedUser, selectedPosition, selectedState, star
 
 function updateParticipantBarChart(selectedUser, selectedPosition, selectedState, startDate, endDate) {
 
-    console.log(selectedUser, selectedPosition, selectedState, startDate, endDate);
-
-
     $.ajax({
         url: '/app-bar-chart', // URL to fetch data from
         type: 'GET',
