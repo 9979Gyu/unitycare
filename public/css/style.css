@@ -120,7 +120,7 @@ body{
     font-size: 30px;
 }
 
-.grayscale {
+.grayscale-content {
     filter: grayscale(100%);
     -webkit-filter: grayscale(100%);
     transition: filter 0.3s ease-in-out;
@@ -131,6 +131,17 @@ body{
     padding: 5px;
     border-radius: 20%;
     color: white;
+}
+
+.special {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    z-index: 1000;
+}
+
+.special .dropdown-toggle::after {
+    display: none;
 }
 
 /* Default styles */
