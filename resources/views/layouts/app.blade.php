@@ -52,6 +52,32 @@
         @include('headers.mainhead')
     </header>
 
+    <!-- Floating button for accessibility -->
+    <div class="position-fixed top-2 end-0 p-3" style="z-index:1000;">
+        <div class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown7" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="bi bi-universal-access-circle accessibility" viewBox="0 0 16 16">
+                    <path d="M8 4.143A1.071 1.071 0 1 0 8 2a1.071 1.071 0 0 0 0 2.143m-4.668 1.47 3.24.316v2.5l-.323 4.585A.383.383 0 0 0 7 13.14l.826-4.017c.045-.18.301-.18.346 0L9 13.139a.383.383 0 0 0 .752-.125L9.43 8.43v-2.5l3.239-.316a.38.38 0 0 0-.047-.756H3.379a.38.38 0 0 0-.047.756Z"/>
+                    <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0M1 8a7 7 0 1 1 14 0A7 7 0 0 1 1 8"/>
+                </svg>
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdown7">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="toggleFontSize">
+                    <label class="form-check-label" for="toggleFontSize">
+                        Size Besar
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="toggleGreyScale">
+                    <label class="form-check-label" for="toggleGreyScale">
+                        Skala kelabu  
+                    </label>
+                </div>
+            </ul>
+        </div>
+    </div>
+
     <div class="container mt-3">
         @yield('content')
     </div>
@@ -113,10 +139,35 @@
     <script type="text/javascript">
         $(document).ready(function(){
 
+            var grayscaleEnabled = localStorage.getItem('grayscaleEnabled');
+            var enlargeEnabled = localStorage.getItem('enlargeEnabled');
+
+            if (grayscaleEnabled === 'true') {
+                $('body').addClass('grayscale');
+                $('#toggleGreyScale').prop('checked', true);
+            }
+
+            if (enlargeEnabled === 'true') {
+                $('body').addClass('enlarged-font');
+                $('#toggleFontSize').prop('checked', true);
+            }
+
             // Transition for the alert message
             setTimeout(function(){
                 $('.alert').fadeOut("slow");
             }, 2000);
+
+            $('#toggleGreyScale').change(function() {
+                var isChecked = $(this).is(':checked');
+                $('*').toggleClass('grayscale', isChecked);
+                localStorage.setItem('grayscaleEnabled', isChecked.toString());
+            });
+
+            $('#toggleFontSize').change(function() {
+                var isChecked = $(this).is(':checked');
+                $('*').toggleClass('enlarged-font', isChecked);
+                localStorage.setItem('enlargeEnabled', isChecked.toString());
+            });
 
             // Set default language to Malay for all DataTables
             $.extend(true, $.fn.dataTable.defaults, {

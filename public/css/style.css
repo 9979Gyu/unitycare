@@ -14,6 +14,10 @@ body{
     text-transform: capitalize;
 }
 
+.justify {
+    text-align: justify;
+}
+
 .lowercase {
     text-transform: lowercase;
 }
@@ -110,6 +114,23 @@ body{
     width: 100px;
     height: 100px;
     overflow: hidden;
+}
+
+.enlarged-font {
+    font-size: 30px;
+}
+
+.grayscale {
+    filter: grayscale(100%);
+    -webkit-filter: grayscale(100%);
+    transition: filter 0.3s ease-in-out;
+}
+
+.accessibility {
+    background-color: blue; 
+    padding: 5px;
+    border-radius: 20%;
+    color: white;
 }
 
 /* Default styles */

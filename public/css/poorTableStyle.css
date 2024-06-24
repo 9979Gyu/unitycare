@@ -1,9 +1,7 @@
-/* Default styling for table */
 .table-responsive {
     overflow-x: auto;
 }
 
-/* Media query for small screens */
 @media (max-width: 768px) {
     .table-responsive {
         overflow-x: hidden;
