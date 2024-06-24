@@ -37,26 +37,72 @@ class JobController extends Controller
         }
     }
 
+    // Function to display the add job form
+    public function createType(){
+
+        if(Auth::check() && Auth::user()->roleID == 1){
+            $roleNo = Auth::user()->roleID;
+
+            return view('jobs.addType', compact('roleNo'));
+        }
+        else{
+            return redirect('/')->withErrors(['message' => 'Anda tidak dibenarkan untuk melayari halaman ini']);
+        }
+    }
+
     // Function to store the data from add form to jobs table in database
     public function store(Request $request){
-    
-        $rules = [
-            'name' => 'required',
-            'position' => 'required',
-            'description' => 'required',
-        ];
+
+        $type = $request->get('type');
+
+        if($type == "jobs"){     
+            $rules = [
+                'name' => 'required',
+                'position' => 'required',
+                'description' => 'required',
+            ];
+        }
+        else if($type == "job_types"){
+            $rules = [
+                'name' => 'required|unique:job_types,name',
+                'description' => 'required',
+            ];
+        }
+        else{
+            $rules = [
+                'name' => 'required|unique:shift_types,name',
+                'description' => 'required',
+            ];
+        }
         
         $validated = $request->validate($rules);
 
         if($validated){
-            $job = new job([
-                'name' => ucwords($request->get('name')),
-                'position' => ucwords($request->get('position')),
-                'description' => $request->get('description'),
-                'status' => 1,
-            ]);
 
-            $result = $job->save();
+            if($type == "jobs"){
+                $data = new job([
+                    'name' => ucwords(trim($request->get('name'))),
+                    'position' => ucwords(trim($request->get('position'))),
+                    'description' => trim($request->get('description')),
+                    'status' => 1,
+                ]);
+            }
+            else if($type == "job_types"){
+                $data = new job_type([
+                    'name' => ucwords(trim($request->get('name'))),
+                    'description' => trim($request->get('description')),
+                    'status' => 1,
+                ]);
+            }
+            else{
+                $data = new shift_type([
+                    'name' => ucwords(trim($request->get('name'))),
+                    'description' => trim($request->get('description')),
+                    'status' => 1,
+                ]);
+            }
+
+            $result = $data->save();
 
             if($result){
                 if(Auth::user()->roleID <= 2)

@@ -26,23 +26,23 @@
             <h5>Maklumat Pekerjaan</h5>
         </div>
         <input type="text" name="roleID" id="roleID" value="{{ $roleNo }}" hidden>
-        <input type="text" name="type" id="type" value="jobs" hidden>
 
         <div class="row mb-3">
-            <!-- Job title : software engineer -->
-            <label for="name" class="col-sm-2 col-form-label required">Nama</label>
+            <label for="position" class="col-sm-2 col-form-label required">Kategori</label>
             <div class="col-sm-10">
-                <input type="text" name="name" class="form-control capitalize" id="name" value="{{ old('name') }}" required>
+                <select name="type" id="type" class="form-control">
+                    <option value="job_types" selected>Jenis Pekerjaan</option>
+                    <option value="shift_types" selected>Jenis Syif</option>
+                </select>
             </div>
         </div>
 
         <br>
 
         <div class="row mb-3">
-            <!-- Job position : cloud software engineer -->
-            <label for="position" class="col-sm-2 col-form-label required">Jawatan</label>
+            <label for="name" class="col-sm-2 col-form-label required">Nama</label>
             <div class="col-sm-10">
-                <input type="text" name="position" class="form-control capitalize" id="position" value="{{ old('position') }}" required>
+                <input type="text" name="name" class="form-control capitalize" id="name" value="{{ old('name') }}" required>
             </div>
         </div>
 

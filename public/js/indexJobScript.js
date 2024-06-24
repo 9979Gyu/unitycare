@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    
+
     var requestTable;
     var selectedType = $('#type option:selected').val();
 
@@ -7,8 +7,20 @@ $(document).ready(function() {
 
     $('#type').change(function() {
         selectedType = $('#type option:selected').val();
+
+        if(selectedType == "shift" || selectedType == "type"){
+            $("#addBtn").show();
+        }
+        else{
+            $("#addBtn").hide();
+        }
+
         // Fetch data based on the selected position
         fetch_data(selectedType);
+    });
+
+    $("#addBtn").click(function(){
+        window.location.href = '/createType';
     });
 
    

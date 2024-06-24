@@ -15,7 +15,7 @@
     @endif
 
     @if ($errors->any())
-        <div class="alert alert-danger condition-message"">
+        <div class="alert alert-danger condition-message">
             <ul>
                 @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
@@ -38,7 +38,8 @@
                 </select>
             </div>
             <div class="col">
-                <button class="btn btn-outline-primary float-end" type="submit" id="excelBtn">Excel</button>
+                <button class="btn btn-outline-primary float-end mx-1" type="submit" id="excelBtn">Excel</button>
+                <button class="btn btn-outline-info float-end" type="button" id="addBtn">Tambah</button>
             </div>
         </div>
 

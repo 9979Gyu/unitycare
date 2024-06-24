@@ -118,6 +118,7 @@ Route::post('/deleteparticipant', [ParticipantController::class, 'destroy']);
 
 // Jobs
 Route::get('/createjob', [JobController::class, 'create']);
+Route::get('/createType', [JobController::class, 'createType']);
 Route::get('/viewjob', [JobController::class, 'index']);
 Route::get('/getjob', [JobController::class, 'getJobsDatatable']);
 Route::post('/storejob', [JobController::class, 'store']);
