@@ -20,7 +20,8 @@ class Poor extends Model
         'employment_status',
         'status',
         'user_id',
-        'volunteer_id'
+        'volunteer_id',
+        'resume',
     ];
 
     public function user()

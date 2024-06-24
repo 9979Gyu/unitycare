@@ -38,10 +38,10 @@
         <div class="row mb-3">
             <label for="name" class="col-sm-2 col-form-label required">Muat Naik Imej</label>
             <div class="col-sm-4">
-                <input type="file" class="form-control"  name="image" id="image">
+                <input type="file" class="form-control"  name="image" id="image" accept=".jpg,.jpeg,.png">
             </div>
             <div class="col-sm-4">
-                <img src="{{ asset('public/user_images/' . $user->image) }}" class="square-box">
+                <img src="{{ asset('public/user_images/' . $user->image) }}" style="width:50px;">
                 <span name="currentImage" id="currentImage">
                     <a href="{{ asset('public/user_images/' . $user->image) }}" target="_blank">{{ $user->image }}</a>
                 </span>
@@ -120,6 +120,18 @@
                     <select name="disType" id="disType" class="form-select">
                         <option selected>{{ $user->poor->disabilityType->name }}</option>
                     </select>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label for="name" class="col-sm-2 col-form-label required">Muat Naik Resume (*.pdf)</label>
+                <div class="col-sm-4">
+                    <input type="file" class="form-control"  name="resume" id="resume" accept=".pdf">
+                </div>
+                <div class="col-sm-4">
+                    <span name="currentResume" id="currentResume">
+                        <a href="{{ asset('public/attachments/' . $user->poor->resume) }}" target="_blank">{{ $user->poor->resume }}</a>
+                    </span>
                 </div>
             </div>
         @endif

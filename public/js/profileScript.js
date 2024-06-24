@@ -2,6 +2,7 @@ $(document).ready(function() {
     
     $("input").attr("readonly", true);
     $("#image").attr("readonly", false);
+    $("#resume").attr("readonly", false);
 
     $("#submitBtn").prop('disabled', true);
     $("#submitBtn").hide();
@@ -28,6 +29,38 @@ $(document).ready(function() {
         if(this.value != null && file != null){
             if (!allowedTypes.includes(file.type)) {
                 alert('Sila pilih fail imej yang sah (JPEG, PNG, atau GIF).');
+                this.value = '';
+            }
+        }
+        else{
+            this.value = '';
+        }
+
+    });
+
+    $("#image").change(function(){
+        var allowedTypes = ['image/jpeg', 'image/png'];
+        var file = this.files[0];
+
+        if(this.value != null && file != null){
+            if (!allowedTypes.includes(file.type)) {
+                alert('Sila pilih fail imej yang sah (JPEG, PNG, atau GIF).');
+                this.value = '';
+            }
+        }
+        else{
+            this.value = '';
+        }
+
+    });
+
+    $("#resume").change(function(){
+        var allowedTypes = ['application/pdf'];
+        var file = this.files[0];
+
+        if(this.value != null && file != null){
+            if (!allowedTypes.includes(file.type)) {
+                alert('Sila pilih fail resume yang sah (PDF).');
                 this.value = '';
             }
         }

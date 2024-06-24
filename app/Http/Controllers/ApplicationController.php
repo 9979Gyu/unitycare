@@ -71,7 +71,7 @@ class ApplicationController extends Controller
         else{
             $convertedDate = "";
         }
-        
+
         Mail::to($apps->email)->send(new NotifyJoinEmail([
             'name' => $apps->username,
             'subject' => 'pekerjaan',
@@ -613,7 +613,8 @@ class ApplicationController extends Controller
                 'processed.email as processedemail',
                 'dt.name as category',
                 'el.name as edu_level',
-                'j.position as position'
+                'j.position as position',
+                'poors.resume',
             )
             ->orderBy("applications.applied_date", "asc")
             ->get();
@@ -679,6 +680,10 @@ class ApplicationController extends Controller
                 $token = csrf_token();
                 $btn = '<div class="justify-content-center">';
                 $btn .= '<a href="/joinoffer/' . $row->offer_id . '?type=permohonan"><span class="btn btn-primary m-1"> Lihat </span></a>';
+
+                if($row->resume != NULL){
+                    $btn .= '<a href="/public/attachments/' . $row->resume . '" target="_blank"><span class="btn btn-info m-1"> Resume </span></a>';
+                }
 
                 if(Auth::user()->roleID == 3 && Auth::user()->id == $userID){
                     if($row->approval_status == 1){

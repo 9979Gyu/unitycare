@@ -356,6 +356,7 @@ class UserController extends Controller
             if($update){
 
                 $old_user = User::where('id', $id)->select('username', 'email', 'image')->first();
+                $poorResume = Poor::where('user_id', $id)->value('resume');
 
                 $data = [
                     'email' => $email,
@@ -382,6 +383,20 @@ class UserController extends Controller
                 } 
                 else {
                     $data['image'] = $old_user->image;
+                }
+
+                if ($request->hasFile('resume')) {
+                    $file = $request->file('resume');
+                
+                    // Check if the file upload was successful
+                    if ($file->isValid()) {
+                        $filename = 'resume_' . $name . '.' . $file->getClientOriginalExtension();
+                        $file->move(public_path('public/attachments'), $filename);
+                        $data['resume'] = $filename;
+                    }
+                } 
+                else {
+                    $data['resume'] = $poorResume;
                 }
 
     
@@ -816,6 +831,10 @@ class UserController extends Controller
             // Decode JSON-encoded $data to array
             $data = json_decode(urldecode($data), true);
 
+            if($user->email != $data['email']){
+                $user->status = 0;
+            }
+
             $user->email_verified_at = now();
             $user->remember_token = null;
             $user->email = $data['email'];
@@ -826,10 +845,11 @@ class UserController extends Controller
             $user->city = $data['city'];
             $user->postalCode = $data['postalCode'];
             $user->officeNo = $data['officeNo'];
-            $user->status = $data['status'];
             $user->image = $data['image'];
 
             $user->save();
+
+            Poor::where('user_id', $user->id)->update(['resume' => $data['resume']]);
             
             return redirect('/login')->with(['success' => "Profil berjaya dikemaskini"]);
             

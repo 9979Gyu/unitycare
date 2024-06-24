@@ -799,7 +799,7 @@ class OfferController extends Controller
             }
     
             // Check for datetime clash
-            if ($this->isDateTimeClash($currentOffer, $enrolledOffer)) {
+            if ($this->isDateTimeClash($currentOffer, $enrolledOffer) && $enrolledOffer->approval_status == 2 && $enrolledOffer->is_selected == 2) {
                 // Clash found
                 return true; 
             }
@@ -842,6 +842,16 @@ class OfferController extends Controller
         ->orderBy('job_offers.updated_at', 'desc')
         ->get();
 
+        $haveEnrolled = Application::join('poors as p', 'p.poor_id', '=', 'applications.poor_id')
+        ->join('users as u', 'u.id', '=', 'p.user_id')
+        ->where([
+            ["u.id", $uid],
+            ['applications.status', 1],
+            ['applications.approval_status', 2],
+            ['applications.is_selected', 2],
+        ])
+        ->value('applications.offer_id');
+
         $enrolledOffers = Application::join('poors as p', 'p.poor_id', '=', 'applications.poor_id')
         ->join('users as u', 'u.id', '=', 'p.user_id')
         ->join('job_offers as jo', 'jo.offer_id', '=', 'applications.offer_id')
@@ -870,23 +880,30 @@ class OfferController extends Controller
 
         foreach ($allOffers as &$offer) {
             $offer->image = "public/user_images/" . $offer->image;
+
+            $enrolledOffer = $enrolledOffers[$offer->offer_id] ?? null;
             // Add enrolled offer attributes if exists
-            if ($enrolledOffer = $enrolledOffers[$offer->offer_id] ?? null) {
+            if ($enrolledOffer) {
                 $offer->enrolled_approval_status = $enrolledOffer->approval_status;
                 $offer->enrolled_is_selected = $enrolledOffer->is_selected;
 
-                // If it is Sepenuh Masa job
-                if ($enrolledOffer->job_type_id == 1 && $enrolledOffer->is_selected == 2) {
+                if ($enrolledOffer->job_type_id == 1 && $enrolledOffer->is_selected == 2 && $enrolledOffer->approval_status == 2) {
                     $alwaysNo = true;
                 }
+
             } 
             else {
                 $offer->enrolled_approval_status = null;
                 $offer->enrolled_is_selected = null;
             }
-        
+
             // Check for datetime clashes with other offers
             $offer->crash = $this->checkDateTimeClash($offer, $enrolledOffers);
+
+            // User have job and current enter loop job is Sepenuh Job
+            if($haveEnrolled && $offer->job_type_id == 1){
+                $offer->crash = true;
+            }
         }
 
         return response()->json([
