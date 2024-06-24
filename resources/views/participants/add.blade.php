@@ -1,4 +1,9 @@
 @extends('layouts.app')
+
+@push('styles')
+    <link href="{{ asset('css/poorTableStyle.css') }}" rel="stylesheet">
+@endpush
+
 @section('title')
     UnityCare-Program
 @endsection
@@ -28,98 +33,101 @@
         @csrf
         <div class="table-responsive">
             <table class="table table-hover">
-                <tr>
-                    <th colspan="4" class="text-center">Maklumat Program</th>
-                </tr>
-                <tr>
-                    <th scope="row">Nama</th>
-                    <td colspan="3">{{ $program->name }}</td>
-                </tr>
-                <tr>
-                    <th scope="row">Jenis</th>
-                    @if($program->type_id == 1)
-                        <td colspan="3">Sukarelawan</td>
-                    @elseif($program->type_id == 2)
-                        <td colspan="3">Pembangunan Kemahiran</td>
-                    @endif
-                </tr>
-                <tr>
-                    <th scope="row">Tempat</th>
-                    <td colspan="3" id="address">{{ $program->venue }}, {{ $program->postal_code }}, {{ $program->city }}, {{ $program->state }}</td>
-                </tr>
-                <tr>
-                    <th scope="row">Mula</th>
-                    <td colspan="3">{{ $program->start_date }} {{ $program->start_time }}</td>
-                </tr>
-                <tr>
-                    <th scope="row">Tamat</th>
-                    <td colspan="3">{{ $program->end_date }} {{ $program->end_time }}</td>
-                </tr>
-                @if (!empty(json_decode($program->description, true)))
+                <tbody>
                     <tr>
-                        <th scope="row">Penerangan</th>
-                        <td colspan="3">{!! nl2br(e(json_decode($program->description, true)['desc'])) !!}</td>
+                        <th colspan="2" class="text-center">Maklumat Program</th>
                     </tr>
-                @endif
-                <tr>
-                    <th scope="row">Tarikh Tutup Permohonan</th>
-                    <td colspan="3">{{ $program->close_date }}</td>
-                </tr>
-                <tr>
-                    <th scope="row" rowspan="2">Kekosongan</th>
-                    <th>Sukarelawan</th>
-                    <th colspan="2">Peserta</th>
-                </tr>
-                <tr>
-                    <td>{{ $volRemain }} / {{ $volLimit->programSpecs[0]->qty_limit }}</td>
-                    <td colspan="2">{{ $poorRemain }} / {{ $poorLimit->programSpecs[0]->qty_limit }}</td>
-                </tr>
-                <tr>
-                    <th scope="row" rowspan="2">Pengurus</th>
-                    <th>Nama</th>
-                    <th>Telefon</th>
-                    <th>Emel</th>
-                </tr>
-                <tr>
-                    <td>{{ $program->organization->name }}</td>
-                    <td>+60{{ $program->organization->contactNo }}</td>
-                    <td>{{ $program->organization->email }}</td>
-                </tr>
-                <tr>
-                    <th>Peta</th>
-                    <td colspan="3">
-                        <div id="map"></div>
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">Pilihan</th>
-                    <input type="number" name="programID" value="{{ $program->program_id }}" hidden>
-                    <td colspan="3">
-                        <!-- Did not apply, close date not reach, is not creator, is not enterprise -->
-                        @if(($action == "nc1" || $participantExist == 0) && $program->close_date >= today() && $program->user_id != $userID && $roleID != 3 && $type == 'true')
-                            <!-- is poor, can be perserta -->
-                            @if($poorRemain > 0 && $roleID == 5)
-                                <button type="submit" class="btn btn-success" name="button_id" value="3"><b>Jadi Peserta</b></button>
+                    <tr>
+                        <th scope="row">Nama</th>
+                        <td>{{ $program->name }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Tempat</th>
+                        <td id="address">
+                            {{ $program->venue }}, {{ $program->postal_code }}, {{ $program->city }}, {{ $program->state }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Jenis</th>
+                        <td>
+                            @if($program->type_id == 1)
+                                Sukarelawan
+                            @elseif($program->type_id == 2)
+                                Pembangunan Kemahiran
+                            @endif
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Mula</th>
+                        <td>{{ $program->start_date }} {{ $program->start_time }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Tamat</th>
+                        <td>{{ $program->end_date }} {{ $program->end_time }}</td>
+                    </tr>
+                    @if (!empty(json_decode($program->description, true)))
+                        <tr>
+                            <th scope="row">Penerangan</th>
+                            <td>{!! nl2br(e(json_decode($program->description, true)['desc'])) !!}</td>
+                        </tr>
+                    @endif
+                    <tr>
+                        <th scope="row">Tarikh Tutup Permohonan</th>
+                        <td>{{ $program->close_date }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" rowspan="2">Kekosongan (kekosongan / diperlukan)</th>
+                        <td>Sukarelawan: {{ $volRemain }} / {{ $volLimit->programSpecs[0]->qty_limit }}</td>
+                    </tr>
+                    <tr>
+                        <td>Peserta: {{ $poorRemain }} / {{ $poorLimit->programSpecs[0]->qty_limit }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" rowspan="3">Pengurus</th>
+                        <td>Nama: {{ $program->organization->name }}</td>
+                    </tr>
+                    <tr>
+                        <td>Emel: {{ $program->organization->email }}</td>
+                    </tr>
+                    <tr>
+                        <td>Telefon: +60{{ $program->organization->contactNo }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Peta</th>
+                        <td>
+                            <div id="map"></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Pilihan</th>
+                        <td>
+                            <!-- Did not apply, close date not reach, is not creator, is not enterprise -->
+                            @if(($action == "nc1" || $participantExist == 0) && $program->close_date >= today() && $program->user_id != $userID && $roleID != 3 && $type == 'true')
+                                <!-- is poor, can be perserta -->
+                                @if($poorRemain > 0 && $roleID == 5)
+                                    <button type="submit" class="btn btn-success" name="button_id" value="3"><b>Jadi Peserta</b></button>
+                                @endif
+
+                                @if($volRemain > 0)
+                                    <button type="submit" class="btn btn-info" name="button_id" value="2"><b>Jadi Sukarelawan</b></button>
+                                @endif
                             @endif
 
-                            @if($volRemain > 0)
-                                <button type="submit" class="btn btn-info" name="button_id" value="2"><b>Jadi Sukarelawan</b></button>
+                            @if($type == 'true')
+                                <button type="button" class="btn btn-secondary" onclick="window.location='/viewallprograms'"><b>Tutup</b></button>
+                            @elseif($type == 'sertai')
+                                <button type="button" class="btn btn-secondary" onclick="window.location='/indexparticipated'"><b>Tutup</b></button>
+                            @elseif($type == 'peserta')
+                                <button type="button" class="btn btn-secondary" onclick="window.location='/indexparticipant'"><b>Tutup</b></button>
+                            @elseif($type == 'permohonan')
+                                <button type="button" class="btn btn-secondary" onclick="window.location='/viewprogram'"><b>Tutup</b></button>
                             @endif
-                        @endif
-
-                        @if($type == 'true')
-                            <button type="button" class="btn btn-secondary" onclick="window.location='/viewallprograms'"><b>Tutup</b></button>
-                        @elseif($type == 'sertai')
-                            <button type="button" class="btn btn-secondary" onclick="window.location='/indexparticipated'"><b>Tutup</b></button>
-                        @elseif($type == 'peserta')
-                            <button type="button" class="btn btn-secondary" onclick="window.location='/indexparticipant'"><b>Tutup</b></button>
-                        @elseif($type == 'permohonan')
-                            <button type="button" class="btn btn-secondary" onclick="window.location='/viewprogram'"><b>Tutup</b></button>
-                        @endif
-                    </td>
-                </tr>
+                        </td>
+                    </tr>
+                </tbody>
             </table>
         </div>
+
     </form>
 
     <!-- Leaflet initialization script -->

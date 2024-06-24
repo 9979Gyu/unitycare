@@ -1,4 +1,9 @@
 @extends('layouts.app')
+
+@push('styles')
+    <link href="{{ asset('css/poorTableStyle.css') }}" rel="stylesheet">
+@endpush
+
 @section('title')
     UnityCare-Pekerjaan
 @endsection
@@ -26,87 +31,89 @@
 
     <div class="table-responsive">
         <table class="table table-hover">
-            <tr>
-                <th colspan="4" class="text-center">Maklumat Pekerjaan</th>
-            </tr>
-            <tr>
-                <th scope="row">Nama</th>
-                <td colspan="3">{{ $offer->job->name }} - {{ $offer->job->position }}</td>
-            </tr>
-            <tr>
-                <th scope="row">Tempat</th>
-                <td colspan="3" id="address">{{ $offer->venue }}, {{ $offer->postal_code }}, {{ $offer->city }}, {{ $offer->state }}</td>
-            </tr>
-            <tr>
-                <th scope="row">Jenis</th>
-                <td colspan="3">{{ $offer->jobType->name }}</td>
-            </tr>
-            <tr>
-                <th scope="row">Syif</th>
-                <td colspan="3">{{ $offer->shiftType->name }}</td>
-            </tr>
-            @if($offer->jobType->job_type_id != 1)
-            <tr>
-                <th scope="row">Tarikh</th>
-                <td colspan="3">{{ $offer->start_date }} Hingga {{ $offer->end_date }}</td>
-            </tr>
-            @endif
-            <tr>
-                <th scope="row">Masa</th>
-                <td colspan="3">{{ $offer->start_time }} Hingga {{ $offer->end_time }}</td>
-            </tr>
-            <tr>
-                <th scope="row">Purata Gaji</th>
-                <td colspan="3">RM {{ $offer->min_salary }} - RM {{ $offer->max_salary }}</td>
-            </tr>
-            <tr>
-                <th scope="row">Penerangan</th>
-                <td colspan="3">{!! nl2br(e(json_decode($offer->description, true)['description'])) !!}</td>
-            </tr>
-            <tr>
-                <th scope="row" rowspan="2">Pengurus</th>
-                <th>Nama</th>
-                <th>Telefon</th>
-                <th>Emel</th>
-            </tr>
-            <tr>
-                <td>{{ $offer->organization->name }}</td>
-                <td>+60{{ $offer->organization->contactNo }}</td>
-                <td>{{ $offer->organization->email }}</td>
-            </tr>
-            <tr>
-                <th>Peta</th>
-                <td colspan="3">
-                    <div class="border-radius" id="map"></div>
-                </td>
-            </tr>
-            <tr>
-                <th scope="row">Pilihan</th>
-                <td colspan="3">
-                    @if($user->roleID == 5 && $offer->user_id != $user->id)
-                        <!-- is not creator and not yet apply -->
-                        @if($action == "nc1" || $applied == 0)
-                            <button type="button" class="btn btn-success" name="apply" id="apply" value="mohon"><b>Mohon</b></button>
-                        <!-- applied and approved -->
-                        @elseif($applied > 0)
-                            @if($approval == 2)
-                                <button type="button" class="btn btn-success" name="approve" id="approve" value="terima"><b>Terima</b></button>
-                                <button type="button" class="btn btn-danger" name="decline" id="decline" value="tolak"><b>Tolak</b></button>
-                            @elseif($approval == 1)
-                                <button type="button" class="btn btn-danger" name="dismiss" id="dismiss"><b>Tarik Diri</b></button>
+            <tbody>
+                <tr>
+                    <th colspan="2" class="text-center">Maklumat Pekerjaan</th>
+                </tr>
+                <tr>
+                    <th scope="row">Nama</th>
+                    <td>{{ $offer->job->name }} - {{ $offer->job->position }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Tempat</th>
+                    <td id="address">{{ $offer->venue }}, {{ $offer->postal_code }}, {{ $offer->city }}, {{ $offer->state }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Jenis</th>
+                    <td>{{ $offer->jobType->name }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Syif</th>
+                    <td>{{ $offer->shiftType->name }}</td>
+                </tr>
+                @if($offer->jobType->job_type_id != 1)
+                <tr>
+                    <th scope="row">Tarikh</th>
+                    <td>{{ $offer->start_date }} Hingga {{ $offer->end_date }}</td>
+                </tr>
+                @endif
+                <tr>
+                    <th scope="row">Masa</th>
+                    <td>{{ $offer->start_time }} Hingga {{ $offer->end_time }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Purata Gaji Bulanan</th>
+                    <td>RM {{ $offer->min_salary }} - RM {{ $offer->max_salary }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Penerangan</th>
+                    <td>{!! nl2br(e(json_decode($offer->description, true)['description'])) !!}</td>
+                </tr>
+                <tr>
+                    <th scope="row" rowspan="3">Pengurus</th>
+                    <td>Nama: {{ $offer->organization->name }}</td>
+                </tr>
+                <tr>
+                    <td>Emel: {{ $offer->organization->email }}</td>
+                </tr>
+                <tr>
+                    <td>Telefon: +60{{ $offer->organization->contactNo }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Peta</th>
+                    <td>
+                        <div class="border-radius" id="map"></div>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">Pilihan</th>
+                    <td>
+                        @if($user->roleID == 5 && $offer->user_id != $user->id)
+                            <!-- is not creator and not yet apply -->
+                            @if($action == "nc1" || $applied == 0)
+                                <button type="button" class="btn btn-success" name="apply" id="apply" value="mohon"><b>Mohon</b></button>
+                            <!-- applied and approved -->
+                            @elseif($applied > 0)
+                                @if($approval == 2)
+                                    <button type="button" class="btn btn-success" name="approve" id="approve" value="terima"><b>Terima</b></button>
+                                    <button type="button" class="btn btn-danger" name="decline" id="decline" value="tolak"><b>Tolak</b></button>
+                                @elseif($approval == 1)
+                                    <button type="button" class="btn btn-danger" name="dismiss" id="dismiss"><b>Tarik Diri</b></button>
+                                @endif
                             @endif
                         @endif
-                    @endif
 
-                    @if($type == 'true')
-                        <button type="button" class="btn btn-secondary" onclick="window.location='/viewoffer'"><b>Tutup</b></button>
-                    @elseif($type == 'permohonan')
-                        <button type="button" class="btn btn-secondary" onclick="window.location='/viewapplication'"><b>Tutup</b></button>
-                    @endif
-                </td>
-            </tr>
+                        @if($type == 'true')
+                            <button type="button" class="btn btn-secondary" onclick="window.location='/viewoffer'"><b>Tutup</b></button>
+                        @elseif($type == 'permohonan')
+                            <button type="button" class="btn btn-secondary" onclick="window.location='/viewapplication'"><b>Tutup</b></button>
+                        @endif
+                    </td>
+                </tr>
+            </tbody>
         </table>
     </div>
+
 
     <!-- Modal -->
     <form method="POST" action="/storeapplication" id="applyForm">
