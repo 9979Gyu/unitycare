@@ -770,6 +770,7 @@ class ProgramController extends Controller
             'offer' => $program->name,
             'datetime' => $program->approved_at,
             'reason' => $program->reason ? $program->reason : "",
+            'is_selected' => 1,
         ]));
     }
 
@@ -802,6 +803,7 @@ class ProgramController extends Controller
                 'offer' => $program->name,
                 'datetime' => $program->approved_at,
                 'reason' => $program->reason ? $program->reason : "",
+                'is_selected' => 1,
             ]));
         }
     }

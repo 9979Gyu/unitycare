@@ -100,6 +100,7 @@
                     </tr>
                     <tr>
                         <th scope="row">Pilihan</th>
+                        <input type="number" name="programID" value="{{ $program->program_id }}" hidden>
                         <td>
                             <!-- Did not apply, close date not reach, is not creator, is not enterprise -->
                             @if(($action == "nc1" || $participantExist == 0) && $program->close_date >= today() && $program->user_id != $userID && $roleID != 3 && $type == 'true')

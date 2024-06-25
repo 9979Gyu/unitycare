@@ -22,6 +22,7 @@ use App\Mail\NotifyPasswordChange;
 use App\Mail\ChangeProfileEmail;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
+use DateTime;
 
 class UserController extends Controller
 {
@@ -164,6 +165,7 @@ class UserController extends Controller
                         'remember_token' => Str::random(32),
                         'username' => $result->name,
                         'password' => Hash::make($password),
+                        'image' => 'default_image.png',
                     ]);
 
                     if($roleID == 3){
@@ -258,6 +260,30 @@ class UserController extends Controller
             $email = Str::lower(trim($request->get('email')));
             $password = Str::random(8);
             $ic = $request->get('ICNo');
+
+            $firstYear = substr($ic, 0, 1);
+            $secondYear = substr($ic, 1, 1);
+            $yy = substr($ic, 0, 2);
+            $mm = substr($ic, 2, 2);
+            $dd = substr($ic, 4, 2);
+
+            if($firstYear <= 2){
+                $birthDateStr = "20$yy-$mm-$dd";
+            }
+            else{
+                $birthDateStr = "19$yy-$mm-$dd";
+            }
+
+            // Convert birthDateStr to a DateTime object
+            $birthDate = new DateTime($birthDateStr);
+
+            // Calculate 12 years ago from today
+            $eighteenYearsAgo = new DateTime('-12 years');
+
+            if ($birthDate > $eighteenYearsAgo) {
+                return redirect()->back()->withInput($request->all())->withErrors(['message' => 'Maaf. Umur pengguna tidak sesuai']);
+            }
+
             $user = new User([
                 'name' => ucwords(trim($request->get('name'))),
                 'email' => $email,

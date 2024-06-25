@@ -980,6 +980,7 @@ class OfferController extends Controller
             'offer' => $offer->position,
             'datetime' => $offer->approved_at,
             'reason' => $offer->reason ? $offer->reason : "",
+            'is_selected' => 1,
         ]));
     }
 
@@ -1022,6 +1023,7 @@ class OfferController extends Controller
                 'offer' => $position,
                 'datetime' => $datetime,
                 'reason' => $user->reason ? $user->reason : "",
+                'is_selected' => 1,
             ]));
         }
     }
