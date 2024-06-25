@@ -45,6 +45,8 @@
         crossorigin=""/>
     @stack('styles')
 
+    @laravelPWA
+
 </head>
 <body>
 

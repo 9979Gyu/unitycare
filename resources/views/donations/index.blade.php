@@ -1,11 +1,11 @@
 @extends('layouts.app')
 @section('title')
-    UnityCare-Pekerjaan
+    UnityCare-Sumbangan
 @endsection
 
 @section('content')
     
-    <h2>Pekerjaan</h2>
+    <h2>Sumbangan</h2>
     <br>
 
     @if (session()->has('success'))
