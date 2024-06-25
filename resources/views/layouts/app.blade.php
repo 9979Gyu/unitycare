@@ -104,6 +104,7 @@
                             <li class="nav-item mb-3">Telefon: 60129231224</li>
                             <li class="nav-item mb-3"><a href="mailto:B032220008@student.utem.edu.my" class="nav-link p-0 text-white">Emel: B032220008@student.utem.edu.my</a></li>
                             <li class="nav-item mb-3">Alamat: Universiti Teknikal Malaysia Melaka, Hang Tuah Jaya, Durian Tunggal, 76100, Melaka, Malaysia.</li>
+                            <li class="nav-item mb-3"><a href="/create-transaction" class="nav-link p-0 text-white">Sumbangan: Buy me a coffee</a></li>
                         </ul>
                     </div>
                     <div class="col">

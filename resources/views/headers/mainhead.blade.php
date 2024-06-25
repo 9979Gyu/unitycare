@@ -104,7 +104,7 @@
                         </ul>
                     </li>
 
-                    @if(Auth::user()->roleID == 1 || Auth::user()->roleID == 2)
+                    @if(Auth::user()->roleID == 1)
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown5" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <b>Laporan</b>
@@ -113,6 +113,8 @@
                                 <li><a class="dropdown-item" href="/indexparticipant"><b>Pekerjaan</b></a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="/viewoffer"><b>Program</b></a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="/view-transaction"><b>Sumbangan</b></a></li>
                             </ul>
                         </li>
                     @endif

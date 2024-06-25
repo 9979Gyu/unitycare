@@ -11,6 +11,7 @@ use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ChartController;
+use App\Http\Controllers\PayPalController;
 
 /*
 |--------------------------------------------------------------------------
@@ -65,6 +66,7 @@ Route::post('/export-applications', [ApplicationController::class, 'exportApplic
 Route::post('/export-participants', [ParticipantController::class, 'exportParticipants']);
 Route::post('/export-participated', [ParticipantController::class, 'exportParticipated']);
 Route::post('/export-applies', [ApplicationController::class, 'exportApplied']);
+Route::post('/export-transactions', [PayPalController::class, 'exportTransactions']);
 
 // User
 Route::get('/create', [UserController::class, 'create']);
@@ -164,3 +166,13 @@ Route::get('/program-bar-chart', [ParticipantController::class, 'programBarChart
 Route::get('/program_type_pie_chart', [ParticipantController::class, 'programTypePieChart']);
 Route::get('/part_type_pie_chart', [ParticipantController::class, 'participantTypePieChart']);
 Route::get('/part_bar_chart', [ParticipantController::class, 'participantBarChart']);
+
+// Donation
+Route::get('view-transaction', [PayPalController::class, 'index'])->name('index');
+Route::get('getTransactionDatatable', [PayPalController::class, 'getTransactionDatatable'])->name('getTransactionDatatable');
+Route::post('delete-transaction', [PayPalController::class, 'destroy'])->name('destroy');
+
+Route::get('create-transaction', [PayPalController::class, 'createTransaction'])->name('createTransaction');
+Route::post('process-transaction', [PayPalController::class, 'processTransaction'])->name('processTransaction');
+Route::get('success-transaction', [PayPalController::class, 'successTransaction'])->name('successTransaction');
+Route::get('cancel-transaction', [PayPalController::class, 'cancelTransaction'])->name('cancelTransaction');
