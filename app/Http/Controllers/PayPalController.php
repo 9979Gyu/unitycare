@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Payment;
 use App\Models\Transaction;
 use DataTables;
+use PDF;
 use Illuminate\Support\Facades\Auth;
 use App\Exports\ExportTransaction;
 use Maatwebsite\Excel\Facades\Excel;
@@ -84,6 +84,7 @@ class PayPalController extends Controller{
             $table->addColumn('action', function ($row) {
                 $token = csrf_token();
                 $btn = '<div class="justify-content-center">';
+                $btn .= '<a class="printAnchor" href="#" id="' . $row->reference_no . '"><span class="btn btn-primary m-1" data-bs-toggle="modal" data-bs-target="#printModal"> Cetak </span></a>';
                 $btn .= '<a class="deleteAnchor" href="#" id="' . $row->reference_no . '"><span class="btn btn-danger m-1" data-bs-toggle="modal" data-bs-target="#deleteModal"> Padam </span></a>';
                 $btn .= '</div>';
 
@@ -227,9 +228,22 @@ class PayPalController extends Controller{
 
             $payment->save();
 
+            $data = [
+                'transactionID' => $payment->reference_no,
+                'payerName' => $payment->payer_name,
+                'description' => $payment->references,
+                'price' => number_format($payment->amount, 2),
+                'currency' => $payment->currency,
+                'receiptNo' => time(),
+            ];
+
+            // Store the data in the session
+            session(['invoice_data' => $data]);
+            
             return redirect()
-                ->route('createTransaction')
+                ->route('getInvoice')
                 ->with('success', 'Terima Kasih');
+
         } 
         else {
             return redirect()

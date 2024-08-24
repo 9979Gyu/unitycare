@@ -122,6 +122,11 @@ $(document).ready(function(){
         selectedID = $(this).attr('id');
     });
 
+    $(document).on('click', '.printAnchor', function() {
+        selectedID = $(this).attr('id');
+        $('#referenceNo').val(selectedID);
+    });
+
     $('#delete').click(function() {
         if (selectedID) {
             $.ajax({

@@ -12,6 +12,7 @@ use App\Http\Controllers\LandingController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ChartController;
 use App\Http\Controllers\PayPalController;
+use App\Http\Controllers\DomPdfController;
 
 /*
 |--------------------------------------------------------------------------
@@ -176,3 +177,8 @@ Route::get('create-transaction', [PayPalController::class, 'createTransaction'])
 Route::post('process-transaction', [PayPalController::class, 'processTransaction'])->name('processTransaction');
 Route::get('success-transaction', [PayPalController::class, 'successTransaction'])->name('successTransaction');
 Route::get('cancel-transaction', [PayPalController::class, 'cancelTransaction'])->name('cancelTransaction');
+
+//DomPDF
+Route::get('/get-invoice', [DomPdfController::class, 'getInvoice'])->name('getInvoice');
+Route::post('/view-invoice', [DomPdfController::class, 'viewInvoice'])->name('viewInvoice');
+Route::get('/print-invoice', [DomPdfController::class, 'printInvoice'])->name('printInvoice');
