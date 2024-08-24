@@ -54,8 +54,9 @@
             <thead>
                 <tr style="text-align:center">
                     <th> No. </th>
-                    <th>ID Transaksi</th>
+                    <th>No Rujukan</th>
                     <th>Nama</th>
+                    <th>Tujuan</th>
                     <th>Nilai ({{ $paypalCurrency }})</th>
                     <th>Tarikh</th>
                     <th>Tindakan</th>

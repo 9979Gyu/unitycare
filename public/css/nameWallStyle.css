@@ -1,0 +1,48 @@
+.name-wall {
+    width: 100%;
+    max-width: 600px;
+    overflow: hidden;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    position: relative;
+}
+
+.name-scroll {
+    overflow: hidden;
+    white-space: nowrap;
+    position: relative;
+}
+
+.name-list {
+    display: inline-block;
+    padding: 10px 0;
+    white-space: nowrap;
+    animation: scroll 10s linear infinite;
+}
+
+.name-item {
+    display: inline-block;
+    background: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 1.2em;
+    margin-right: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.name-item:last-child {
+    margin-right: 0;
+}
+
+@keyframes scroll {
+    from {
+        transform: translateX(100%);
+    }
+    to {
+        transform: translateX(-100%);
+    }
+}

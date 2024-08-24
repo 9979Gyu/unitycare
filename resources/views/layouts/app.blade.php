@@ -82,7 +82,7 @@
             
         </ul>
     </div>
-
+    
     <div class="container mt-3">
         @yield('content')
     </div>

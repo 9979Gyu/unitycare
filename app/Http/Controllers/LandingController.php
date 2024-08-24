@@ -8,6 +8,7 @@ use App\Models\Job;
 use App\Models\Job_Offer;
 use App\Models\Sector;
 use App\Models\User;
+use App\Models\Transaction;
 use Illuminate\Database\Eloquent\Builder;
 use Auth;
 use Illuminate\Support\Facades\DB;
@@ -23,6 +24,19 @@ class LandingController extends Controller{
     public function index(){
         
         $now =  date('Y-m-d');
+        $totalUser = User::where([
+            ['status', 1],
+            ['roleID', '>=', 3],
+        ])->count('id');
+
+        $totalProgram = Program::where('status', 1)->count('program_id');
+        $totalOffer = Job_Offer::where('status', 1)->count('offer_id');
+        $totalDonation = Transaction::where([
+            ['payment_status', 1],
+            ['transaction_type_id', 1],
+        ])->sum('amount');
+        $formattedTotalDonation = number_format($totalDonation, 2);
+
         // Check if user logged in and is B40/OKU
         if(Auth::check() && Auth::user()->roleID == 5){
 
@@ -98,7 +112,7 @@ class LandingController extends Controller{
             ->get();
         }
 
-        return view('landings.index', compact('sectors'));
+        return view('landings.index', compact('sectors', 'totalProgram', 'totalOffer', 'formattedTotalDonation', 'totalUser'));
     }
 
     public function search(Request $request)

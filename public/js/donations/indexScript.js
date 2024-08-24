@@ -66,7 +66,7 @@ $(document).ready(function(){
                 "className": "text-center",
                 "width": "2%"
             }, {
-                "targets": [1, 2, 3, 4, 5],
+                "targets": [1, 2, 3, 4, 5, 6],
                 "className": "text-center",
             },], 
             columns: [{
@@ -77,8 +77,8 @@ $(document).ready(function(){
                     return meta.row + meta.settings._iDisplayStart + 1;
                 }
             }, {
-                data: 'transaction_id',
-                name: 'transaction_id',
+                data: 'reference_no',
+                name: 'reference_no',
                 orderable: true,
                 searchable: true
             }, {
@@ -87,6 +87,11 @@ $(document).ready(function(){
                 orderable: true,
                 searchable: true,
             },  {
+                data: 'references',
+                name: 'references',
+                orderable: true,
+                searchable: true,
+            }, {
                 data: 'formatted_amount',
                 name: 'amount',
                 orderable: true,

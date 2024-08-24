@@ -13,10 +13,17 @@ use Srmklive\PayPal\Services\PayPal as PayPalClient;
 
 class PayPalController extends Controller{
 
+    private $paypalCurrency;
+
+    public function __construct()
+    {
+        $this->paypalCurrency = \Config::get('app.PAYPAL_CURRENCY');
+    }
+
     public function index(){
         if(Auth::check() && Auth::user()->roleID == 1){
             $roleNo = Auth::user()->roleID;
-            $paypalCurrency = \Config::get('app.PAYPAL_CURRENCY');
+            $paypalCurrency = $this->paypalCurrency;
             return view('donations.index', compact('roleNo', 'paypalCurrency'));
         }
         else{
@@ -26,7 +33,7 @@ class PayPalController extends Controller{
 
     // Function to get list of transaction by the selection option
     public function retrieveTransaction($startDate, $endDate){
-        $query = Payment::where('payment_status', 1);
+        $query = Transaction::where('payment_status', 1);
 
         if($startDate != '' && $endDate != ''){
             $query = $query->where([
@@ -36,8 +43,8 @@ class PayPalController extends Controller{
         }
 
         $selectedData = $query->select(
-            'id',
-            'transaction_id',
+            'reference_no',
+            'references',
             'payer_name',
             'amount',
             'created_at',
@@ -77,7 +84,7 @@ class PayPalController extends Controller{
             $table->addColumn('action', function ($row) {
                 $token = csrf_token();
                 $btn = '<div class="justify-content-center">';
-                $btn .= '<a class="deleteAnchor" href="#" id="' . $row->id . '"><span class="btn btn-danger m-1" data-bs-toggle="modal" data-bs-target="#deleteModal"> Padam </span></a>';
+                $btn .= '<a class="deleteAnchor" href="#" id="' . $row->reference_no . '"><span class="btn btn-danger m-1" data-bs-toggle="modal" data-bs-target="#deleteModal"> Padam </span></a>';
                 $btn .= '</div>';
 
                 return $btn;
@@ -118,7 +125,8 @@ class PayPalController extends Controller{
     public function destroy(Request $request){
 
         $id = $request->get('payment_id');
-        $update = Payment::where('id', $id)
+
+        $update = Transaction::where('reference_no', $id)
             ->update([
                 'payment_status' => 0,
             ]);
@@ -137,7 +145,7 @@ class PayPalController extends Controller{
      * @return \Illuminate\Http\Response
      */
     public function createTransaction(){
-        $paypalCurrency = \Config::get('app.PAYPAL_CURRENCY');
+        $paypalCurrency = $this->paypalCurrency;
         return view('donations.create', compact('paypalCurrency'));
     }
 
@@ -149,7 +157,7 @@ class PayPalController extends Controller{
     public function processTransaction(Request $request){
 
         $amount = $request->get('amount');
-        $paypalCurrency = \Config::get('app.PAYPAL_CURRENCY');
+        $paypalCurrency = $this->paypalCurrency;
 
         $provider = new PayPalClient;
         $provider->setApiCredentials(config('paypal'));
@@ -214,7 +222,7 @@ class PayPalController extends Controller{
                 'payment_status' => 1,
                 'transaction_type_id' => 1, // donation
                 'payer_id' => $loggedUser,
-                'references' => 'Donation',
+                'references' => 'Derma',
             ]);
 
             $payment->save();

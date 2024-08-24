@@ -1,5 +1,10 @@
 @extends('layouts.app')
 
+@push('styles')
+    <link href="{{ asset('css/counterStyle.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/nameWallStyle.css') }}" rel="stylesheet">
+@endpush
+
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
 @endpush
@@ -27,6 +32,7 @@
     @endif
 
     <div class="container mt-5">
+
         <!-- Tab for program and job -->
         <ul class="nav nav-tabs" id="tab" role="tablist">
             <li class="nav-item" role="presentation">
@@ -186,6 +192,61 @@
 
         <br>
 
+        <!-- Section of donation earn -->
+        <div class="counter-wrapper">
+            <div class="counter">
+                <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="currentColor" class="bi bi-people text-primary" viewBox="0 0 16 16">
+                    <path d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1zm-7.978-1L7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002-.014.002zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4m3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0M6.936 9.28a6 6 0 0 0-1.23-.247A7 7 0 0 0 5 9c-4 0-5 3-5 4q0 1 1 1h4.216A2.24 2.24 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816M4.92 10A5.5 5.5 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275ZM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0m3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4"/>
+                </svg>
+                <div>
+                    <h3 class="count" data-target="{{ $totalUser }}">0</h3>
+                    <span>Jumlah Pengguna</span>
+                </div>
+            </div>
+            <div class="counter">
+                <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="currentColor" class="bi bi-tools text-success" viewBox="0 0 16 16">
+                    <path d="M1 0 0 1l2.2 3.081a1 1 0 0 0 .815.419h.07a1 1 0 0 1 .708.293l2.675 2.675-2.617 2.654A3.003 3.003 0 0 0 0 13a3 3 0 1 0 5.878-.851l2.654-2.617.968.968-.305.914a1 1 0 0 0 .242 1.023l3.27 3.27a.997.997 0 0 0 1.414 0l1.586-1.586a.997.997 0 0 0 0-1.414l-3.27-3.27a1 1 0 0 0-1.023-.242L10.5 9.5l-.96-.96 2.68-2.643A3.005 3.005 0 0 0 16 3q0-.405-.102-.777l-2.14 2.141L12 4l-.364-1.757L13.777.102a3 3 0 0 0-3.675 3.68L7.462 6.46 4.793 3.793a1 1 0 0 1-.293-.707v-.071a1 1 0 0 0-.419-.814zm9.646 10.646a.5.5 0 0 1 .708 0l2.914 2.915a.5.5 0 0 1-.707.707l-2.915-2.914a.5.5 0 0 1 0-.708M3 11l.471.242.529.026.287.445.445.287.026.529L5 13l-.242.471-.026.529-.445.287-.287.445-.529.026L3 15l-.471-.242L2 14.732l-.287-.445L1.268 14l-.026-.529L1 13l.242-.471.026-.529.445-.287.287-.445.529-.026z"/>
+                </svg>
+                <div>
+                    <h3 class="count" data-target="{{ $totalProgram }}">0</h3>
+                    <span>Jumlah Program</span>
+                </div>
+            </div>
+            <div class="counter">
+                <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="currentColor" class="bi bi-briefcase-fill text-warning" viewBox="0 0 16 16">
+                    <path d="M6.5 1A1.5 1.5 0 0 0 5 2.5V3H1.5A1.5 1.5 0 0 0 0 4.5v1.384l7.614 2.03a1.5 1.5 0 0 0 .772 0L16 5.884V4.5A1.5 1.5 0 0 0 14.5 3H11v-.5A1.5 1.5 0 0 0 9.5 1zm0 1h3a.5.5 0 0 1 .5.5V3H6v-.5a.5.5 0 0 1 .5-.5"/>
+                    <path d="M0 12.5A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5V6.85L8.129 8.947a.5.5 0 0 1-.258 0L0 6.85z"/>
+                </svg>
+                <div>
+                    <h3 class="count" data-target="{{ $totalOffer }}">0</h3>
+                    <span>Jumlah Pekerjaan</span>
+                </div>
+            </div>
+            <div class="counter">
+                <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="currentColor" class="bi bi-house-heart-fill text-danger" viewBox="0 0 16 16">
+                    <path d="M8 6.982C9.664 5.309 13.825 8.236 8 12 2.175 8.236 6.336 5.309 8 6.982"/>
+                    <path d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.707L2 8.207V13.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V8.207l.646.646a.5.5 0 0 0 .708-.707L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293zM13 7.207V13.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V7.207l5-5z"/>
+                </svg>
+                <div class="counter-content">
+                    <span class="additional-text">MYR</span>
+                    <h3 class="count" data-target="{{ $formattedTotalDonation }}">0</h3>
+                </div>
+                <span>Jumlah Sumbangan</span>
+            </div>
+        </div>
+
+        <div class="name-wall" id="name-wall">
+            <div class="name-scroll">
+                <div class="name-list">
+                    <div class="name-item">张三</div>
+                    <div class="name-item">李四</div>
+                    <div class="name-item">王五</div>
+                    <div class="name-item">赵六</div>
+                    <!-- 添加更多名字 -->
+                </div>
+            </div>
+        </div>
+
         <br>
 
         <div id="poverty-content">
@@ -273,5 +334,6 @@
     </div>
 
     <script src="{{ asset('js/landingScript.js') }}"></script>
+    <script src="{{ asset('js/counterScript.js') }}"></script>
 
 @endsection

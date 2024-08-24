@@ -26,8 +26,9 @@ class ExportTransaction implements FromCollection, WithHeadings, ShouldAutoSize
             $selectedData = $this->selectedData->map(function ($item) {
 
                 return[
-                    'ID Transaksi' => $item->transaction_id,
+                    'No Rujukan' => $item->reference_no,
                     'Nama' => $item->payer_name,
+                    'Tujuan' => $item->references,
                     'Nilai' => $item->formatted_amount,
                     'Tarikh' => $item->formatted_created_at,
                 ];
@@ -39,9 +40,10 @@ class ExportTransaction implements FromCollection, WithHeadings, ShouldAutoSize
 
     public function headings(): array{
         return [
-            'ID Transaksi',
+            'No Rujukan',
             'Nama',
-            'Nilai (SGD)',
+            'Tujuan',
+            'Nilai ' . \Config::get('app.PAYPAL_CURRENCY'),
             'Tarikh'
         ];
     }
