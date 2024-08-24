@@ -35,7 +35,21 @@ class LandingController extends Controller{
             ['payment_status', 1],
             ['transaction_type_id', 1],
         ])->sum('amount');
-        $formattedTotalDonation = number_format($totalDonation, 2);
+
+        $donors = Transaction::where([
+            ['payment_status', 1],
+            ['transaction_type_id', 1],
+        ])
+        ->select(
+            'payer_name',
+            'amount',
+            DB::raw('DATE_FORMAT(created_at, "%d/%m/%Y %H:%i") as formatted_created_at')
+        )
+        ->get()
+        ->map(function ($donor) {
+            $donor->amount = number_format($donor->amount, 2);
+            return $donor;
+        });
 
         // Check if user logged in and is B40/OKU
         if(Auth::check() && Auth::user()->roleID == 5){
@@ -112,7 +126,8 @@ class LandingController extends Controller{
             ->get();
         }
 
-        return view('landings.index', compact('sectors', 'totalProgram', 'totalOffer', 'formattedTotalDonation', 'totalUser'));
+        return view('landings.index', compact(
+            'sectors', 'totalProgram', 'totalOffer', 'totalDonation', 'totalUser', 'donors'));
     }
 
     public function search(Request $request)

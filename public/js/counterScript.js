@@ -24,27 +24,3 @@ function updateCounts() {
 
 // Call updateCounts once to start the counting
 updateCounts();
-
-// script.js
-
-document.addEventListener('DOMContentLoaded', () => {
-    const nameWall = document.getElementById('nameWall');
-
-    // Pause the animation when hovering or touching
-    nameWall.addEventListener('mouseenter', () => {
-        nameWall.classList.add('paused');
-    });
-
-    nameWall.addEventListener('mouseleave', () => {
-        nameWall.classList.remove('paused');
-    });
-
-    // To ensure it also pauses on touch (for touch devices)
-    nameWall.addEventListener('touchstart', () => {
-        nameWall.classList.add('paused');
-    });
-
-    nameWall.addEventListener('touchend', () => {
-        nameWall.classList.remove('paused');
-    });
-});

@@ -229,7 +229,7 @@
                 </svg>
                 <div class="counter-content">
                     <span class="additional-text">MYR</span>
-                    <h3 class="count" data-target="{{ $formattedTotalDonation }}">0</h3>
+                    <h3 class="count" data-target="{{ $totalDonation }}">0</h3>
                 </div>
                 <span>Jumlah Sumbangan</span>
             </div>
@@ -238,11 +238,13 @@
         <div class="name-wall" id="name-wall">
             <div class="name-scroll">
                 <div class="name-list">
-                    <div class="name-item">张三</div>
-                    <div class="name-item">李四</div>
-                    <div class="name-item">王五</div>
-                    <div class="name-item">赵六</div>
-                    <!-- 添加更多名字 -->
+                    @foreach($donors as $donor)
+                        <div class="name-item">
+                            <span class="name">{{ $donor->payer_name }}</span><br>
+                            <span class="price">MYR {{ $donor->amount }}</span><br>
+                            <span class="date">{{ $donor->formatted_created_at }}</span><br>
+                        </div>
+                    @endforeach
                 </div>
             </div>
         </div>
@@ -335,5 +337,6 @@
 
     <script src="{{ asset('js/landingScript.js') }}"></script>
     <script src="{{ asset('js/counterScript.js') }}"></script>
+    <script src="{{ asset('js/nameWallScript.js') }}"></script>
 
 @endsection

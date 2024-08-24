@@ -38,10 +38,6 @@
     font-weight: 700;
 }
 
-/* .counter svg{
-    color:rgb(55, 136, 216);
-} */
-
 .counter-content {
     display: flex;
     align-items: center;
