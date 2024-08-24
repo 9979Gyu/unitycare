@@ -33,7 +33,7 @@
                         <form method="POST" action="/process-transaction">
                             @csrf
                             <div class="form-group position-relative">
-                                <label for="password" class="required">Derma (SGD)</label>
+                                <label for="password" class="required">Derma ({{ $paypalCurrency }})</label>
                                 <div class="input-group">
                                     <input type="number" name="amount" class="form-control" id="amount" min="0.01" step="0.01" required>
                                 </div>

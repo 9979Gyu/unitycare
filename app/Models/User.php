@@ -76,4 +76,14 @@ class User extends Authenticatable
         return $this->hasOne(Poor::class, 'user_id');
     }
 
+    public function pay()
+    {
+        return $this->hasMany(Transaction::class, 'payer_id');
+    }
+
+    public function receive()
+    {
+        return $this->hasMany(Transaction::class, 'receiver_id');
+    }
+
 }

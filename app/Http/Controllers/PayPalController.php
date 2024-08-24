@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Payment;
+use App\Models\Transaction;
 use DataTables;
 use Illuminate\Support\Facades\Auth;
 use App\Exports\ExportTransaction;
@@ -15,7 +16,7 @@ class PayPalController extends Controller{
     public function index(){
         if(Auth::check() && Auth::user()->roleID == 1){
             $roleNo = Auth::user()->roleID;
-            $paypalCurrency = 'SGD';
+            $paypalCurrency = \Config::get('app.PAYPAL_CURRENCY');
             return view('donations.index', compact('roleNo', 'paypalCurrency'));
         }
         else{
@@ -23,6 +24,7 @@ class PayPalController extends Controller{
         }
     }
 
+    // Function to get list of transaction by the selection option
     public function retrieveTransaction($startDate, $endDate){
         $query = Payment::where('payment_status', 1);
 
@@ -92,6 +94,7 @@ class PayPalController extends Controller{
 
     }
 
+    // Function to export transaction data in Excel
     public function exportTransactions(Request $request){
         
         // Retrieve the validated data
@@ -111,6 +114,7 @@ class PayPalController extends Controller{
         
     }
 
+    // Function to remove transaction info
     public function destroy(Request $request){
 
         $id = $request->get('payment_id');
@@ -133,7 +137,8 @@ class PayPalController extends Controller{
      * @return \Illuminate\Http\Response
      */
     public function createTransaction(){
-        return view('donations.create');
+        $paypalCurrency = \Config::get('app.PAYPAL_CURRENCY');
+        return view('donations.create', compact('paypalCurrency'));
     }
 
     /**
@@ -144,6 +149,7 @@ class PayPalController extends Controller{
     public function processTransaction(Request $request){
 
         $amount = $request->get('amount');
+        $paypalCurrency = \Config::get('app.PAYPAL_CURRENCY');
 
         $provider = new PayPalClient;
         $provider->setApiCredentials(config('paypal'));
@@ -157,7 +163,7 @@ class PayPalController extends Controller{
             "purchase_units" => [
                 0 => [
                     "amount" => [
-                        "currency_code" => "SGD",
+                        "currency_code" => $paypalCurrency,
                         "value" => $amount
                     ]
                 ]
@@ -198,12 +204,17 @@ class PayPalController extends Controller{
             $name = $response['purchase_units'][0]['shipping']['name']['full_name'];
             $details = $response['purchase_units'][0]['payments']['captures'][0]['amount'];
 
-            $payment = new Payment([
-                'transaction_id' => $response['id'],
+            $loggedUser = Auth::user()->id ?? null;
+
+            $payment = new Transaction([
+                'reference_no' => $response['id'],
                 'payer_name' => $name,
                 'amount' => floatval($details['value']),
                 'currency' => $details['currency_code'],
                 'payment_status' => 1,
+                'transaction_type_id' => 1, // donation
+                'payer_id' => $loggedUser,
+                'references' => 'Donation',
             ]);
 
             $payment->save();
@@ -229,4 +240,7 @@ class PayPalController extends Controller{
             ->route('createTransaction')
             ->withErrors(['message' => $response['message'] ?? 'Transaksi telah dibatalkan']);
     }
+
+
+    // Transfer to 
 }

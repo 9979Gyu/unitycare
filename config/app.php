@@ -27,6 +27,7 @@ return [
     */
 
     'env' => env('APP_ENV', 'production'),
+    'PAYPAL_CURRENCY' => env('PAYPAL_CURRENCY', 'MYR'),
 
     /*
     |--------------------------------------------------------------------------
