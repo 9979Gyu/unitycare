@@ -20,7 +20,7 @@ table {
     padding: 50px 20px;
 }
 
-img {
+.title-img img {
     width: 130px;
     height: auto;
 }
@@ -44,4 +44,12 @@ h3{
 .title h2 {
     text-align: left;
     font-size: 50px;
+}
+
+.signature{
+    text-align: center;
+}
+
+.signature img {
+    border-bottom: 1px solid rgba(10, 17, 53, 0.904);
 }

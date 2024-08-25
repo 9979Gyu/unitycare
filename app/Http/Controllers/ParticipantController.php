@@ -472,8 +472,10 @@ class ParticipantController extends Controller
                 if((Auth::user()->roleID == 1 || $row->joined_user_id == $userID) && $row->status == 1){
                     if($row->close_date >= $now)
                         $btn .= '<a class="dismissAnchor" href="#" id="' . $row->participant_id . '"><span class="btn btn-danger m-1" data-bs-toggle="modal" data-bs-target="#dismissModal"> Tarik Diri </span></a>';
-                    elseif($row->end_date < $now)
+                    elseif($row->end_date < $now){
+                        $btn .= '<a class="printAnchor" href="#" id="' . $row->participant_id . '"><span class="btn btn-warning m-1" data-bs-toggle="modal" data-bs-target="#printModal"> Sijil </span></a>';
                         $btn .= '<a class="deleteAnchor" href="#" id="' . $row->participant_id . '"><span class="btn btn-danger m-1" data-bs-toggle="modal" data-bs-target="#deleteModal"> Padam </span></a>';
+                    }
                 }
 
                 return $btn;

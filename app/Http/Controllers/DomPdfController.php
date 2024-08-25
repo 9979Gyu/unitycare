@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Carbon\Carbon;
+use DB;
 use PDF;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -11,6 +12,7 @@ use App\Models\Participant;
 use App\Models\Program;
 use App\Models\Transaction;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 class DomPdfController extends Controller
 {
@@ -81,7 +83,10 @@ class DomPdfController extends Controller
         $partID = $request->get('participantID');
 
         if(!$partID){
-            return redirect('/indexparticipant')->withErrors(["message" => "Muat turun sijil tidak berjaya"]);
+            if(Auth::user()->roleID == 1 || Auth::user()->roleID == 2){
+                return redirect('/indexparticipant')->withErrors(["message" => "Muat turun sijil tidak berjaya"]);
+            }
+            return redirect('/indexparticipated')->withErrors(["message" => "Muat turun sijil tidak berjaya"]);
         }
 
         $data = Participant::where([
@@ -89,6 +94,14 @@ class DomPdfController extends Controller
             ['participants.status', 1],
         ])
         ->join('programs as p', 'p.program_id', '=', 'participants.program_id')
+        ->join('users as u', 'u.id', '=', 'participants.user_id')
+        ->select(
+            'participants.participant_id',
+            'u.name as userName',
+            'p.name as programName',
+            'p.name as programName',
+            DB::raw('DATE_FORMAT(p.end_date, "%d/%m/%Y") as formatted_date'),
+        )
         ->first();
 
         $pdf = PDF::loadView('participants.cert', ['data' => $data]);

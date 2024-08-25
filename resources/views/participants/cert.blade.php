@@ -40,17 +40,30 @@
             </tr>
             <tr>
                 <td colspan="2">
-                    <h3>[Your Name]</h3>
+                    <h3>{{ $data->userName }}</h3>
                 </td>
             </tr>
             <tr>
                 <td colspan="2">
-                    <p>on [The Program End Date] for successfully completing</p>
+                    <p>for successfully completing</p>
                 </td>
             </tr>
             <tr>
                 <td colspan="2">
-                    <h3>[Program Name]</h3>
+                    <h3>{{ $data->programName }}</h3>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <p>on {{ $data->formatted_date }}</p>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <div class="signature">
+                        <span><img src="{{ asset('images/signature.png') }}" alt="Unity Care" /></span><br>
+                        <span>UnityCare</span>
+                    </div>
                 </td>
             </tr>
         </table>

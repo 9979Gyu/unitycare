@@ -91,8 +91,6 @@ $(document).ready(function() {
 
     function fetch_data(selectedState, selectedUser, selectedProgram, startDate, endDate) {
 
-        console.log(selectedState, selectedUser, selectedProgram, startDate, endDate);
-
         updateProgramBarChart(selectedState, selectedUser, selectedProgram, startDate, endDate);
         updateProgramPieChart(selectedState, selectedUser, selectedProgram, startDate, endDate); 
 
@@ -233,6 +231,11 @@ $(document).ready(function() {
                 }
             })
         }
+    });
+
+    $(document).on('click', '.printAnchor', function() {
+        selectedID = $(this).attr('id');
+        $('#participantID').val(selectedID);
     });
 
     $(document).on('click', '.deleteAnchor', function() {
