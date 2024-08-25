@@ -426,6 +426,7 @@ class ParticipantController extends Controller
 
                 // Can remove participant if is admin or staff
                 if((Auth::user()->roleID == 1 || Auth::user()->roleID == 2) && $row->status == 1){
+                    $btn .= '<a class="printAnchor" href="#" id="' . $row->participant_id . '"><span class="btn btn-warning m-1" data-bs-toggle="modal" data-bs-target="#printModal"> Sijil </span></a>';
                     $btn .= '<a class="dismissAnchor" href="#" id="' . $row->participant_id . '"><span class="btn btn-danger m-1" data-bs-toggle="modal" data-bs-target="#dismissModal"> Padam </span></a>';
                 }
 

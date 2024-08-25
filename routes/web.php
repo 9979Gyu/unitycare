@@ -180,5 +180,6 @@ Route::get('cancel-transaction', [PayPalController::class, 'cancelTransaction'])
 
 //DomPDF
 Route::get('/get-invoice', [DomPdfController::class, 'getInvoice'])->name('getInvoice');
-Route::post('/view-invoice', [DomPdfController::class, 'viewInvoice'])->name('viewInvoice');
-Route::get('/print-invoice', [DomPdfController::class, 'printInvoice'])->name('printInvoice');
+// Route::post('/view-invoice', [DomPdfController::class, 'viewInvoice'])->name('viewInvoice');
+Route::post('/print-invoice', [DomPdfController::class, 'printInvoice'])->name('printInvoice');
+Route::post('/print-certificate', [DomPdfController::class, 'printCert'])->name('printCert');

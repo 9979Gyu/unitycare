@@ -43,7 +43,7 @@ class ExportTransaction implements FromCollection, WithHeadings, ShouldAutoSize
             'No Rujukan',
             'Nama',
             'Tujuan',
-            'Nilai ' . \Config::get('app.PAYPAL_CURRENCY'),
+            'Nilai (' . \Config::get('app.PAYPAL_CURRENCY') . ')',
             'Tarikh'
         ];
     }

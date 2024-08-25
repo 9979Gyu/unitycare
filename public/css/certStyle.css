@@ -1,0 +1,47 @@
+body {
+    background-image: url('../images/certBg2.png');
+    background-color: rgba(10, 17, 53, 0.904);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    margin: 0;
+    padding-top: 50px;
+    text-align: center;
+}
+
+table {
+    width: 100%;
+    max-width: 100%;
+    padding: 50px 20px;
+}
+
+img {
+    width: 130px;
+    height: auto;
+}
+
+h1, h3, p{
+    text-align: center;
+}
+
+h1{
+    font-size: 70px;
+}
+
+h3{
+    font-size: 30px;
+}
+
+.title-img {
+    text-align: right;
+}
+
+.title h2 {
+    text-align: left;
+    font-size: 50px;
+}

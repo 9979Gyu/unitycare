@@ -10,79 +10,93 @@
 
 @section('content')
 
+    <br>
+
     <div class="container">
 
-        <div class="receipt-wrapper">
-            <table class="full-width">
-                <tr>
-                    <td class="half-width">
-                        <img src="{{ asset('images/webicon-trans.png') }}" alt="unity care" width="100" />
-                    </td>
-                    <td class="half-width">
-                        <h2><b>RESIT<b></h2>
-                    </td>
-                    <td class="float-end">
-                        <p><b>No. Resit</b>: {{ $data['receiptNo'] }}</p>
-                    </td>
-                </tr>
-            </table>
-        
-            <div class="margin-top">
-                <table class="full-width">
-                    <tr>
-                        <td class="half-width">
-                            <div><h5>Kepada:</h5></div>
-                            <div>{{ $data['payerName'] }}</div>
-                        </td>
-                        <td class="half-width">
-                            <div><h5>Daripada:</h5></div>
-                            <div>Unity Care</div>
-                            <div>info.unitycare@gmail.com</div>
-                        </td>
-                    </tr>
+        <form method="POST" action="/print-invoice" class="container" id="pdf">
+            @csrf
+            <div class="row mb-4 justify-content-between align-items-center">
+                <div class="col-auto d-flex justify-content-start">
+                    <img src="{{ asset('images/webicon-trans.png') }}" alt="unity care" width="100" class="img-fluid" />
+                </div>
+                <div class="col text-center">
+                    <h2><b>RESIT</b></h2>
+                </div>
+                <div class="col-auto d-flex justify-content-end">
+                    <div>No. Resit: {{ $data['receiptNo'] }}</div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-sm-12">
+                    <p>Tarikh: {{ $data['createdAt'] }}</p>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <div><h5>Kepada:</h5></div>
+                        <div>{{ $data['payerName'] }}</div>
+                        <div>{{ $data['payerEmail'] }}</div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <div><h5>Daripada:</h5></div>
+                        <div>Unity Care</div>
+                        <div>info.unitycare@gmail.com</div>
+                    </div>
+                </div> 
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-sm-12">
+                    <p>Transaksi ID: <b>{{ $data['transactionID'] }}</b></p>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table id="requestTable" class="table table-bordered table-striped dt-responsive" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                    <thead>
+                        <tr style="text-align:center">
+                            <th>Item</th>
+                            <th>Nilai ({{ $data['currency'] }})</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="text-align:center">
+                            <td>{{ $data['description'] }}</td>
+                            <td>{{ $data['price'] }}</td>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
 
-            <div class="margin-top">
-                <p>Transaksi ID: <b>{{ $data['transactionID'] }}</b></p>
+            <div class="row mb-3">
+                <div class="col-sm-12 float-end">
+                    <p>Jumlah: <b>{{ $data['price'] }}</b> {{ $data['currency'] }}</p>
+                </div>
             </div>
-        
-            <div class="margin-top">
-                <table class="products">
-                    <tr>
-                        <th>Item</th>
-                        <th>Nilai ({{ $data['currency'] }})</th>
-                    </tr>
-                    <tr class="items">
-                        <td>
-                            {{ $data['description'] }}
-                        </td>
-                        <td>
-                            {{ $data['price'] }}
-                        </td>
-                    </tr>
-                </table>
-            </div>
-        
-            <div class="total">
-                Jumlah: {{ $data['price'] }} {{ $data['currency'] }}
-            </div>
-        
+
             <hr>
 
-            <div class="footer margin-top">
+            <div class="mb-4 footer">
                 <div>&copy; UnityCare</div>
             </div>
-        </div>
 
-        <div class="row justify-content-center">
-            <div class="col-sm-auto">
-                <button type="button" class="btn btn-primary btn-block mb-2" onclick="window.location.href='print-invoice'">Cetak</button>
+            <div class="row justify-content-center">
+                <div class="col-sm-auto">
+                    <button type="submit" class="btn btn-primary btn-block mb-2">Cetak</button>
+                </div>
+                <div class="col-sm-auto">
+                    <button type="button" class="btn btn-danger btn-block mb-2" onclick="window.location.href='/'">Tutup</button>
+                </div>
             </div>
-            <div class="col-sm-auto">
-                <button type="button" class="btn btn-danger btn-block mb-2" onclick="window.location.href='/'">Tutup</button>
-            </div>
-        </div>
+            
+        </form>
+
     </div>
 
 @endsection

@@ -28,11 +28,16 @@
     </table>
 
     <div class="margin-top">
+        <p>Tarikh: {{ $data['createdAt'] }}</p>
+    </div>
+
+    <div class="margin-top">
         <table class="full-width">
             <tr>
                 <td class="half-width">
                     <div><h5>Kepada:</h5></div>
                     <div>{{ $data['payerName'] }}</div>
+                    <div>{{ $data['payerEmail'] }}</div>
                 </td>
                 <td class="half-width">
                     <div><h5>Daripada:</h5></div>

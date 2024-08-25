@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Transaction;
+use Carbon\Carbon;
 use DataTables;
 use PDF;
 use Illuminate\Support\Facades\Auth;
@@ -211,6 +212,7 @@ class PayPalController extends Controller{
         if (isset($response['status']) && $response['status'] == 'COMPLETED') {
 
             $name = $response['purchase_units'][0]['shipping']['name']['full_name'];
+            $email = $response['payer']['email_address'];
             $details = $response['purchase_units'][0]['payments']['captures'][0]['amount'];
 
             $loggedUser = Auth::user()->id ?? null;
@@ -223,18 +225,22 @@ class PayPalController extends Controller{
                 'payment_status' => 1,
                 'transaction_type_id' => 1, // donation
                 'payer_id' => $loggedUser,
-                'references' => 'Derma',
+                'references' => $email . '|Derma',
             ]);
 
             $payment->save();
 
+            $newReference = explode('|', $payment->references);
+
             $data = [
                 'transactionID' => $payment->reference_no,
                 'payerName' => $payment->payer_name,
-                'description' => $payment->references,
+                'payerEmail' => $newReference[0],
+                'description' => $newReference[1],
                 'price' => number_format($payment->amount, 2),
                 'currency' => $payment->currency,
                 'receiptNo' => time(),
+                'createdAt' => Carbon::parse($payment->created_at)->format('d/m/y H:i:s'),
             ];
 
             // Store the data in the session

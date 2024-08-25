@@ -2,9 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use PDF;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\InvoiceEmail;
+use App\Models\Participant;
+use App\Models\Program;
 use App\Models\Transaction;
+use App\Models\User;
 
 class DomPdfController extends Controller
 {
@@ -17,6 +23,7 @@ class DomPdfController extends Controller
         $this->paypalCurrency = \Config::get('app.PAYPAL_CURRENCY');
     }
 
+    // function to display receipt for view
     public function getInvoice(){
 
         $data = session('invoice_data');
@@ -26,25 +33,34 @@ class DomPdfController extends Controller
             ->withErrors(['message' => $response['message'] ?? 'Maaf. Sumbangan tidak berjaya']);
         }
 
+        // Send the email with the Receipt attachment
+        Mail::to($data['payerEmail'])->send(new InvoiceEmail($data));
+
         return view('transactions.invoicePDF', compact('data'));
     }
 
-    public function viewInvoice(Request $request){
+    // function to display receipt for download in pdf
+    public function printInvoice(Request $request){
 
+        $data = session('invoice_data');
         $refNo = $request->get('referenceNo');
 
         if($refNo){
+
             $payment = Transaction::where('reference_no', $refNo)->first();
+
+            $newReference = explode('|', $payment->references);
 
             $data = [
                 'transactionID' => $payment->reference_no,
                 'payerName' => $payment->payer_name,
-                'description' => $payment->references,
+                'payerEmail' => $newReference[0],
+                'description' => $newReference[1],
                 'price' => number_format($payment->amount, 2),
                 'currency' => $payment->currency,
                 'receiptNo' => time(),
+                'createdAt' => Carbon::parse($payment->created_at)->format('d/m/y H:i:s'),
             ];
-
         }
         
         if(!$data){
@@ -59,32 +75,26 @@ class DomPdfController extends Controller
         return $pdf->stream('Resit Transaksi-'.time().'.pdf');
     }
 
-    public function printInvoice(Request $request){
-        $data = session('invoice_data');
-        $refNo = $request->get('referenceNo');
+    // function to print program certificate
+    public function printCert(Request $request){
 
-        if($refNo){
+        $partID = $request->get('participantID');
 
-            $payment = Transaction::where('reference_no', $refNo)->first();
-
-            $data = [
-                'transactionID' => $payment->reference_no,
-                'payerName' => $payment->payer_name,
-                'description' => $payment->references,
-                'price' => number_format($payment->amount, 2),
-                'currency' => $payment->currency,
-                'receiptNo' => time(),
-            ];
-
-        }
-        
-        if(!$data){
-            return redirect('/');
+        if(!$partID){
+            return redirect('/indexparticipant')->withErrors(["message" => "Muat turun sijil tidak berjaya"]);
         }
 
-        $pdf = PDF::loadView('transactions.printInvoice', ['data' => $data]);
+        $data = Participant::where([
+            ['participants.participant_id', $partID],
+            ['participants.status', 1],
+        ])
+        ->join('programs as p', 'p.program_id', '=', 'participants.program_id')
+        ->first();
+
+        $pdf = PDF::loadView('participants.cert', ['data' => $data]);
         
-        return $pdf->stream('Resit Transaksi-'.time().'.pdf');
+        return $pdf->stream('Sijil Penyertaan-'.time().'.pdf');
     }
+
 
 }

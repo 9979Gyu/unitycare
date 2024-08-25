@@ -202,6 +202,11 @@ $(document).ready(function() {
     }
 
     var selectedID;
+    $(document).on('click', '.printAnchor', function() {
+        selectedID = $(this).attr('id');
+        $('#participantID').val(selectedID);
+    });
+
     $(document).on('click', '.dismissAnchor', function() {
         selectedID = $(this).attr('id');
     });

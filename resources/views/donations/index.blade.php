@@ -88,7 +88,7 @@
     </div>
 
     <!-- Print Modal -->
-    <form method="post" action="/view-invoice">
+    <form method="post" action="/print-invoice">
         @csrf
         <div class="modal fade" id="printModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog">
