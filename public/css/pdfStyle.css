@@ -1,9 +1,3 @@
-.receipt-wrapper {
-    margin: 5px;
-    padding: 10px;
-    border: 1px solid silver;
-}
-
 h4 {
     margin: 0;
 }
@@ -58,4 +52,3 @@ table tr.items td {
     padding: 10px;
     font-weight: 700;
 }
-

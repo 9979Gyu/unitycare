@@ -75,6 +75,8 @@ class DomPdfController extends Controller
         $pdf = PDF::loadView('transactions.printInvoice', ['data' => $data]);
         
         return $pdf->stream('Resit Transaksi-'.time().'.pdf');
+
+        exit();
     }
 
     // function to print program certificate
@@ -105,8 +107,10 @@ class DomPdfController extends Controller
         ->first();
 
         $pdf = PDF::loadView('participants.cert', ['data' => $data]);
-        
+
         return $pdf->stream('Sijil Penyertaan-'.time().'.pdf');
+
+        exit();
     }
 
 

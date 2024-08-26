@@ -8,15 +8,70 @@
     <title>Resit</title>
 
     <!-- Tab icon -->
-    <link rel="icon" href="{{ asset('images/webicon-756px.png') }}" type="image/png">
+    <link rel="icon" href="{{ public_path('images/webicon-512px.png') }}" type="image/png">
 
-    <link rel="stylesheet" href="{{ asset('css/pdfStyle.css') }}" type="text/css"> 
+    <style>
+        h4 {
+            margin: 0;
+        }
+        
+        .full-width {
+            width: 100%;
+        }
+        
+        .half-width {
+            width: 50%;
+        }
+        
+        .float-end {
+            text-align: right;
+        }
+        
+        .margin-top {
+            margin-top: 20px;
+        }
+        
+        table {
+            width: 100%;
+            border-spacing: 0;
+        }
+        
+        table.products tr {
+            text-align: center;
+            background-color: rgba(33, 116, 233, 0.808);
+        }
+        
+        table.products th {
+            color: #ffffff;
+            padding: 0.5rem;
+        }
+        
+        table tr.items {
+            text-align: center;
+            background-color: whitesmoke;
+        }
+        
+        table tr.items td {
+            padding: 0.5rem;
+        }
+        
+        .total {
+            text-align: right;
+            margin: 20px 0;
+        }
+        
+        .footer {
+            font-size: 13px;
+            padding: 10px;
+            font-weight: 700;
+        }
+    </style>
 </head>
 <body>
     <table class="full-width">
         <tr>
             <td class="half-width">
-                <img src="{{ asset('images/webicon-trans.png') }}" alt="unity care" width="100" />
+                <img src="{{ public_path('public/user_images/default_image.png') }}" alt="unity care" width="100" />
             </td>
             <td class="half-width">
                 <h2><b>RESIT<b></h2>

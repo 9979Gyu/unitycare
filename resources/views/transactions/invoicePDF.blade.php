@@ -1,9 +1,5 @@
 @extends('layouts.app')
 
-@push('styles')
-    <link href="{{ asset('css/pdfStyle.css') }}" rel="stylesheet">
-@endpush
-
 @section('title')
     UnityCare-Resit
 @endsection
