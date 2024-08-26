@@ -270,6 +270,6 @@ class PayPalController extends Controller{
     }
 
 
-    // Transfer to seller
-
+    // participant pay to organizer
+    
 }

@@ -23,6 +23,7 @@ use App\Mail\ChangeProfileEmail;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 use DateTime;
+use thiagoalessio\TesseractOCR\TesseractOCR;
 
 class UserController extends Controller
 {
@@ -99,6 +100,49 @@ class UserController extends Controller
             return redirect('/login')->withErrors(['message' => 'Anda perlu log masuk untuk mendaftarkan orang kurang upaya.']);
         }
 
+    }
+
+    // Function to extract icno from image
+    public function extractText(Request $request){
+
+        if ($request->hasFile('image')){
+            // Handle the uploaded file
+            $imagePath = $request->file('image')->storeAs('images', 'ic_image', 'public');
+
+            if (!$imagePath) {
+                return redirect()->back()->withErrors(['message' => 'Pengesanan teks tidak berjaya']);
+            }
+    
+            // Generate the full path to the file
+            $fullPath = storage_path('app/public/' . $imagePath);
+    
+            if (!file_exists($fullPath)) {
+                return redirect()->back()->withErrors(['message' => 'Pengesanan teks tidak berjaya']);
+            }
+    
+            // Create a new instance of TesseractOCR
+            $tesseract = new TesseractOCR($fullPath);
+    
+            // Set the language of the text in the image
+            $tesseract->lang('eng');
+    
+            // Get the text from the image
+            $text = $tesseract->run();
+    
+            // Recognize IC number from the text
+            if (preg_match('/\b\d{6}-\d{2}-\d{4}\b/', $text, $matches)) {
+                $number = $matches[0];
+                
+                // Remove the '-' from the IC number
+                $number = str_replace('-', '', $number);
+    
+                // Return the extracted text as JSON response
+                return redirect()->back()->with(['extractedText' => $number]);
+            } 
+        }
+        
+        return response()->json(['message' => 'Text extraction failed'], 400);
+        
     }
 
     // Function to search poor or enterprise from external databases

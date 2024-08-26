@@ -183,3 +183,7 @@ Route::get('/get-invoice', [DomPdfController::class, 'getInvoice'])->name('getIn
 // Route::post('/view-invoice', [DomPdfController::class, 'viewInvoice'])->name('viewInvoice');
 Route::post('/print-invoice', [DomPdfController::class, 'printInvoice'])->name('printInvoice');
 Route::post('/print-certificate', [DomPdfController::class, 'printCert'])->name('printCert');
+
+
+// OCR
+Route::post('/extract-text', [UserController::class, 'extractText'])->name('extractText');
