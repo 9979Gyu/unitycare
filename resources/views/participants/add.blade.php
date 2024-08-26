@@ -41,6 +41,13 @@
                         <th scope="row">Nama</th>
                         <td>{{ $program->name }}</td>
                     </tr>
+                    @if($roleID == 5)
+                    <tr>
+                        <th scope="row">Yuran Pendaftaran</th>
+                        <td>{{ $program->fee }} MYR <br>
+                        (Nota: Yuran pendaftaran tidak dibayar balik)</td>
+                    </tr>
+                    @endif
                     <tr>
                         <th scope="row">Tempat</th>
                         <td id="address">
@@ -101,6 +108,9 @@
                     <tr>
                         <th scope="row">Pilihan</th>
                         <input type="number" name="programID" value="{{ $program->program_id }}" hidden>
+                        <input type="text" name="amount" value="{{ $program->fee }}" hidden>
+                        <input type="text" name="organizerID" value="{{ $program->user_id }}" hidden>
+                        <input type="text" name="programName" value="{{ $program->name }}" hidden>
                         <td>
                             <!-- Did not apply, close date not reach, is not creator, is not enterprise -->
                             @if(($action == "nc1" || $participantExist == 0) && $program->close_date >= today() && $program->user_id != $userID && $roleID != 3 && $type == 'true')

@@ -101,6 +101,10 @@
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="/indexparticipated"><b>Sertai</b></a></li>
                             @endif
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/view-receives"><b>Bayaran Terima</b></a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/view-payments"><b>Sejarah Bayaran</b></a></li>
                         </ul>
                     </li>
 

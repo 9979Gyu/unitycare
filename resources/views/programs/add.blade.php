@@ -127,10 +127,14 @@
                 <input type="number" name="poor" value="1" min="1" class="form-control" id="poor" value="{{ old('poor') }}" required>
             </div>
         </div>
-
+        
         <div class="row mb-3">
+            <label for="close_date" class="col-sm-2 col-form-label required">Yuran Pendaftaran Peserta (MYR)</label>
+            <div class="col-sm-4">
+                <input type="number" value="0" name="fee" class="form-control" id="fee" min="0" max="100" value="{{ old('fee') }}" required>
+            </div>
             <label for="close_date" class="col-sm-2 col-form-label required">Tarikh Tutup Permohonan</label>
-            <div class="col-sm-10">
+            <div class="col-sm-4">
                 <input type="date" value="{{ old('close_date') }}" name="close_date" class="form-control" id="close_date" required>
             </div>
         </div>

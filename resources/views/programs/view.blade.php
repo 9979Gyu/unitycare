@@ -85,6 +85,8 @@
                 </div>
                 <div class="modal-body">
                     Adakah anda pasti untuk berhenti menyertai program?
+                    <br>
+                    (Nota: Yuran pendaftaran tidak dibayar balik)
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger" id="dismiss">Tarik Diri</button>

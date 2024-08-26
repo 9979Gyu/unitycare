@@ -15,7 +15,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Mail;
 use DB;
 use DataTables;
-
+use App\Http\Controllers\PayPalController;
 
 class ParticipantController extends Controller
 {
@@ -116,6 +116,8 @@ class ParticipantController extends Controller
             $program->end_date = DateController::parseDate($program->end_date);
             $program->end_time = DateController::formatTime($program->end_time);
             $program->close_date = DateController::parseDate($program->close_date);
+            
+            $program->fee = number_format(json_decode($program->description, true)['fee'], 2);
 
             $volLimit = Program::where([
                 ['program_id', $id],
@@ -161,6 +163,26 @@ class ParticipantController extends Controller
         $userID = Auth::user()->id;
 
         if(isset($userType) && isset($programID)){
+
+            // Peserta not sukarelawan
+            if($userType == "3"){
+
+                $organizerEmail = User::where('id', $request->get('organizerID'))->value('email');
+
+                $paypalController = new PayPalController();
+
+                $data = [
+                    'amount' => $request->get('amount'),
+                    'organizerEmail' => $organizerEmail,
+                    'programName' => $request->get('programName'),
+                    'organizerID' => $request->get('organizerID'),
+                ];
+
+                // Direct to payment
+                $paypalController->userToOrganizerTransaction($data);
+
+            }
+
             $participant = new participant([
                 'user_type_id' => $userType,
                 'program_id' => $programID,

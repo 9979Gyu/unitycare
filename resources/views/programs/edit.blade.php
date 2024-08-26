@@ -135,8 +135,12 @@
         </div>
 
         <div class="row mb-3">
+            <label for="close_date" class="col-sm-2 col-form-label required">Yuran Pendaftaran Peserta (MYR)</label>
+            <div class="col-sm-4">
+                <input type="number" value="{{ $program->fee }}"  name="fee" class="form-control" id="fee" min="0" max="100" required>
+            </div>
             <label for="close_date" class="col-sm-2 col-form-label required">Tarikh Tutup Permohonan</label>
-            <div class="col-sm-10">
+            <div class="col-sm-4">
                 <input type="date" value="{{ $program->close_date }}" name="close_date" class="form-control" id="close_date" required>
             </div>
         </div>

@@ -178,6 +178,7 @@ class ProgramController extends Controller
             'programs.*',
             'programs.description->desc as description',
             'programs.description->reason as reason',
+            'programs.description->fee as fee',
             't.name as typename',
             'u.name as username',
             'u.email as useremail',
@@ -230,6 +231,8 @@ class ProgramController extends Controller
 
             $closeDate = $program->close_date;
             $program->close_date = DateController::parseDate($closeDate);
+
+            $program->fee = number_format($program->fee, 2);
 
             return $program;
         });
@@ -290,8 +293,10 @@ class ProgramController extends Controller
                             
                         }
                         elseif($row->approved_status == 2 && $row->user_id == Auth::user()->id){
-                            $btn .= '<a class="boostAnchor" href="#" id="' . $row->program_id . '"><span class="btn btn-warning m-1" data-bs-toggle="modal" data-bs-target="#boostModal"> Galak </span></a>';
-                            $btn .= '<a class="deleteAnchor" href="#" id="' . $row->program_id . '"><span class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"> Padam </span></a>';
+                            if($row->close_date >= DateController::parseDate(date('Y-m-d'))){
+                                $btn .= '<a class="boostAnchor" href="#" id="' . $row->program_id . '"><span class="btn btn-warning m-1" data-bs-toggle="modal" data-bs-target="#boostModal"> Galak </span></a>';
+                            }
+                            $btn .= '<a class="deleteAnchor" href="#" id="' . $row->program_id . '"><span class="btn btn-danger m-1" data-bs-toggle="modal" data-bs-target="#deleteModal"> Padam </span></a>';
                         }
                     }
 
@@ -517,7 +522,8 @@ class ProgramController extends Controller
             ])
             ->select(
                 "*",
-                "description->desc as description"
+                "description->desc as description",
+                "description->fee as fee"
             )
             ->first();
     
@@ -565,6 +571,7 @@ class ProgramController extends Controller
             'address' => 'required',
             'volunteer' => 'required',
             'poor' => 'required',
+            'fee' => 'required',
         ];
 
         $validated = $request->validate($rules);
@@ -577,6 +584,7 @@ class ProgramController extends Controller
             $desc = [
                 "desc" => ucwords(trim($request->get('description'))),
                 "reason" => "",
+                "fee" => $request->get('fee'),
             ];
 
             $name = ucwords(trim($request->get('name')));
@@ -676,6 +684,7 @@ class ProgramController extends Controller
             'volunteer' => 'required',
             'poor' => 'required',
             'programType' => 'required',
+            'fee' => 'required',
             'roleID' => 'required|in:1,2,3,4'
         ];
 
@@ -686,6 +695,7 @@ class ProgramController extends Controller
             $desc = [
                 "desc" => trim($request->get('description')),
                 "reason" => "",
+                "fee" => $request->get('fee'),
             ];
 
             $program = new Program([

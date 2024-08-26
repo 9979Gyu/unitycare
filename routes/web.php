@@ -68,6 +68,7 @@ Route::post('/export-participants', [ParticipantController::class, 'exportPartic
 Route::post('/export-participated', [ParticipantController::class, 'exportParticipated']);
 Route::post('/export-applies', [ApplicationController::class, 'exportApplied']);
 Route::post('/export-transactions', [PayPalController::class, 'exportTransactions']);
+Route::post('/export-payments', [PayPalController::class, 'exportPayments']);
 
 // User
 Route::get('/create', [UserController::class, 'create']);
@@ -178,12 +179,19 @@ Route::post('process-transaction', [PayPalController::class, 'processTransaction
 Route::get('success-transaction', [PayPalController::class, 'successTransaction'])->name('successTransaction');
 Route::get('cancel-transaction', [PayPalController::class, 'cancelTransaction'])->name('cancelTransaction');
 
+// Transaction
+Route::get('view-payments', [PayPalController::class, 'indexPayment'])->name('indexPayment');
+Route::get('view-receives', [PayPalController::class, 'indexReceive'])->name('indexReceive');
+Route::get('getPaymentDatatable', [PayPalController::class, 'getPaymentDatatable'])->name('getPaymentDatatable');
+Route::post('delete-payment', [PayPalController::class, 'destroyPayment'])->name('destroyPayment');
+
+Route::get('success-uto-transaction', [PayPalController::class, 'successUserToOrganizerTransaction'])->name('successUserToOrganizerTransaction');
+Route::get('cancel-uto-transaction', [PayPalController::class, 'cancelUserToOrganizerTransaction'])->name('cancelUserToOrganizerTransaction');
+
 //DomPDF
 Route::get('/get-invoice', [DomPdfController::class, 'getInvoice'])->name('getInvoice');
-// Route::post('/view-invoice', [DomPdfController::class, 'viewInvoice'])->name('viewInvoice');
 Route::post('/print-invoice', [DomPdfController::class, 'printInvoice'])->name('printInvoice');
 Route::post('/print-certificate', [DomPdfController::class, 'printCert'])->name('printCert');
-
 
 // OCR
 Route::post('/extract-text', [UserController::class, 'extractText'])->name('extractText');

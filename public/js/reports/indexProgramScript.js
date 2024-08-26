@@ -145,7 +145,10 @@ $(document).ready(function(){
                     orderable: true,
                     searchable: true,
                 }, {
-                    data: 'description',
+                    data: function(row) {
+                        return 'Yuran Pendaftaran: ' + row.fee + 
+                        ' MYR<br><br>' + row.description
+                    },
                     name: 'description',
                     orderable: true,
                     searchable: true,
