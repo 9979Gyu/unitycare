@@ -270,5 +270,6 @@ class PayPalController extends Controller{
     }
 
 
-    // Transfer to 
+    // Transfer to seller
+
 }
