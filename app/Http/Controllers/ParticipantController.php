@@ -7,6 +7,7 @@ use App\Models\Program;
 use App\Models\Program_Spec;
 use App\Models\Participant;
 use App\Models\User;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Exports\ExportParticipant;
@@ -161,26 +162,41 @@ class ParticipantController extends Controller
         $programID = $request->get('programID');
         $userType = $request->get("button_id");
         $userID = Auth::user()->id;
+        $organizerID = $request->get('organizerID');
+        $amount = $request->get('amount');
+        $result = null;
 
         if(isset($userType) && isset($programID)){
 
             // Peserta not sukarelawan
-            if($userType == "3"){
+            if($userType == "3" && $amount != "0"){
 
-                $organizerEmail = User::where('id', $request->get('organizerID'))->value('email');
+                $organizerEmail = User::where('id', $organizerID)->value('email');
+
+                // // Check if paid before but quit
+                // $paymentExist = Transaction::where([
+                //     ['receiver_id', $organizerID],
+                //     ['payer_id', $userID],
+                //     ['payment_status', 1],
+                //     ['transaction_type_id', 2],
+                // ])
+                // ->last();
+
+                // dd($paymentExist);
 
                 $paypalController = new PayPalController();
 
                 $data = [
-                    'amount' => $request->get('amount'),
+                    'amount' => $amount,
+                    'organizerID' => $organizerID,
                     'organizerEmail' => $organizerEmail,
+                    'programID' => $programID,
                     'programName' => $request->get('programName'),
-                    'organizerID' => $request->get('organizerID'),
+                    'userTypeID' => $userType,
                 ];
 
                 // Direct to payment
-                $paypalController->userToOrganizerTransaction($data);
-
+                return $paypalController->userToOrganizerTransaction($data);
             }
 
             $participant = new participant([
@@ -191,7 +207,7 @@ class ParticipantController extends Controller
             ]);
 
             $result = $participant->save();
-
+            
             if($result){
                 $updateEnrolled = Program_Spec::where([
                     ['program_id', $programID],

@@ -67,7 +67,7 @@ $(document).ready(function(){
                 "className": "text-center",
                 "width": "2%"
             }, {
-                "targets": [1, 2, 3, 4, 5, 6, 7, 8],
+                "targets": [1, 2, 3, 4, 5, 6, 7],
                 "className": "text-center",
             },], 
             columns: [{
@@ -115,12 +115,6 @@ $(document).ready(function(){
                 name: 'payment_status',
                 orderable: true,
                 searchable: true
-            }, 
-            {
-                data: 'action',
-                name: 'action',
-                orderable: false,
-                searchable: false
             },]
             
         });

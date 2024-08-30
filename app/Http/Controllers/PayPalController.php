@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Program;
+use App\Models\Program_Spec;
+use App\Models\Participant;
 use App\Models\Transaction;
 use App\Models\User;
 use Carbon\Carbon;
@@ -11,8 +14,10 @@ use Illuminate\Support\Facades\Auth;
 use App\Exports\ExportTransaction;
 use App\Exports\ExportPayment;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
 use Srmklive\PayPal\Services\PayPal as PayPalClient;
+use App\Http\Controllers\ParticipantController;
 
 class PayPalController extends Controller{
 
@@ -60,7 +65,7 @@ class PayPalController extends Controller{
         $selectedData->transform(function ($item) {
             $item->formatted_created_at = $item->created_at->format('d M Y H:i:s');
             $item->formatted_amount = number_format($item->amount, 2);
-            $item->references = explode('|', $item->references)[1];
+            $item->references = json_decode($item->references, true)['reason'];
             return $item;
         });
 
@@ -223,6 +228,12 @@ class PayPalController extends Controller{
 
             $loggedUser = Auth::user()->id ?? null;
 
+            $references = [
+                "email" => $email,
+                "reason" => "Derma",
+                "programID" => null,
+            ];
+
             $payment = new Transaction([
                 'reference_no' => $response['id'],
                 'payer_name' => $name,
@@ -231,18 +242,18 @@ class PayPalController extends Controller{
                 'payment_status' => 1,
                 'transaction_type_id' => 1, // donation
                 'payer_id' => $loggedUser,
-                'references' => $email . '|Derma',
+                'references' => json_encode($references),
             ]);
 
             $payment->save();
 
-            $newReference = explode('|', $payment->references);
+            $referenceArray = json_decode($payment->references, true);
 
             $data = [
                 'transactionID' => $payment->reference_no,
                 'payerName' => $payment->payer_name,
-                'payerEmail' => $newReference[0],
-                'description' => $newReference[1],
+                'payerEmail' => $referenceArray['email'],
+                'description' => $referenceArray['reason'],
                 'price' => number_format($payment->amount, 2),
                 'currency' => $payment->currency,
                 'receiptNo' => time(),
@@ -286,11 +297,12 @@ class PayPalController extends Controller{
         $provider = new PayPalClient;
         $provider->setApiCredentials(config('paypal'));
         $paypalToken = $provider->getAccessToken();
+
         $response = $provider->createOrder([
             "intent" => "CAPTURE",
             "application_context" => [
                 "return_url" => route('successUserToOrganizerTransaction', 
-                    ['organizerID' => $oid, 'programName' => $pn]),
+                    ['programData' => $data]),
                 "cancel_url" => route('cancelUserToOrganizerTransaction'),
             ],
             "purchase_units" => [
@@ -313,16 +325,12 @@ class PayPalController extends Controller{
                     return redirect()->to($links['href'])->send();
                 }
             }
-
-            return redirect()
-                ->route('createTransaction')
-                ->with('error', 'Something went wrong.');
         } 
-        else {
-            return redirect()
-                ->route('createTransaction')
-                ->with('error', $response['message'] ?? 'Something went wrong.');
-        }
+        
+        return redirect()
+            ->route('/viewallprograms')
+            ->with('error', $response['message'] ?? 'Something went wrong.');
+
     }
 
     /**
@@ -334,7 +342,7 @@ class PayPalController extends Controller{
 
         $provider = new PayPalClient;
         $provider->setApiCredentials(config('paypal'));
-        $provider->getAccessToken();
+        $paypalToken = $provider->getAccessToken();
         $response = $provider->capturePaymentOrder($request['token']);
 
         if (isset($response['status']) && $response['status'] == 'COMPLETED') {
@@ -342,9 +350,14 @@ class PayPalController extends Controller{
             $email = $response['payer']['email_address'];
             $details = $response['purchase_units'][0]['payments']['captures'][0]['amount'];
             
-            $programName = $request->query('programName');
-            $organizerID = $request->query('organizerID');
+            $programData = $request->query('programData');
             $loggedUser = Auth::user()->id ?? null;
+
+            $references = [
+                "email" => $email,
+                "reason" => "Yuran Pendaftaran-" . $programData['programName'],
+                "programID" => $programData['programID'],
+            ];
 
             $payment = new Transaction([
                 'reference_no' => $response['id'],
@@ -354,19 +367,41 @@ class PayPalController extends Controller{
                 'payment_status' => 1,
                 'transaction_type_id' => 2, // payment
                 'payer_id' => $loggedUser,
-                'references' => $email . '|Yuran Pendaftaran-' . $programName,
-                'receiver_id' => $organizerID,
+                'references' => json_encode($references),
+                'receiver_id' => $programData['organizerID'],
             ]);
 
             $payment->save();
 
-            $newReference = explode('|', $payment->references);
+            // Payment success then create participants
+            $participant = new Participant([
+                'user_type_id' => $programData['userTypeID'],
+                'program_id' => $programData['programID'],
+                'user_id' => $loggedUser,
+                'status' => 1,
+            ]);
+
+            $participant->save();
+
+            Program_Spec::where([
+                ['program_id', $programData['programID']],
+                ['user_type_id', $programData['userTypeID']],
+            ])
+            ->increment('qty_enrolled', 1);
+
+            $participantController = new ParticipantController();
+
+            $participantController->notifyUser(
+                $programData['programID'], $loggedUser, 1
+            );
+
+            $referenceArray = json_decode($payment->references, true);
 
             $data = [
                 'transactionID' => $payment->reference_no,
                 'payerName' => $payment->payer_name,
-                'payerEmail' => $newReference[0],
-                'description' => $newReference[1],
+                'payerEmail' => $referenceArray['email'],
+                'description' => $referenceArray['reason'],
                 'price' => number_format($payment->amount, 2),
                 'currency' => $payment->currency,
                 'receiptNo' => time(),
@@ -381,10 +416,10 @@ class PayPalController extends Controller{
                 ->with('success', 'Terima Kasih');
 
         } 
-        else {
-            return redirect('/viewallprograms')
-                ->withErrors(['message' => $response['message'] ?? 'Maaf. Pembayaran tidak berjaya.']);
-        }
+        
+        return redirect('/viewallprograms')
+            ->withErrors(['message' => $response['message'] ?? 'Maaf. Pembayaran tidak berjaya.']);
+
     }
 
     /**
@@ -426,6 +461,7 @@ class PayPalController extends Controller{
 
         $query = Transaction::where([
             ['transaction_type_id', 2],
+            ['payment_status', 1],
         ])
         ->join('users as payer', 'payer.id', '=', 'transactions.payer_id')
         ->join('users as receiver', 'receiver.id', '=', 'transactions.receiver_id');
@@ -463,7 +499,8 @@ class PayPalController extends Controller{
         $selectedData->transform(function ($item) {
             $item->formatted_created_at = $item->created_at->format('d M Y H:i:s');
             $item->formatted_amount = number_format($item->amount, 2);
-            $item->references = explode('|', $item->references)[1];
+
+            $item->references = json_decode($item->references, true)['reason'];
 
             if($item->payment_status == 1){
                 $item->status = "Selesai";
@@ -528,13 +565,20 @@ class PayPalController extends Controller{
         // Retrieve the validated data
         $startDate = $request->get('startDate');
         $endDate = $request->get('endDate');
-        $checkPoint = $request->get('check-point');
+        $checkPoint = $request->get('checkPoint');
 
         $selectedData = $this->retrievePayments($startDate, $endDate, $checkPoint);
 
-        return Excel::download(new ExportPayment($selectedData), 
-            'Senarai Bayaran - ' . time() . '.xlsx'
-        );
+        if($checkPoint == "history"){
+            return Excel::download(new ExportPayment($selectedData), 
+                'Sejarah Transaksi - ' . time() . '.xlsx'
+            );
+        }
+        else{
+            return Excel::download(new ExportPayment($selectedData), 
+                'Senarai Bayaran - ' . time() . '.xlsx'
+            );
+        }
 
         return redirect()->back()->withErrors(["message" => "Eksport Excel tidak berjaya"]);
         

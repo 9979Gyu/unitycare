@@ -71,7 +71,7 @@
             </div>
 
             <div class="row mb-3">
-                <div class="col-sm-12 float-end">
+                <div class="col-sm-12 text-right">
                     <p>Jumlah: <b>{{ $data['price'] }}</b> {{ $data['currency'] }}</p>
                 </div>
             </div>

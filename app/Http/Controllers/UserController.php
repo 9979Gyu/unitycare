@@ -141,7 +141,7 @@ class UserController extends Controller
             } 
         }
         
-        return response()->json(['message' => 'Text extraction failed'], 400);
+        return redirect()->back()->withErrors(['message' => 'Pengesanan teks tidak berjaya']);
         
     }
 

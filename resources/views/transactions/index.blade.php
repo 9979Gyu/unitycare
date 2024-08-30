@@ -56,7 +56,7 @@
                 <tr style="text-align:center">
                     <th> No. </th>
                     <th>No Rujukan</th>
-                    <th>Nama Pembayar (Nama UnityCare)</th>
+                    <th>Nama Peserta (Pembayar)</th>
                     <th>Tujuan</th>
                     <th>Nilai ({{ $paypalCurrency }})</th>
                     <th>Tarikh</th>

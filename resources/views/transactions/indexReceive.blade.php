@@ -56,13 +56,12 @@
                 <tr style="text-align:center">
                     <th> No. </th>
                     <th>No Rujukan</th>
-                    <th>Nama Pembayar (Nama UnityCare)</th>
+                    <th>Nama Peserta (Pembayar)</th>
                     <th>Tujuan</th>
                     <th>Nilai ({{ $paypalCurrency }})</th>
                     <th>Tarikh</th>
                     <th>Nama Penerima</th>
                     <th>Status Bayaran</th>
-                    <th>Tindakan</th>
                 </tr>
             </thead>
             <tbody>
@@ -114,6 +113,6 @@
     </form>
 
     <script src="{{ asset('js/general/modalScript.js') }}"></script>
-    <script src="{{ asset('js/transactions/indexScript.js') }}"></script>
+    <script src="{{ asset('js/transactions/indexReceiveScript.js') }}"></script>
 
 @endsection

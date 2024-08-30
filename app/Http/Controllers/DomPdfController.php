@@ -51,13 +51,13 @@ class DomPdfController extends Controller
 
             $payment = Transaction::where('reference_no', $refNo)->first();
 
-            $newReference = explode('|', $payment->references);
+            $referenceArray = json_decode($payment->references, true);
 
             $data = [
                 'transactionID' => $payment->reference_no,
                 'payerName' => $payment->payer_name,
-                'payerEmail' => $newReference[0],
-                'description' => $newReference[1],
+                'payerEmail' => $referenceArray['email'],
+                'description' => $referenceArray['reason'],
                 'price' => number_format($payment->amount, 2),
                 'currency' => $payment->currency,
                 'receiptNo' => time(),

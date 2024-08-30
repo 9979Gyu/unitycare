@@ -27,7 +27,7 @@ class ExportPayment implements FromCollection, WithHeadings, ShouldAutoSize
 
                 return[
                     'No Rujukan' => $item->reference_no,
-                    'Nama Pembayar' => $item->payer_name . ' (' . $item->account_name . ')',
+                    'Nama Pembayar' => $item->account_name . ' (' . $item->payer_name . ')',
                     'Tujuan' => $item->references,
                     'Nilai' => $item->formatted_amount,
                     'Tarikh' => $item->formatted_created_at,
@@ -42,7 +42,7 @@ class ExportPayment implements FromCollection, WithHeadings, ShouldAutoSize
     public function headings(): array{
         return [
             'No Rujukan',
-            'Nama Pembayar',
+            'Nama Peserta (Pembayar)',
             'Tujuan',
             'Nilai (' . \Config::get('app.PAYPAL_CURRENCY') . ')',
             'Tarikh',
