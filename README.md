@@ -1,3 +1,7 @@
+## Requirements
+
+OCR Engine Tesseract should be install in the system. Follow Tesseract installation guide <a href="https://github.com/tesseract-ocr/tessdoc#compiling-and-installation">here</a>. Make sure from the command line you have the tesseract command available（e.g. Tesseract --help).
+
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
 
 <p align="center">
