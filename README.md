@@ -2,17 +2,87 @@
 
 OCR Engine Tesseract should be install in the system. Follow Tesseract installation guide <a href="https://github.com/tesseract-ocr/tessdoc#compiling-and-installation">here</a>. Make sure from the command line you have the tesseract command available（e.g. Tesseract --help).
 
-## To set up and run the Rest API, follow these steps:
+## To set up, follow these steps:
 
-Clone the GitHub repository: git clone https://github.com/9979Gyu/unitycare.git
-Navigate to the project directory: cd your-repo
-Create a MySQL database.
-Configure the database in the .env file with your MySQL credentials.
-Install dependencies: composer install
-Set up the database: php artisan migrate
-Insert the require data
+<p>Clone the GitHub repository: git clone https://github.com/9979Gyu/unitycare.git</p>
+<p>Navigate to the project directory: cd your-repo</p>
+<p>Create a MySQL database.</p>
+<p>Configure the database in the .env file with your MySQL credentials.</p>
+<p>Install dependencies: composer install</p>
+<p>Set up the database: php artisan migrate</p>
+<p>Insert the require data</p>
+
+## System Modules
+
+<ul>
+    <li>
+        Authentication Module
+        <ul>
+            <li>Login</li>
+            <li>Logout</li>
+            <li>Change Password</li>
+        </ul>
+    </li>
+    <li>
+        User Management Module
+        <ul>
+            <li>Create User</li>
+            <li>View User</li>
+            <li>Update User</li>
+            <li>Delete User</li>
+            <li>Verify User</li>
+        </ul>
+    </li>
+    <li>
+        Program Management Module
+        <ul>
+            <li>Create Program</li>
+            <li>View Program</li>
+            <li>Update Program</li>
+            <li>Delete Program</li>
+            <li>Generate Program Chart</li>
+            <li>Export Program Report</li>
+            <li>Create Program Participation</li>
+            <li>View Program Participation</li>
+            <li>Update Program Participation</li>
+            <li>Delete Program Participation</li>
+            <li>Generate Program Participation Chart</li>
+            <li>Export Program Participation Report</li>
+            <li>Print Certificate</li>
+        </ul>
+    </li>
+    <li>
+        Job Vacancy Management Module
+        <ul>
+            <li>Create Job Vacancy</li>
+            <li>View Job Vacancy</li>
+            <li>Update Job Vacancy</li>
+            <li>Delete Job Vacancy</li>
+            <li>Generate Job Vacancy Chart</li>
+            <li>Export Job Vacancy Report</li>
+            <li>Create Job Application</li>
+            <li>View Job Application</li>
+            <li>Delete Job Application</li>
+            <li>Update Job Application</li>
+            <li>Generate Job Application Chart</li>
+            <li>Export Job Application Report</li>
+        </ul>
+    </li>
+    <li>
+        Transaction Management Module
+        <ul>
+            <li>Create Transaction</li>
+            <li>View Transaction</li>
+            <li>Delete Transaction</li>
+            <li>Export Transaction Report</li>
+            <li>Print Transaction</li>
+        </ul>
+    </li>
+</ul>
+
 
 ## Quick Walkthrough
+
 <a href="https://youtu.be/ab_lJo7JxxQ">Walkthrough Video</a>.
 
 <!-- <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
