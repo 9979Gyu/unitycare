@@ -2,7 +2,20 @@
 
 OCR Engine Tesseract should be install in the system. Follow Tesseract installation guide <a href="https://github.com/tesseract-ocr/tessdoc#compiling-and-installation">here</a>. Make sure from the command line you have the tesseract command available（e.g. Tesseract --help).
 
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
+## To set up and run the Rest API, follow these steps:
+
+Clone the GitHub repository: git clone https://github.com/9979Gyu/unitycare.git
+Navigate to the project directory: cd your-repo
+Create a MySQL database.
+Configure the database in the .env file with your MySQL credentials.
+Install dependencies: composer install
+Set up the database: php artisan migrate
+Insert the require data
+
+## Quick Walkthrough
+<a href="https://youtu.be/ab_lJo7JxxQ">Walkthrough Video</a>.
+
+<!-- <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
 
 <p align="center">
 <a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
@@ -65,4 +78,4 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT). -->
