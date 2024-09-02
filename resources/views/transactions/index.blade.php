@@ -31,6 +31,17 @@
         <input type="number" name="roleID" id="roleID" value="{{ $roleNo }}" hidden>
         <input type="text" id="checkPoint" name="checkPoint" value="history" hidden>
         <div class="row mb-3">
+            <div class="col-sm-12">
+                <select name="type" name="type" id="type" class="form-control">
+                    <option value="all" selected>Semua Program</option>
+                    <option value="donation">Semua Sumbangan</option>
+                    @foreach($programs as $program)
+                        <option value="{{ $program->program_id }}">{{ $program->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+        <div class="row mb-3">
             <div class="col-sm-6">
                 <div class="form-group">
                     <label for="startDate">Dari</label>

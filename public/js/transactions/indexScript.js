@@ -18,6 +18,15 @@ $(document).ready(function(){
         fetch_data(startDate, endDate);
     });
 
+    $("#type").change(function(){
+
+        if(endDate == ""){
+            endDate = startDate;
+        }
+        // Fetch data
+        fetch_data(startDate, endDate);
+    });
+
     function fetch_data(startDate, endDate){
         
         // Make AJAX request to fetch data based on the selected position
@@ -58,6 +67,7 @@ $(document).ready(function(){
                     startDate: startDate,
                     endDate: endDate,
                     checkPoint: $("#checkPoint").val(),
+                    type: $("#type").val(),
                 },
                 type: 'GET',
 

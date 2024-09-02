@@ -437,7 +437,22 @@ class PayPalController extends Controller{
         if(Auth::check()){
             $roleNo = Auth::user()->roleID;
             $paypalCurrency = $this->paypalCurrency;
-            return view('transactions.indexReceive', compact('roleNo', 'paypalCurrency'));
+            $programs = Transaction::where([
+                ['payment_status', 1],
+                ['transaction_type_id', 2] // payments
+            ])
+            ->join('programs', 'programs.program_id', '=', 'transactions.references->programID');
+
+            if(Auth::user()->roleID >= 3 && Auth::user()->roleID <= 4){
+                $programs = $programs->where('receiver_id', Auth::user()->id);
+            }
+
+            $programs = $programs
+            ->select('programs.name', 'programs.program_id')
+            ->groupBy('programs.program_id')
+            ->get();
+
+            return view('transactions.indexReceive', compact('roleNo', 'paypalCurrency', 'programs'));
         }
         else{
             return redirect('/')->withErrors(['message' => 'Anda tidak dibenarkan untuk melayari halaman ini']);
@@ -449,7 +464,22 @@ class PayPalController extends Controller{
         if(Auth::check()){
             $roleNo = Auth::user()->roleID;
             $paypalCurrency = $this->paypalCurrency;
-            return view('transactions.index', compact('roleNo', 'paypalCurrency'));
+            $programs = Transaction::where([
+                ['payment_status', 1],
+                ['transaction_type_id', 2] // payments
+            ])
+            ->join('programs', 'programs.program_id', '=', 'transactions.references->programID');
+
+            if(Auth::user()->roleID >= 3){
+                $programs = $programs->where('payer_id', Auth::user()->id);
+            }
+
+            $programs = $programs
+            ->select('programs.name', 'programs.program_id')
+            ->groupBy('programs.program_id')
+            ->get();
+
+            return view('transactions.index', compact('roleNo', 'paypalCurrency', 'programs'));
         }
         else{
             return redirect('/')->withErrors(['message' => 'Anda tidak dibenarkan untuk melayari halaman ini']);
@@ -457,50 +487,77 @@ class PayPalController extends Controller{
     }
 
     // Function to get list of transaction by the selection option
-    public function retrievePayments($startDate, $endDate, $checkPoint){
+    public function retrievePayments($startDate, $endDate, $checkPoint, $getType){
 
         $query = Transaction::where([
-            ['transaction_type_id', 2],
             ['payment_status', 1],
         ])
-        ->join('users as payer', 'payer.id', '=', 'transactions.payer_id')
-        ->join('users as receiver', 'receiver.id', '=', 'transactions.receiver_id');
-
-        if($startDate != '' && $endDate != ''){
-            $query = $query->where([
-                ['transactions.created_at', '>=', $startDate],
-                ['transactions.created_at', '<=', $endDate],
-            ]);
-        }
+        ->join('users as payer', 'payer.id', '=', 'transactions.payer_id');
 
         if(Auth::user()->roleID >= 3){
-            // transaction history
             if($checkPoint == "history"){
+                // payment made
                 $query = $query->where('transactions.payer_id', Auth::user()->id);
             }
-            else if($checkPoint == "receive"){
+            elseif($checkPoint == "receive"){
                 // payment received
                 $query = $query->where('transactions.receiver_id', Auth::user()->id);
             }
         }
 
-        $selectedData = $query->select(
-            'transactions.reference_no',
-            'transactions.references',
-            'transactions.payer_name',
-            'transactions.amount',
-            'transactions.created_at',
-            'transactions.payment_status',
-            'payer.name as account_name', 
-            'receiver.name as receiver_name',
-        )
-        ->get();
+        if($startDate != '' && $endDate != ''){
+            $query = $query->whereBetween('transactions.created_at', [$startDate, $endDate]);
+        }
+
+        if($getType == "donation"){
+            $query = $query->where('transaction_type_id', 1);
+
+            $selectedData = $query->select(
+                'transactions.reference_no',
+                'transactions.references',
+                'transactions.payer_name',
+                'transactions.amount',
+                'transactions.created_at',
+                'transactions.payment_status',
+                'payer.name as account_name',
+            )
+            ->get();
+        }
+        else{
+            if ($getType != "all") {
+                // When getType is a program ID
+                $query = $query->join('users as receiver', 'receiver.id', '=', 'transactions.receiver_id')
+                    ->where([
+                        ['transaction_type_id', 2],
+                        ['references->programID', $getType]
+                    ]);
+            } 
+            else {
+                // When getType is "all"
+                $query = $query->join('users as receiver', 'receiver.id', '=', 'transactions.receiver_id')
+                    ->where('transaction_type_id', 2);
+            }
+
+            $selectedData = $query->select(
+                'transactions.reference_no',
+                'transactions.references',
+                'transactions.payer_name',
+                'transactions.amount',
+                'transactions.created_at',
+                'transactions.payment_status',
+                'payer.name as account_name',
+                'receiver.name as receiver_name'
+            )
+            ->get();
+        }
 
         $selectedData->transform(function ($item) {
             $item->formatted_created_at = $item->created_at->format('d M Y H:i:s');
             $item->formatted_amount = number_format($item->amount, 2);
 
             $item->references = json_decode($item->references, true)['reason'];
+
+            $item->receiver_name = $item->receiver_name ?? 'UnityCare';
 
             if($item->payment_status == 1){
                 $item->status = "Selesai";
@@ -515,15 +572,16 @@ class PayPalController extends Controller{
             
     }
 
-    // Function to display list of donation
+    // Function to display list of payments
     public function getPaymentDatatable(Request $request){
 
         if(request()->ajax()){
             $startDate = $request->get('startDate');
             $endDate = $request->get('endDate');
             $checkPoint = $request->get('checkPoint');
+            $getType = $request->get('type');
 
-            $selectedData = $this->retrievePayments($startDate, $endDate, $checkPoint);
+            $selectedData = $this->retrievePayments($startDate, $endDate, $checkPoint, $getType);
 
             if ($selectedData === null || $selectedData->isEmpty()) {
                 return response()->json([
@@ -566,8 +624,9 @@ class PayPalController extends Controller{
         $startDate = $request->get('startDate');
         $endDate = $request->get('endDate');
         $checkPoint = $request->get('checkPoint');
+        $getType = $request->get('type');
 
-        $selectedData = $this->retrievePayments($startDate, $endDate, $checkPoint);
+        $selectedData = $this->retrievePayments($startDate, $endDate, $checkPoint, $getType);
 
         if($checkPoint == "history"){
             return Excel::download(new ExportPayment($selectedData), 
