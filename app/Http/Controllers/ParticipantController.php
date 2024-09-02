@@ -173,30 +173,33 @@ class ParticipantController extends Controller
 
                 $organizerEmail = User::where('id', $organizerID)->value('email');
 
-                // // Check if paid before but quit
-                // $paymentExist = Transaction::where([
-                //     ['receiver_id', $organizerID],
-                //     ['payer_id', $userID],
-                //     ['payment_status', 1],
-                //     ['transaction_type_id', 2],
-                // ])
-                // ->last();
+                // Check if paid before but quit
+                $paymentExist = Transaction::where([
+                    ['receiver_id', $organizerID],
+                    ['payer_id', $userID],
+                    ['payment_status', 1],
+                    ['transaction_type_id', 2],
+                    ['references->programID', $programID]
+                ])
+                ->orderBy('created_at', 'desc')
+                ->first();
 
-                // dd($paymentExist);
+                if(!$paymentExist){
+                    $paypalController = new PayPalController();
 
-                $paypalController = new PayPalController();
-
-                $data = [
-                    'amount' => $amount,
-                    'organizerID' => $organizerID,
-                    'organizerEmail' => $organizerEmail,
-                    'programID' => $programID,
-                    'programName' => $request->get('programName'),
-                    'userTypeID' => $userType,
-                ];
-
-                // Direct to payment
-                return $paypalController->userToOrganizerTransaction($data);
+                    $data = [
+                        'amount' => $amount,
+                        'organizerID' => $organizerID,
+                        'organizerEmail' => $organizerEmail,
+                        'programID' => $programID,
+                        'programName' => $request->get('programName'),
+                        'userTypeID' => $userType,
+                    ];
+    
+                    // Direct to payment
+                    return $paypalController->userToOrganizerTransaction($data);
+                }
+                
             }
 
             $participant = new participant([
