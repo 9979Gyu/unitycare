@@ -14,7 +14,7 @@ OCR Engine Tesseract should be install in the system. Follow Tesseract installat
 
 ## System Modules
 
-<ul>
+<ol>
     <li>
         Authentication Module
         <ul>
@@ -78,11 +78,12 @@ OCR Engine Tesseract should be install in the system. Follow Tesseract installat
             <li>Print Transaction</li>
         </ul>
     </li>
-</ul>
+</ol>
 
 
 ## Quick Walkthrough
 
+<iframe width="420" height="345" src="https://youtu.be/ab_lJo7JxxQ"></iframe>
 <a href="https://youtu.be/ab_lJo7JxxQ">Walkthrough Video</a>.
 
 <!-- <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
