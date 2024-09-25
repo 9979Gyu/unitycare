@@ -94,7 +94,13 @@ OCR Engine Tesseract should be install in the system. Follow Tesseract installat
 
 ## Quick Walkthrough
 
-<a href="https://youtu.be/ab_lJo7JxxQ">Walkthrough Video</a>.
+<div align="center">
+    <a href="https://youtu.be/ab_lJo7JxxQ" target="_blank">
+        <img src="https://img.youtube.com/vi/ab_lJo7JxxQ/hqdefault.jpg" width="300" border_radius="5" alt="Quick Walkthrough Video">
+    </a>
+</div>
+
+## Example
 
 <div align="center">
     <p border><img src="https://github.com/user-attachments/assets/56d1cb71-9d35-4cb7-940a-22cd682653ac" alt="UnityCare Dashboard"></p>
