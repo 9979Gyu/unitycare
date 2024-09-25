@@ -1,3 +1,15 @@
+<p align="center"><img src="https://github.com/user-attachments/assets/c6f6d996-a5d3-45ee-9f81-b7e682f47cfc" width="200"></p>
+
+## UnityCare - An Application to Empower Community Employment and Skill
+
+<p>UnityCare is an application designed to address the various challenges posed by poverty and disability. It serves as a comprehensive platform that:</p>
+
+<div class="container"><ol><li><b>Facilitating Accessible Employment Opportunities:</b><p>Enables enterprises to post vacancies designed specifically for individuals with disabilities, ensuring a tailored fit between job requirements and applicant abilities. Increase the visibility and accessibility of job opportunities for vulnerable groups, thereby increasing their chances of getting a job and improving their quality of life.</p></li>
+<li><b>Encourage Skill Development and Volunteerism:</b><p>Engage volunteers to organize and promote skills development programs adapted for individuals with disabilities, foster personal growth and improve employability. Providing a platform for volunteers to contribute to society by supporting educational and vocational initiatives, further building a more inclusive and empathetic society. </p></li>
+<li><b>Raise Awareness and Build Empathy:</b><p>Share comprehensive poverty-related information to raise public awareness of the challenges faced by individuals living in poverty and those with disabilities. Cultivate a culture of empathy and collective responsibility, encouraging community members to take proactive steps towards poverty reduction and social equality.</p></li></ol></div>
+
+<p>Through UnityCare, we aim to create a supportive environment where businesses, volunteers and individuals with disabilities can effectively work together to promote economic resilience and social inclusion. These initiatives not only aim to alleviate immediate financial hardship but also seek to build a sustainable path towards long-term economic stability and community well-being.</p>
+
 ## Requirements
 
 OCR Engine Tesseract should be install in the system. Follow Tesseract installation guide <a href="https://github.com/tesseract-ocr/tessdoc#compiling-and-installation">here</a>. Make sure from the command line you have the tesseract command available（e.g. Tesseract --help).
@@ -12,78 +24,84 @@ OCR Engine Tesseract should be install in the system. Follow Tesseract installat
 <p>Set up the database: php artisan migrate</p>
 <p>Insert the require data</p>
 
-## System Modules
+## System Modules (General)
 
 <ol>
     <li>
-        Authentication Module
+        <b>Authentication Module</b>
         <ul>
-            <li>Login</li>
-            <li>Logout</li>
-            <li>Change Password</li>
+            <li>Login - To log in to the system with account</li>
+            <li>Logout - To end session</li>
+            <li>Change Password - To reset password of an account</li>
         </ul>
-    </li>
+    </li><br>
     <li>
-        User Management Module
+        <b>User Management Module</b>
         <ul>
-            <li>Create User</li>
-            <li>View User</li>
-            <li>Update User</li>
-            <li>Delete User</li>
-            <li>Verify User</li>
+            <li>Create User - To add user or create account by role</li>
+            <li>View User - To list users or view personal profile</li>
+            <li>Update User - To update account details</li>
+            <li>Delete User - To inactivate account</li>
+            <li>Verify User - To verify email and activate account</li>
         </ul>
-    </li>
+    </li><br>
     <li>
-        Program Management Module
+        <b>Program Management Module</b>
         <ul>
-            <li>Create Program</li>
-            <li>View Program</li>
-            <li>Update Program</li>
-            <li>Delete Program</li>
-            <li>Generate Program Chart</li>
-            <li>Export Program Report</li>
-            <li>Create Program Participation</li>
-            <li>View Program Participation</li>
-            <li>Update Program Participation</li>
-            <li>Delete Program Participation</li>
-            <li>Generate Program Participation Chart</li>
-            <li>Export Program Participation Report</li>
-            <li>Print Certificate</li>
+            <li>Create Program - To add volunteering or skill development program</li>
+            <li>View Program - To list programs based on conditions</li>
+            <li>Update Program - To update selected program details</li>
+            <li>Delete Program - To inactivate program</li>
+            <li>Generate Program Chart - To display program classification chart</li>
+            <li>Export Program Report - To download list of programs based on condition in Excel file</li>
+            <li>Create Program Participation - To participate a program</li>
+            <li>View Program Participation - To display list of participated program or list of participants of selected program</li>
+            <li>Update Program Participation - To update the approval status of the program or user participation</li>
+            <li>Delete Program Participation - To inactivate user participation</li>
+            <li>Generate Program Participation Chart - To display participation classification chart</li>
+            <li>Export Program Participation Report - To download list of participated program or list of participants of selected program based on condition in Excel file</li>
+            <li>Print Certificate - To download participation certificate in PDF file</li>
         </ul>
-    </li>
+    </li><br>
     <li>
-        Job Vacancy Management Module
+        <b>Job Vacancy Management Module</b>
         <ul>
-            <li>Create Job Vacancy</li>
-            <li>View Job Vacancy</li>
-            <li>Update Job Vacancy</li>
-            <li>Delete Job Vacancy</li>
-            <li>Generate Job Vacancy Chart</li>
-            <li>Export Job Vacancy Report</li>
-            <li>Create Job Application</li>
-            <li>View Job Application</li>
-            <li>Delete Job Application</li>
-            <li>Update Job Application</li>
-            <li>Generate Job Application Chart</li>
-            <li>Export Job Application Report</li>
+            <li>Create Job Vacancy - To add job offer, type of job (e.g. Engineering) or type of job shift (e.g. Full time)</li>
+            <li>View Job Vacancy - To list job offers by enterprise, type of jobs or type of job shift</li>
+            <li>Update Job Vacancy - To update job details</li>
+            <li>Delete Job Vacancy - To inactivate job offer</li>
+            <li>Generate Job Vacancy Chart - To display job offer classification chart by type of job</li>
+            <li>Export Job Vacancy Report - To download list of job offers based on condition in Excel file</li>
+            <li>Create Job Application - To apply job</li>
+            <li>View Job Application - To display list of applied jobs or list of applicants</li>
+            <li>Delete Job Application - To inactivate job application</li>
+            <li>Update Job Application - To update the approval status of the job offer or user's application</li>
+            <li>Generate Job Application Chart - To display job offer classification chart by type of job</li>
+            <li>Export Job Application Report - To download list of applied job offers based on condition in Excel file</li>
         </ul>
-    </li>
+    </li><br>
     <li>
-        Transaction Management Module
+        <b>Transaction Management Module</b>
         <ul>
-            <li>Create Transaction</li>
-            <li>View Transaction</li>
-            <li>Delete Transaction</li>
-            <li>Export Transaction Report</li>
-            <li>Print Transaction</li>
+            <li>Create Transaction - To donate or pay for program registration fee</li>
+            <li>View Transaction - To display list of transactions based on condition</li>
+            <li>Delete Transaction - To remove transaction record</li>
+            <li>Export Transaction Report - To download list of transaction records based on condition in Excel file</li>
+            <li>Print Transaction - To download receipt of selected transaction</li>
         </ul>
     </li>
 </ol>
 
-
 ## Quick Walkthrough
 
 <a href="https://youtu.be/ab_lJo7JxxQ">Walkthrough Video</a>.
+
+<div align="center">
+    <p border><img src="https://github.com/user-attachments/assets/56d1cb71-9d35-4cb7-940a-22cd682653ac" alt="UnityCare Dashboard"></p>
+    <p><img src="https://github.com/user-attachments/assets/835921a0-625e-43db-bd2a-d3ad2444235d" alt="UnityCare Job Offer"></p>
+    <p><img src="https://github.com/user-attachments/assets/729f0ecb-9050-46d5-9721-182b01ebfb12" alt="UnityCare Job Offer"></p>
+    <p><img src="https://github.com/user-attachments/assets/bddbfd0b-d832-40de-a1d3-036bcd62d7cd" alt="UnityCare Programs"></p>
+</div>
 
 <!-- <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
 
